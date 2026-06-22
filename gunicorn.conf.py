@@ -12,7 +12,7 @@ import os
 # Fixed 8080 — matches Dockerfile EXPOSE and Railway's target port. We do NOT
 # read $PORT so there is exactly one port everyone agrees on.
 bind = "[::]:8080"
-workers = int(os.environ.get("WEB_CONCURRENCY", "2"))
+workers = int(os.environ.get("WEB_CONCURRENCY", "1"))
 timeout = 120
 accesslog = "-"
 errorlog = "-"

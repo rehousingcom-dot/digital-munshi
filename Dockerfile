@@ -22,5 +22,6 @@ RUN python manage.py collectstatic --noinput || true
 
 EXPOSE 8080
 
-# Container start: migrate + gunicorn (port gunicorn.conf.py se env me padhta hai)
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application -c gunicorn.conf.py"]
+# Container start: PURE gunicorn (PID 1, foreground — kabhi exit nahi hota).
+# Migrations railway.json ke preDeployCommand se alag chalti hain.
+CMD ["gunicorn", "config.wsgi:application", "-c", "gunicorn.conf.py"]

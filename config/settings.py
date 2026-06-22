@@ -126,9 +126,10 @@ if _WHITENOISE:
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
+    # JWT only — SPA Bearer token se auth karti hai. SessionAuthentication
+    # hata diya taaki stray admin session cookie "CSRF Failed" na de.
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
@@ -167,6 +168,11 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     # SECURE_SSL_REDIRECT env se control (reverse-proxy ke peeche off rakh sakte hain)
     SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=False)
+    # CSRF trusted origins — ALLOWED_HOSTS se banao (https:// + wildcard subdomains)
+    CSRF_TRUSTED_ORIGINS = [
+        (f"https://*{h}" if h.startswith(".") else f"https://{h}")
+        for h in ALLOWED_HOSTS if h not in ("127.0.0.1", "localhost", "*")
+    ]
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # local dev only; server pe restrict karenge
 

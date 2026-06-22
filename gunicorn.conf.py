@@ -1,19 +1,20 @@
 """Gunicorn config for Railway.
 
-Railway's internal/private network is IPv6. The edge proxy reaches the
-container over IPv6, so gunicorn MUST listen on IPv6 (``[::]``) or Railway
-can't connect -> 502 "Application failed to respond". ``[::]`` is a
-dual-stack socket: it accepts both IPv6 and IPv4. PORT is provided by
-Railway in the environment; we read it in Python (no shell $PORT needed)."""
+Railway's internal network is IPv6 — gunicorn MUST listen on ``[::]`` (a
+dual-stack socket that accepts both IPv6 and IPv4) or Railway's edge proxy
+can't connect -> 502 "Application failed to respond".
+
+We bind a FIXED port 8080 (matching Dockerfile EXPOSE and Railway's target
+port) so there is zero ambiguity about which port Railway should route to.
+PORT env (if Railway sets it) overrides, but defaults to 8080."""
 import os
 
-_port = os.environ.get("PORT", "8080")
-bind = f"[::]:{_port}"
+# Fixed 8080 — matches Dockerfile EXPOSE and Railway's target port. We do NOT
+# read $PORT so there is exactly one port everyone agrees on.
+bind = "[::]:8080"
 workers = int(os.environ.get("WEB_CONCURRENCY", "2"))
 timeout = 120
-# Log to stdout/stderr so Railway captures it
 accesslog = "-"
 errorlog = "-"
 loglevel = "info"
-# Trust Railway's proxy headers
 forwarded_allow_ips = "*"

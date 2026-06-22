@@ -20,7 +20,7 @@ COPY . .
 # Static files build-time pe collect (DEBUG default, DB nahi chahiye)
 RUN python manage.py collectstatic --noinput || true
 
-EXPOSE 8000
+EXPOSE 8080
 
 # Container start: migrate + gunicorn (port gunicorn.conf.py se env me padhta hai)
 CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application -c gunicorn.conf.py"]

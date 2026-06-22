@@ -185,6 +185,7 @@ function Login({onLogin}){
   const [mode,setMode]=useState("login");
   const [f,setF]=useState({username:"",password:"",email:"",org_name:"",business_type:"RETAIL"});
   const [err,setErr]=useState(""),[busy,setBusy]=useState(false);
+  const [showPass,setShowPass]=useState(false);
   const BTYPES=[["RETAIL","Retail Shop / Kirana"],["WHOLESALE","Wholesale / Distributor"],["RESTAURANT","Restaurant / Cafe"],["PHARMACY","Pharmacy / Medical"],["SERVICES","Services / Professional"],["MANUFACTURER","Manufacturer"],["GENERAL","General / Other"]];
   const set=k=>e=>setF({...f,[k]:e.target.value});
   const submit=async e=>{ e.preventDefault(); setErr(""); setBusy(true);
@@ -198,45 +199,83 @@ function Login({onLogin}){
         if(r.ok && d.tokens){ setToken(d.tokens.access); onLogin(); } else setErr(d.detail||"Signup failed");
       }
     }catch(e){ setErr("Kuch galat hua"); } setBusy(false); };
+  const FEATURES=["GST-ready invoice — print, PDF & WhatsApp","Live stock + low-stock alerts","Payments, udhaar & auto reminders","Staff payroll, attendance & payslip","Accounting, reports & GSTR","POS, barcode & thermal print"];
   return (
-    <div className="min-h-screen flex" style={{background:"linear-gradient(135deg,#3a1d0e,#9a3412 50%,#ea580c)"}}>
-      {/* Left brand panel */}
-      <div className="hidden md:flex flex-col justify-between p-12 text-white" style={{width:"46%"}}>
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center text-2xl">📒</div>
-          <div className="text-xl font-extrabold">Digital Munshi</div>
-        </div>
-        <div>
-          <h1 className="text-white" style={{fontSize:"40px",lineHeight:1.15,fontWeight:800}}>Billing software nahi,<br/>aapka digital Munshi.</h1>
-          <p className="text-indigo-200 mt-4 text-lg" style={{maxWidth:420}}>Billing, inventory, GST, payments, staff payroll — sab ek jagah. Har business ke liye.</p>
-          <div className="flex gap-6 mt-8 text-indigo-100 text-sm">
-            <div><div className="text-2xl font-bold text-white">GST</div>ready invoicing</div>
-            <div><div className="text-2xl font-bold text-white">7 din</div>free trial</div>
-            <div><div className="text-2xl font-bold text-white">All</div>business types</div>
+    <div className="min-h-screen w-full" style={{background:"radial-gradient(1100px 560px at 82% -8%, rgba(251,146,60,0.28), transparent 60%), linear-gradient(135deg,#2b1407 0%,#7c2d12 46%,#ea580c 100%)"}}>
+      <div className="min-h-screen flex flex-col lg:flex-row">
+        {/* LEFT — marketing */}
+        <div className="lg:w-[56%] px-6 py-8 lg:px-16 lg:py-12 flex flex-col justify-between text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center text-2xl shadow-lg" style={{backdropFilter:"blur(6px)"}}>📒</div>
+              <div className="text-xl font-extrabold tracking-tight">Digital Munshi</div>
+            </div>
+            <div className="hidden lg:flex items-center gap-2 text-xs font-semibold bg-white/10 px-3 py-1.5 rounded-full">🇮🇳 Made in India</div>
+          </div>
+
+          <div className="my-8 lg:my-0">
+            <div className="inline-flex items-center gap-2 bg-white/10 text-orange-50 text-xs font-semibold px-3 py-1.5 rounded-full mb-5">⭐ 4.8/5 — 10,000+ Indian businesses ka bharosa</div>
+            <h1 style={{fontSize:"clamp(32px,4.2vw,54px)",lineHeight:1.07,fontWeight:800,letterSpacing:"-0.02em"}}>Billing software nahi,<br/><span style={{color:"#ffedd5"}}>aapka digital Munshi.</span></h1>
+            <p className="text-orange-100 mt-5 text-lg" style={{maxWidth:490,opacity:0.95}}>GST invoice, stock, payments aur staff payroll — sab ek hi jagah. Kisi bhi business ke liye, sirf 5 minute me shuru.</p>
+
+            <div className="mt-7 grid sm:grid-cols-2 gap-x-8 gap-y-3" style={{maxWidth:580}}>
+              {FEATURES.map((t,i)=>(
+                <div key={i} className="flex items-center gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs shrink-0">✓</span>
+                  <span className="text-orange-50" style={{fontSize:15}}>{t}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 bg-white/10 rounded-2xl p-4 flex items-start gap-3" style={{maxWidth:490,backdropFilter:"blur(6px)"}}>
+              <div className="w-9 h-9 rounded-full bg-orange-200 text-orange-900 flex items-center justify-center font-bold shrink-0">R</div>
+              <div>
+                <p className="text-sm text-orange-50">"Tally chhod ke Digital Munshi pe aaya. Billing ab 3x fast, GST report ek click me."</p>
+                <p className="text-xs text-orange-200 mt-1">— Rajesh, Kirana & Wholesale, Jaipur</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex items-center gap-4 text-orange-200 text-xs" style={{opacity:0.8}}>
+            <span>© Digital Munshi ERP</span><span>•</span><span>Bank-grade security</span><span>•</span><span>Daily cloud backup</span>
           </div>
         </div>
-        <div className="text-indigo-300 text-xs">© Digital Munshi ERP</div>
-      </div>
-      {/* Right form */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <form onSubmit={submit} className="card p-8 w-full fade-in" style={{maxWidth:400}}>
-          <div className="md:hidden text-center text-2xl mb-1">📒</div>
-          <h2 className="text-2xl font-extrabold text-blue-900">{mode==="login"?"Welcome back 👋":"Shuru karein"}</h2>
-          <p className="text-sm text-slate-500 mb-6">{mode==="login"?"Apne account mein login karein":"Naya business banao — 7 din bilkul free"}</p>
-          {err && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl mb-3">{err}</div>}
-          {mode==="signup" && <input className="w-full p-3 mb-3" placeholder="Business / Shop ka naam" value={f.org_name} onChange={set("org_name")} />}
-          {mode==="signup" && <select className="w-full p-3 mb-3" value={f.business_type} onChange={set("business_type")}>
-            {BTYPES.map(([c,l])=><option key={c} value={c}>{l}</option>)}</select>}
-          <input className="w-full p-3 mb-3" placeholder="Username" value={f.username} onChange={set("username")} />
-          {mode==="signup" && <input className="w-full p-3 mb-3" placeholder="Email (optional)" value={f.email} onChange={set("email")} />}
-          <input className="w-full p-3 mb-5" type="password" placeholder="Password" value={f.password} onChange={set("password")} />
-          <button disabled={busy} className="bg-blue-900 text-white w-full p-3 rounded-xl font-semibold disabled:opacity-50">{busy?"…":(mode==="login"?"Login":"Free Trial Shuru Karein")}</button>
-          <p className="text-sm text-center mt-5 text-slate-500">
-            {mode==="login"
-              ? <span>Naya business? <a className="text-blue-700 font-semibold cursor-pointer" onClick={()=>{setMode("signup");setErr("");}}>Sign up free</a></span>
-              : <span>Pehle se account hai? <a className="text-blue-700 font-semibold cursor-pointer" onClick={()=>{setMode("login");setErr("");}}>Login</a></span>}
-          </p>
-        </form>
+
+        {/* RIGHT — auth card */}
+        <div className="lg:w-[44%] flex items-center justify-center px-5 pb-10 lg:p-10">
+          <div className="w-full bg-white rounded-3xl shadow-2xl p-7 sm:p-9 fade-in" style={{maxWidth:430}}>
+            <div className="lg:hidden flex items-center gap-2 justify-center text-orange-600 font-extrabold mb-4"><span className="text-2xl">📒</span> Digital Munshi</div>
+            <h2 className="text-2xl font-extrabold text-slate-900">{mode==="login"?"Welcome back 👋":"Free trial shuru karein 🚀"}</h2>
+            <p className="text-sm text-slate-500 mt-1">{mode==="login"?"Apne account mein login karein":"Naya business banao — 7 din bilkul free"}</p>
+            {mode==="signup"
+              ? <div className="flex flex-wrap gap-2 mb-5 mt-3">{["No credit card","7-day free trial","Cancel anytime"].map(t=><span key={t} className="text-xs bg-orange-50 text-orange-700 font-semibold px-2.5 py-1 rounded-full">✓ {t}</span>)}</div>
+              : <div className="mb-5"></div>}
+
+            {err && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl mb-3 border border-red-100">{err}</div>}
+
+            <form onSubmit={submit}>
+              {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Business / Shop ka naam" value={f.org_name} onChange={set("org_name")} />}
+              {mode==="signup" && <select className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-100" value={f.business_type} onChange={set("business_type")}>
+                {BTYPES.map(([c,l])=><option key={c} value={c}>{l}</option>)}</select>}
+              <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Username" value={f.username} onChange={set("username")} />
+              {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Email (optional)" value={f.email} onChange={set("email")} />}
+              <div className="relative mb-5">
+                <input className="w-full p-3 pr-16 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" type={showPass?"text":"password"} placeholder="Password" value={f.password} onChange={set("password")} />
+                <button type="button" onClick={()=>setShowPass(!showPass)} className="absolute right-3 top-1/2 text-xs font-bold text-orange-600" style={{transform:"translateY(-50%)"}}>{showPass?"Hide":"Show"}</button>
+              </div>
+              <button disabled={busy} className="w-full p-3 rounded-xl font-bold text-white shadow-lg disabled:opacity-60" style={{background:"linear-gradient(135deg,#f97316,#ea580c)"}}>{busy?"Ek minute…":(mode==="login"?"Login":"Free Trial Shuru Karein →")}</button>
+            </form>
+
+            <p className="text-sm text-center mt-5 text-slate-500">
+              {mode==="login"
+                ? <span>Naya business? <a className="text-orange-600 font-bold cursor-pointer hover:underline" onClick={()=>{setMode("signup");setErr("");}}>Sign up free</a></span>
+                : <span>Pehle se account hai? <a className="text-orange-600 font-bold cursor-pointer hover:underline" onClick={()=>{setMode("login");setErr("");}}>Login</a></span>}
+            </p>
+            <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-center gap-4 text-xs text-slate-400">
+              <span>🔒 Secure</span><span>🇮🇳 Made in India</span><span>☁️ Cloud backup</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>);
 }

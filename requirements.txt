@@ -1,0 +1,15 @@
+# ERP Munshi - Python dependencies
+# Ranges taaki purane (3.8/3.9) aur naye (3.10+) dono Python pe install ho jaye.
+# Python 3.10+ pe Django 5.0 milega, purane pe Django 4.2 LTS (dono pe code chalta hai).
+Django>=4.2,<5.1
+djangorestframework>=3.14,<3.16
+django-cors-headers>=4.0
+django-environ>=0.11
+psycopg2-binary>=2.9          # PostgreSQL (server). Local SQLite ke liye optional.
+Pillow>=10,<11               # image/file uploads
+djangorestframework-simplejwt>=5.3   # JWT auth
+gunicorn>=21                 # production server
+whitenoise>=6.6              # static files serving (production)
+xhtml2pdf>=0.2.16            # invoice PDF generation
+drf-spectacular>=0.27        # OpenAPI / Swagger API docs
+# razorpay>=1.4              # SIRF live payments ke liye (dev mode bina iske chalta hai)

@@ -1,0 +1,27 @@
+{
+  "name": "digital-munshi-desktop",
+  "version": "1.0.0",
+  "description": "Digital Munshi ERP — Desktop App (Windows/Mac/Linux)",
+  "main": "main.js",
+  "author": "Digital Munshi",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.digitalmunshi.erp",
+    "productName": "Digital Munshi",
+    "directories": { "output": "dist" },
+    "files": ["main.js", "preload.js", "offline.html", "package.json"],
+    "mac": { "category": "public.app-category.business", "target": ["dmg", "zip"] },
+    "win": { "target": ["nsis"] },
+    "linux": { "target": ["AppImage"], "category": "Office" }
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}

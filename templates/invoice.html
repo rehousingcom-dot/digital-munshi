@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{{ title }} {{ v.number }}</title>
+<style>
+  @page { size: A4; margin: 1.2cm; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #222; }
+  .box { border: 1px solid #444; }
+  .head { text-align: center; padding: 8px; border-bottom: 1px solid #444; }
+  .head h1 { margin: 0; font-size: 18px; color: #1F4E79; }
+  .head .sub { font-size: 10px; color: #555; }
+  .title { text-align:center; font-weight:bold; font-size:13px; padding:4px; background:#EAF0FA; border-bottom:1px solid #444;}
+  table { width: 100%; border-collapse: collapse; }
+  .meta td { padding: 4px 8px; vertical-align: top; }
+  .meta .label { color:#666; font-size:10px; }
+  .items th { background:#1F4E79; color:#fff; padding:5px; font-size:10px; border:1px solid #444; }
+  .items td { padding:4px 5px; border:1px solid #ccc; font-size:10px; }
+  .r { text-align:right; } .c { text-align:center; }
+  .totals td { padding:3px 8px; }
+  .grand { font-size:13px; font-weight:bold; color:#1F4E79; }
+  .words { font-style:italic; padding:6px 8px; border-top:1px solid #444; }
+  .foot { padding:6px 8px; font-size:10px; color:#555; }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="head">
+    {% if company and company.logo %}<img src="{{ company.logo.url }}" style="max-height:55px;margin-bottom:4px;">{% endif %}
+    <h1>{% if company %}{{ company.name }}{% else %}My Business{% endif %}</h1>
+    <div class="sub">
+      {% if company %}{{ company.address }}{% if company.phone %} · Ph: {{ company.phone }}{% endif %}<br>
+      {% if company.gstin %}GSTIN: {{ company.gstin }}{% endif %} {% if company.state %} · State: {{ company.state }}{% endif %}{% endif %}
+    </div>
+  </div>
+  <div class="title">{{ title }}</div>
+
+  <table class="meta">
+    <tr>
+      <td width="55%">
+        <div class="label">Bill To</div>
+        <strong>{{ v.party.name }}</strong><br>
+        {{ v.party.address }}{% if v.party.city %}, {{ v.party.city }}{% endif %}<br>
+        {% if v.party.gstin %}GSTIN: {{ v.party.gstin }}<br>{% endif %}
+        {% if v.party.phone %}Ph: {{ v.party.phone }}{% endif %}
+      </td>
+      <td width="45%">
+        <div><span class="label">Invoice No:</span> <strong>{{ v.number }}</strong></div>
+        <div><span class="label">Date:</span> {{ v.date }}</div>
+        <div><span class="label">Godown:</span> {{ v.godown.name }}</div>
+      </td>
+    </tr>
+  </table>
+
+  <table class="items">
+    <thead>
+      <tr>
+        <th width="4%">#</th>
+        <th width="30%">Item</th>
+        <th width="8%">HSN</th>
+        <th width="8%">Qty</th>
+        <th width="7%">Unit</th>
+        <th width="10%">Rate</th>
+        <th width="9%">Disc</th>
+        <th width="12%">Taxable</th>
+        <th width="6%">GST%</th>
+        <th width="12%">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in lines %}
+      <tr>
+        <td class="c">{{ forloop.counter }}</td>
+        <td>{{ l.variant.item.name }}{% if l.variant.size or l.variant.colour or l.variant.model %}
+            <br><span style="color:#888;font-size:9px;">{{ l.variant.size }} {{ l.variant.colour }} {{ l.variant.model }}</span>{% endif %}</td>
+        <td class="c">{{ l.variant.item.hsn_code }}</td>
+        <td class="r">{{ l.qty }}</td>
+        <td class="c">{{ l.unit.short_code }}</td>
+        <td class="r">{{ l.rate }}</td>
+        <td class="r">{{ l.discount_total }}</td>
+        <td class="r">{{ l.taxable_value }}</td>
+        <td class="c">{{ l.tax_percent }}</td>
+        <td class="r">{{ l.line_total }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr>
+      <td width="60%" class="words">
+        <strong>Amount in words:</strong> {{ amount_words }}
+      </td>
+      <td width="40%">
+        <table>
+          <tr><td>Taxable Value</td><td class="r">{{ v.taxable_value }}</td></tr>
+          {% if is_igst %}
+          <tr><td>IGST</td><td class="r">{{ v.igst }}</td></tr>
+          {% else %}
+          <tr><td>CGST</td><td class="r">{{ v.cgst }}</td></tr>
+          <tr><td>SGST</td><td class="r">{{ v.sgst }}</td></tr>
+          {% endif %}
+          <tr><td>Round Off</td><td class="r">{{ v.round_off }}</td></tr>
+          <tr class="grand"><td>Grand Total</td><td class="r">&#8377; {{ v.grand_total }}</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <div class="foot">
+    Total Discount: {{ v.total_discount }} &nbsp;|&nbsp; Total Tax: {{ v.total_tax }}<br><br>
+    <div style="text-align:right;">For <strong>{% if company %}{{ company.name }}{% else %}My Business{% endif %}</strong><br>
+      {% if company and company.signature %}<img src="{{ company.signature.url }}" style="max-height:48px;margin:4px 0;">{% else %}<br><br>{% endif %}
+      <br>Authorised Signatory</div>
+  </div>
+</div>
+<p style="text-align:center;color:#999;font-size:9px;">Generated by Digital Munshi ERP</p>
+</body>
+</html>

@@ -152,6 +152,8 @@ urlpatterns = [
     path("api/expense-summary/", cashbank_views.expense_summary, name="expense_summary"),
     path("api/trial-balance/", acc_views.trial_balance, name="trial_balance"),
     path("portal/<uuid:share>/", party_extra.customer_portal, name="customer_portal"),
+    path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),
+    path("api/catalog/toggle/", tenant_views.catalog_toggle, name="catalog_toggle"),
     path("api/", include(router.urls)),
     path("api/reports/", include("apps.reports.urls")),
     # API docs (Swagger)

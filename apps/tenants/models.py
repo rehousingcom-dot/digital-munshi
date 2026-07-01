@@ -1,3 +1,4 @@
+import uuid as _uuid
 from datetime import timedelta
 from decimal import Decimal
 from django.conf import settings
@@ -16,6 +17,9 @@ class Organization(models.Model):
                               null=True, blank=True, related_name="owned_orgs")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    # Online catalog (public shop link)
+    catalog_uuid = models.UUIDField(default=_uuid.uuid4, editable=False, unique=True)
+    catalog_enabled = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

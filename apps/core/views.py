@@ -105,3 +105,65 @@ class TaxRateViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
 class GodownViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
     queryset = Godown.objects.all()
     serializer_class = GodownSerializer
+
+
+def catalog_shop(request, catalog_uuid):
+    """Public online catalog — login ke bina. Customer products dekh ke
+    WhatsApp pe order bhej sakta hai (dukaan ke number pe)."""
+    from django.shortcuts import render
+    from django.http import HttpResponse
+    from apps.tenants.models import Organization
+    from apps.core.models import Company
+    from apps.inventory.models import Item, ItemUnitPrice
+
+    org = Organization.objects.filter(catalog_uuid=catalog_uuid).first()
+    if not org or not org.catalog_enabled:
+        return HttpResponse("Catalog not found or disabled", status=404)
+
+    company = (Company.all_objects.filter(organization=org, is_active=True).first()
+               or Company.all_objects.filter(organization=org).first())
+
+    items = []
+    for it in (Item.all_objects.filter(organization=org)
+               .prefetch_related("variants", "variants__unit_prices")):
+        v = it.variants.all().first()
+        price = float(it.mrp or 0)
+        if v:
+            up = None
+            for x in v.unit_prices.all():
+                if it.primary_unit_id and x.unit_id == it.primary_unit_id:
+                    up = x
+                    break
+            if up and up.sale_price:
+                price = float(up.sale_price)
+        img = ""
+        try:
+            if it.image:
+                img = it.image.url
+        except Exception:
+            img = ""
+        items.append({"name": it.name, "price": price, "img": img,
+                      "type": it.item_type, "code": (v.item_code if v else "")})
+
+    wa = ""
+    if company:
+        raw = (company.whatsapp_business_number or company.phone or "").strip()
+        digits = "".join(c for c in raw if c.isdigit())
+        if len(digits) == 10:
+            digits = "91" + digits
+        wa = digits
+
+    logo = ""
+    try:
+        if company and company.logo:
+            logo = company.logo.url
+    except Exception:
+        logo = ""
+
+    ctx = {
+        "shop_name": (company.name if company else org.name),
+        "shop_phone": (company.phone if company else ""),
+        "shop_address": (company.address if company else ""),
+        "wa": wa, "logo": logo, "items": items,
+    }
+    return render(request, "catalog.html", ctx)

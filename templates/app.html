@@ -1592,6 +1592,29 @@ function ReturnChallanModal({voucher,onClose,onConfirm}){
 }
 
 // ---------- Settings (business profile) ----------
+function CatalogCard(){
+  const [me,setMe]=useState(null),[copied,setCopied]=useState(false),[busy,setBusy]=useState(false);
+  useEffect(()=>{ api("/me/").then(setMe).catch(()=>{}); },[]);
+  if(!me||!me.catalog_uuid) return null;
+  const url=window.location.origin+"/shop/"+me.catalog_uuid+"/";
+  const toggle=async()=>{ setBusy(true); try{ const r=await api("/catalog/toggle/",{method:"POST",body:JSON.stringify({enabled:!me.catalog_enabled})}); setMe({...me,catalog_enabled:r.catalog_enabled}); }catch(e){} setBusy(false); };
+  const copy=()=>{ navigator.clipboard.writeText(url).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),1500);}); };
+  return (
+    <div className="card p-5 mb-4" style={{background:"linear-gradient(135deg,#fff7ed,#ffffff)"}}>
+      <div className="flex items-center justify-between mb-2">
+        <div className="font-bold text-slate-700">🛍️ {t("Online Catalog","ऑनलाइन कैटलॉग")}</div>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!me.catalog_enabled} disabled={busy} onChange={toggle}/> {me.catalog_enabled?t("On","चालू"):t("Off","बंद")}</label>
+      </div>
+      <div className="text-xs text-slate-500 mb-2">{t("Ye link customers ko bhejo — wo products dekh ke WhatsApp par order karenge.","Share this link with customers — they browse products and order on WhatsApp.")}</div>
+      <div className="flex gap-2 items-center flex-wrap">
+        <input readOnly value={url} className="flex-1 min-w-[200px] border border-slate-200 p-2 rounded-lg text-xs bg-white"/>
+        <button onClick={copy} className="bg-slate-100 px-3 py-2 rounded-lg text-sm font-semibold">{copied?"✓ "+t("Copied","कॉपी हुआ"):t("Copy","कॉपी")}</button>
+        <a href={"https://wa.me/?text="+encodeURIComponent(t("Hamare products dekho: ","हमारे products देखें: ")+url)} target="_blank" className="text-white px-3 py-2 rounded-lg text-sm font-semibold" style={{background:"#22c55e"}}>{t("Share","शेयर")}</a>
+        <a href={url} target="_blank" className="text-blue-700 px-2 py-2 text-sm font-semibold">{t("Preview","देखें")} →</a>
+      </div>
+    </div>);
+}
+
 function Settings({onSaved}){
   const [p,setP]=useState(null),[msg,setMsg]=useState(""),[stab,setStab]=useState("business");
   useEffect(()=>{ api("/business-profile/").then(setP); },[]);
@@ -1605,6 +1628,7 @@ function Settings({onSaved}){
   return (
     <div className="p-6 fade-in">
       <h2 className="text-2xl font-extrabold text-slate-800 mb-4">{t("Settings","सेटिंग्स")}</h2>
+      <CatalogCard/>
       {msg && <div className="rounded-xl p-2.5 mb-3 text-sm font-semibold" style={{background:"#ecfdf5",color:"#166534",border:"1px solid #a7f3d0"}}>{msg}</div>}
       <div className="flex flex-col md:flex-row gap-5">
         <div className="md:w-56 shrink-0">

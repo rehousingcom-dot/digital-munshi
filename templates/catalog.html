@@ -1,0 +1,80 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ shop_name }} — Online Catalog</title>
+<meta name="description" content="{{ shop_name }} ka online catalog — products dekho aur WhatsApp par order karo.">
+<meta property="og:title" content="{{ shop_name }} — Online Catalog">
+<meta property="og:type" content="website">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{background:#f8fafc}</style>
+</head>
+<body class="text-slate-800">
+<header class="bg-white border-b sticky top-0 z-10">
+  <div class="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
+    {% if logo %}<img src="{{ logo }}" alt="" class="w-10 h-10 rounded-lg object-cover border">{% else %}
+    <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">{{ shop_name|slice:":1" }}</div>{% endif %}
+    <div>
+      <div class="font-extrabold text-lg leading-tight">{{ shop_name }}</div>
+      <div class="text-xs text-slate-400">{% if shop_phone %}📞 {{ shop_phone }} · {% endif %}Online Catalog</div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-5 pb-28">
+  <input id="q" placeholder="Search products…" class="w-full mb-4 p-3 rounded-xl border border-slate-200 text-sm" oninput="filter()">
+  <div id="grid" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+    {% for it in items %}
+    <div class="prod bg-white rounded-2xl border border-slate-100 p-3 flex flex-col" data-name="{{ it.name|lower }}">
+      <div class="aspect-square rounded-xl bg-slate-50 overflow-hidden mb-2 flex items-center justify-center">
+        {% if it.img %}<img src="{{ it.img }}" alt="{{ it.name }}" class="w-full h-full object-cover">{% else %}<span class="text-3xl">📦</span>{% endif %}
+      </div>
+      <div class="font-semibold text-sm leading-tight flex-1">{{ it.name }}</div>
+      <div class="text-orange-600 font-extrabold mt-1">₹{{ it.price }}</div>
+      <div class="flex items-center justify-between mt-2" data-name2="{{ it.name }}" data-price="{{ it.price }}">
+        <div class="flex items-center gap-2">
+          <button onclick="step(this,-1)" class="w-7 h-7 rounded-lg bg-slate-100 font-bold">−</button>
+          <span class="qty w-5 text-center text-sm font-semibold">0</span>
+          <button onclick="step(this,1)" class="w-7 h-7 rounded-lg bg-orange-100 text-orange-700 font-bold">+</button>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center text-slate-400 py-10">No products yet.</div>
+    {% endfor %}
+  </div>
+</main>
+
+<div id="bar" class="fixed bottom-0 inset-x-0 bg-white border-t p-3 hidden">
+  <div class="max-w-4xl mx-auto flex items-center gap-3">
+    <div class="flex-1">
+      <div class="text-xs text-slate-400"><span id="citems">0</span> items</div>
+      <div class="font-extrabold text-lg">Total: ₹<span id="ctotal">0</span></div>
+    </div>
+    <a id="waBtn" href="#" class="text-white px-5 py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#22c55e,#16a34a)">Order on WhatsApp →</a>
+  </div>
+</div>
+
+<script>
+var WA = "{{ wa }}";
+var SHOP = {{ shop_name|json_script:"shopn" }};
+function filter(){ var q=document.getElementById("q").value.toLowerCase();
+  document.querySelectorAll(".prod").forEach(function(p){ p.style.display = p.dataset.name.indexOf(q)>=0?"":"none"; }); }
+function step(btn,d){ var row=btn.closest("[data-price]"); var span=row.querySelector(".qty");
+  var q=Math.max(0,(parseInt(span.textContent)||0)+d); span.textContent=q; recalc(); }
+function recalc(){ var items=0,total=0,lines=[];
+  document.querySelectorAll("[data-price]").forEach(function(row){ var q=parseInt(row.querySelector(".qty").textContent)||0;
+    if(q>0){ var name=row.dataset.name2, price=parseFloat(row.dataset.price)||0; items+=q; total+=q*price; lines.push(q+" x "+name+" = ₹"+(q*price).toFixed(0)); } });
+  document.getElementById("citems").textContent=items;
+  document.getElementById("ctotal").textContent=total.toFixed(0);
+  document.getElementById("bar").classList.toggle("hidden", items===0);
+  var shop=document.getElementById("shopn")?JSON.parse(document.getElementById("shopn").textContent):"Shop";
+  var msg="Namaste "+shop+"%0A%0AMujhe ye order chahiye:%0A"+encodeURIComponent(lines.join("\n"))+"%0A%0ATotal: ₹"+total.toFixed(0)+"%0A%0AMera naam: ";
+  var btn=document.getElementById("waBtn");
+  btn.href = WA ? ("https://wa.me/"+WA+"?text="+msg) : "#";
+  if(!WA){ btn.textContent="Shop ka WhatsApp number set nahi"; btn.style.background="#94a3b8"; }
+}
+</script>
+</body>
+</html>

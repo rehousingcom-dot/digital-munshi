@@ -250,7 +250,22 @@ def me(request):
         "is_platform_admin": bool(u.is_staff or u.is_superuser),
         "organization": org.name if org else None,
         "logo": logo,
+        "catalog_uuid": str(org.catalog_uuid) if org else None,
+        "catalog_enabled": bool(org.catalog_enabled) if org else False,
     })
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def catalog_toggle(request):
+    """Online catalog on/off (owner)."""
+    org = getattr(request.user, "organization", None)
+    if not org:
+        return Response({"detail": "No org"}, status=400)
+    org.catalog_enabled = bool(request.data.get("enabled", True))
+    org.save(update_fields=["catalog_enabled"])
+    return Response({"catalog_enabled": org.catalog_enabled,
+                     "catalog_uuid": str(org.catalog_uuid)})
 
 
 @api_view(["GET"])

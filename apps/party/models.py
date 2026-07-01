@@ -27,6 +27,8 @@ class Party(OrgOwned):
     name = models.CharField(max_length=200, db_index=True)
     legal_name = models.CharField(max_length=200, blank=True, help_text="GST registered legal name")
     party_type = models.CharField(max_length=10, choices=Type.choices, default=Type.CUSTOMER)
+    # Customer digital khata — public link (customer apna udhaar + pay dekh sake)
+    khata_token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
 
     gstin = models.CharField("GSTIN", max_length=15, blank=True, validators=[validate_gstin])
     pan = models.CharField("PAN", max_length=10, blank=True)

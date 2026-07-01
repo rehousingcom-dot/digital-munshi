@@ -263,6 +263,8 @@ urlpatterns = [
     path("api/munshi/ask/", __import__("apps.core.munshi", fromlist=["munshi_ask"]).munshi_ask, name="munshi_ask"),
     path("api/udhaar/reminder/", __import__("apps.core.udhaar", fromlist=["udhaar_reminder"]).udhaar_reminder, name="udhaar_reminder"),
     path("api/udhaar/bharosa/", __import__("apps.core.udhaar", fromlist=["bharosa"]).bharosa, name="udhaar_bharosa"),
+    # Customer digital khata (public, Khatabook-style)
+    path("khata/<uuid:token>/", __import__("apps.party.public_views", fromlist=["party_khata"]).party_khata, name="party_khata"),
     # Committee public (online boli + join) + member statement
     path("c/<uuid:public_uuid>/", committee_public.committee_public, name="committee_public"),
     path("c/<uuid:public_uuid>/bid/", committee_public.api_public_bid, name="committee_public_bid"),

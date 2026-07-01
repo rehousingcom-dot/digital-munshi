@@ -9,9 +9,24 @@ class CommitteeSerializer(serializers.ModelSerializer):
     members_total = serializers.SerializerMethodField()
     rounds_done = serializers.SerializerMethodField()
 
+    # Optional fields jinhe khali chhoda ja sakta hai -> model default lag jaayega
+    _OPTIONAL_BLANK = ["coupon1", "coupon2", "late_fee_per_day", "bid_increment",
+                       "members_count", "start_date", "end_date", "open_month",
+                       "bid_day", "due_day"]
+
     class Meta:
         model = Committee
         fields = "__all__"
+
+    def to_internal_value(self, data):
+        try:
+            data = data.copy()
+            for k in self._OPTIONAL_BLANK:
+                if k in data and data.get(k) in ("", None):
+                    data.pop(k, None)
+        except Exception:
+            pass
+        return super().to_internal_value(data)
 
     def get_members_total(self, obj):
         return obj.members.count()

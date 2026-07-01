@@ -76,3 +76,13 @@ _Priority order: bugs first, then missing features in waves._
 - [x] ✅ **Hindi/English toggle** expanded — New Sale, Party, Items, Reports/Cash&Bank/Utilities/Accounting/HR
       titles + tab bars + core form fields wrapped in `t()`. _(bc70ec0, aa97ab5, 4864299, 3e03187)_
 - [x] ✅ **Challan→invoice returned-qty**, **multi-batch grid**, **batch-wise barcode**. _(5b1db8e, 144b661)_
+
+## Razorpay payments — WORKING (July 1, 2026)
+- [x] ✅ **Razorpay checkout end-to-end tested** (test mode) — create order → checkout → payment →
+      server callback → signature verify → subscription activate. Pro ₹799 activated successfully.
+- **Key learning:** popup/handler mode ne user ke browser me blank-tab kholi → **redirect mode +
+      server callback** (`/api/subscription/callback/`) use kiya. Reliable.
+- **PWA service worker DISABLED** (kill-switch) — stale app.html serve kar raha tha, redirect break.
+- **Go-LIVE step (website approval ke baad):** Railway me `RAZORPAY_KEY_ID`+`RAZORPAY_KEY_SECRET`
+      ko test se **LIVE** keys (`rzp_live_...`) se replace + Deploy. Koi code change nahi.
+- `razorpay>=1.4` requirements me enabled. `seed_plans` se Basic/Pro/Premium plans seed hote hain.

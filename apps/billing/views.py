@@ -154,3 +154,26 @@ class VoucherViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
             "whatsapp_url": wa, "to": v.party.name, "phone": v.party.phone,
             "auto_send": api_result,
         })
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def transactions_export(request):
+    """All transactions (invoices/vouchers) CSV export — data backup."""
+    import csv
+    from django.http import HttpResponse
+    resp = HttpResponse(content_type="text/csv")
+    resp["Content-Disposition"] = 'attachment; filename="transactions.csv"'
+    w = csv.writer(resp)
+    w.writerow(["date", "type", "number", "party", "taxable_value", "cgst", "sgst",
+                "igst", "cess", "total_tax", "round_off", "grand_total", "notes"])
+    qs = Voucher.objects.select_related("party").all()
+    vt = request.GET.get("type")
+    if vt:
+        qs = qs.filter(voucher_type=vt)
+    for v in qs:
+        w.writerow([v.date, v.get_voucher_type_display(), v.number,
+                    v.party.name if v.party_id else "", v.taxable_value, v.cgst, v.sgst,
+                    v.igst, v.cess, v.total_tax, v.round_off, v.grand_total,
+                    (v.notes or "").replace("\n", " ")])
+    return resp

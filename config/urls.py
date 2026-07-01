@@ -123,6 +123,7 @@ urlpatterns = [
     path("api/items-export/", inv_extra.items_export, name="items_export"),
     path("api/items-import/", inv_extra.items_import, name="items_import"),
     path("api/parties-export/", party_extra.parties_export, name="parties_export"),
+    path("api/transactions-export/", billing_views.transactions_export, name="transactions_export"),
     path("api/parties-import/", party_extra.parties_import, name="parties_import"),
     path("api/cashbank-summary/", cashbank_views.cashbank_summary, name="cashbank_summary"),
     path("api/expense-summary/", cashbank_views.expense_summary, name="expense_summary"),

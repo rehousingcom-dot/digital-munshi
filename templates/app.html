@@ -784,7 +784,7 @@ function ItemForm({item,onClose,onSaved}){
     mrp:0,tax_rate:"",reorder_level:0,size:"",colour:"",model:"",
     sale_price:0,purchase_price:0,sec_sale_price:0,
     batch_no:"",batch_mrp:0,batch_disc_type:"PERCENT",batch_disc_value:0,batch_expiry:"",batch_mfg:"",batch_size:"",batch_colour:"",batch_model:"",
-    opening_godown:"",opening_qty:0,is_combo:false,components:[]};
+    opening_godown:"",opening_qty:0,is_combo:false,components:[],more_batches:[]};
   const [f,setF]=useState(item?{...blank,name:item.name,item_type:item.item_type,hsn_code:item.hsn_code||"",category:item.category||"",
     primary_unit:item.primary_unit||"",secondary_unit:item.secondary_unit||"",conversion_factor:item.conversion_factor||1,
     mrp:item.mrp||0,tax_rate:item.tax_rate||"",reorder_level:item.reorder_level||0,is_combo:!!item.is_combo,components:[],
@@ -823,6 +823,7 @@ function ItemForm({item,onClose,onSaved}){
         // batch
         let batchId=null;
         if(f.batch_no){ const b=await api("/batches/",{method:"POST",body:JSON.stringify({variant:variant.id,batch_no:f.batch_no,mrp:String(f.batch_mrp||0),discount_type:f.batch_disc_type,discount_value:String(f.batch_disc_value||0),expiry_date:f.batch_expiry||null,mfg_date:f.batch_mfg||null,size:f.batch_size||"",colour:f.batch_colour||"",model:f.batch_model||""})}).catch(()=>null); if(b)batchId=b.id; }
+        for(const mb of (f.more_batches||[])){ if(mb.batch_no) await api("/batches/",{method:"POST",body:JSON.stringify({variant:variant.id,batch_no:mb.batch_no,mrp:String(mb.mrp||0),expiry_date:mb.expiry||null})}).catch(()=>{}); }
         // opening stock
         if(+f.opening_qty&&f.opening_godown) await api("/stock/",{method:"POST",body:JSON.stringify({variant:variant.id,godown:+f.opening_godown,batch:batchId,quantity:String(f.opening_qty)})}).catch(()=>{});
       }
@@ -895,6 +896,15 @@ function ItemForm({item,onClose,onSaved}){
                 {I(t("Opening Qty (primary unit)","ओपनिंग मात्रा (प्राइमरी यूनिट)"),"opening_qty",{type:"number"})}
               </div>
               {I(t("Reorder / Low-stock Level","रीऑर्डर / लो-स्टॉक लेवल"),"reorder_level",{type:"number"})}
+              <div className="border-t pt-3">
+                <div className="text-xs font-bold text-slate-500 mb-1">{t("More Batches (add many at once)","और बैच (एक साथ कई जोड़ें)")}</div>
+                {(f.more_batches||[]).map((mb,i)=><div key={i} className="grid grid-cols-12 gap-2 mb-1 items-center">
+                  <input className={cell+" col-span-4"} placeholder={t("Batch No.","बैच नं.")} value={mb.batch_no} onChange={e=>set("more_batches",f.more_batches.map((x,j)=>j===i?{...x,batch_no:e.target.value}:x))}/>
+                  <input type="number" className={cell+" col-span-3"} placeholder="MRP" value={mb.mrp} onChange={e=>set("more_batches",f.more_batches.map((x,j)=>j===i?{...x,mrp:e.target.value}:x))}/>
+                  <input type="date" className={cell+" col-span-4"} value={mb.expiry} onChange={e=>set("more_batches",f.more_batches.map((x,j)=>j===i?{...x,expiry:e.target.value}:x))}/>
+                  <button onClick={()=>set("more_batches",f.more_batches.filter((_,j)=>j!==i))} className="text-red-500 col-span-1">×</button></div>)}
+                <button onClick={()=>set("more_batches",[...(f.more_batches||[]),{batch_no:"",mrp:"",expiry:""}])} className="text-xs bg-slate-200 px-3 py-1 rounded-lg font-semibold mt-1">+ {t("Batch","बैच")}</button>
+              </div>
             </div>}
             {tab==="variant" && <div className="space-y-2">
               <div className="text-xs text-slate-400">Size/Colour/Model bharo — unique item-code auto-generate hoga (slide 5 point 4).</div>
@@ -1127,14 +1137,19 @@ function BarcodeDesigner(){
   const [vid,setVid]=useState(""),[value,setValue]=useState(""),[name,setName]=useState(""),[price,setPrice]=useState("");
   const [sym,setSym]=useState("CODE128"),[w,setW]=useState(50),[h,setH]=useState(30),[copies,setCopies]=useState(24);
   const [cols,setCols]=useState(3),[uniq,setUniq]=useState(false),[showName,setShowName]=useState(true),[showPrice,setShowPrice]=useState(true);
+  const [bid,setBid]=useState("");
   const svgRef=useRef(null);
   const barcodeSVG=(val)=>{ const el=document.createElementNS("http://www.w3.org/2000/svg","svg");
     try{ window.JsBarcode(el,val,{format:(sym==="EAN13"&&/^\d{12,13}$/.test(val))?"EAN13":"CODE128",width:2,height:48,fontSize:14,margin:6}); }catch(e){}
     return el.outerHTML; };
   useEffect(()=>{ apiList("/items/?page_size=500").then(its=>{ setItems(its);
-    const vs=[]; its.forEach(it=>(it.variants||[]).forEach(v=>vs.push({id:v.id,label:it.name+(v.size||v.colour||v.model?` (${[v.size,v.colour,v.model].filter(Boolean).join(" ")})`:""),code:v.item_code,barcode:v.barcode,name:it.name,mrp:it.mrp})));
+    const vs=[]; its.forEach(it=>(it.variants||[]).forEach(v=>vs.push({id:v.id,label:it.name+(v.size||v.colour||v.model?` (${[v.size,v.colour,v.model].filter(Boolean).join(" ")})`:""),code:v.item_code,barcode:v.barcode,name:it.name,mrp:it.mrp,batches:v.batches||[]})));
     setVariants(vs); if(vs[0]){ setVid(String(vs[0].id)); setValue(vs[0].barcode||vs[0].code||""); setName(vs[0].name); setPrice(vs[0].mrp||""); } }); },[]);
-  const onPick=id=>{ setVid(id); const v=variants.find(x=>x.id==id); if(v){ setValue(v.barcode||v.code||""); setName(v.name); setPrice(v.mrp||""); } };
+  const onPick=id=>{ setVid(id); setBid(""); const v=variants.find(x=>x.id==id); if(v){ setValue(v.barcode||v.code||""); setName(v.name); setPrice(v.mrp||""); } };
+  const batchesFor=()=>{ const v=variants.find(x=>x.id==vid); return (v&&v.batches)||[]; };
+  const onPickBatch=id=>{ setBid(id); const v=variants.find(x=>x.id==vid); if(!v)return; const base=v.barcode||v.code||"";
+    if(!id){ setValue(base); setPrice(v.mrp||""); return; }
+    const b=(v.batches||[]).find(x=>x.id==id); if(b){ setValue(base+"-"+b.batch_no); if(+b.mrp)setPrice(b.mrp); } };
   useEffect(()=>{ if(svgRef.current && value && window.JsBarcode){ try{
     window.JsBarcode(svgRef.current,value,{format:sym==="EAN13"&&/^\d{12,13}$/.test(value)?"EAN13":"CODE128",width:2,height:48,fontSize:14,margin:6});
   }catch(e){ try{window.JsBarcode(svgRef.current,value||"000000",{format:"CODE128"});}catch(_){} } } },[value,sym]);
@@ -1156,6 +1171,8 @@ function BarcodeDesigner(){
         <div className="font-bold text-slate-700">🏷️ Barcode & Label Designer</div>
         <div><label className="text-xs font-semibold text-slate-500">Product</label>
           <select className="border border-slate-200 p-2 rounded-lg w-full text-sm mt-1" value={vid} onChange={e=>onPick(e.target.value)}>{variants.map(v=><option key={v.id} value={v.id}>{v.label}</option>)}</select></div>
+        {batchesFor().length>0 && <div><label className="text-xs font-semibold text-slate-500">{t("Batch (batch-wise barcode)","बैच (बैच-वाइज़ बारकोड)")}</label>
+          <select className="border border-slate-200 p-2 rounded-lg w-full text-sm mt-1" value={bid} onChange={e=>onPickBatch(e.target.value)}><option value="">{t("— all / no batch —","— सभी / कोई बैच नहीं —")}</option>{batchesFor().map(b=><option key={b.id} value={b.id}>{b.batch_no}{b.mrp?` (MRP ${b.mrp})`:""}</option>)}</select></div>}
         <div><label className="text-xs font-semibold text-slate-500">Barcode value</label>
           <input className="border border-slate-200 p-2 rounded-lg w-full text-sm mt-1" value={value} onChange={e=>setValue(e.target.value)}/></div>
         <div className="grid grid-cols-2 gap-3">

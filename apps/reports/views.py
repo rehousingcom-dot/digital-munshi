@@ -17,6 +17,24 @@ from apps.party.models import Party
 
 
 def _range(request):
+    # Explicit start/end (YYYY-MM-DD) diye ho to unhe use karo (report filter).
+    s = request.query_params.get("start")
+    e = request.query_params.get("end")
+    if s or e:
+        from datetime import datetime
+        end = timezone.localdate()
+        start = end - timedelta(days=29)
+        try:
+            if e:
+                end = datetime.strptime(e, "%Y-%m-%d").date()
+        except ValueError:
+            pass
+        try:
+            if s:
+                start = datetime.strptime(s, "%Y-%m-%d").date()
+        except ValueError:
+            pass
+        return start, end, (end - start).days + 1
     try:
         days = int(request.query_params.get("days", 30))
     except (TypeError, ValueError):

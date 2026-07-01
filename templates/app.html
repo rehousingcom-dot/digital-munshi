@@ -1229,10 +1229,10 @@ function UtilitiesView(){
     try{ const r=await fetch(API+path,{method:"POST",headers:{Authorization:"Bearer "+getToken()},body:fd}); const d=await r.json(); setMsg(`✓ ${d.created||0} records imported`); setTimeout(()=>setMsg(""),3500);}catch(e){ setMsg("Import fail"); } };
   return (
     <div className="p-6 fade-in">
-      <h2 className="text-2xl font-extrabold text-slate-800 mb-4">Utilities</h2>
+      <h2 className="text-2xl font-extrabold text-slate-800 mb-4">{t("Utilities","सुविधाएँ")}</h2>
       {msg && <div className="rounded-xl p-2.5 mb-3 text-sm font-semibold" style={{background:"#ecfdf5",color:"#166534",border:"1px solid #a7f3d0"}}>{msg}</div>}
       <div className="flex gap-2 flex-wrap mb-4">
-        {[["barcode","Barcode & Labels"],["pricelists","Price Lists"],["data","Import / Export"],["fy","Close Financial Year"]].map(([k,l])=>
+        {[["barcode",t("Barcode & Labels","बारकोड व लेबल")],["pricelists",t("Price Lists","मूल्य सूची")],["data",t("Import / Export","इम्पोर्ट / एक्सपोर्ट")],["fy",t("Close Financial Year","वित्तीय वर्ष बंद")]].map(([k,l])=>
           <button key={k} onClick={()=>setTab(k)} className="px-3.5 py-1.5 rounded-full text-sm font-semibold" style={{background:tab===k?"#ea6a1e":"#fff",color:tab===k?"#fff":"#64748b",border:"1px solid "+(tab===k?"#ea6a1e":"#e2e8f0")}}>{l}</button>)}
       </div>
       {tab==="barcode" && <BarcodeDesigner/>}
@@ -1274,7 +1274,7 @@ function CashBankView(){
   const pName=id=>{const p=parties.find(x=>x.id==id);return p?p.name:"—";};
   return (
     <div className="p-6 fade-in">
-      <h2 className="text-2xl font-extrabold text-slate-800 mb-4">Cash & Bank</h2>
+      <h2 className="text-2xl font-extrabold text-slate-800 mb-4">{t("Cash & Bank","कैश व बैंक")}</h2>
       {sum && <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
         <Card label="Cash in Hand" val={sum.cash_in_hand} color="#059669"/>
         <Card label="Bank Balance" val={sum.bank_balance} color="#1e3a8a"/>
@@ -1283,7 +1283,7 @@ function CashBankView(){
         <Card label="Loan Outstanding" val={sum.loan_outstanding} color="#7c3aed"/>
       </div>}
       <div className="flex gap-2 flex-wrap mb-4">
-        {[["accounts","Bank & Cash"],["expenses","Expenses"],["cheques","Cheques"],["loans","Loan Accounts"]].map(([k,l])=>
+        {[["accounts",t("Bank & Cash","बैंक व कैश")],["expenses",t("Expenses","खर्चे")],["cheques",t("Cheques","चेक")],["loans",t("Loan Accounts","लोन खाते")]].map(([k,l])=>
           <button key={k} onClick={()=>setTab(k)} className="px-3.5 py-1.5 rounded-full text-sm font-semibold" style={{background:tab===k?"#ea6a1e":"#fff",color:tab===k?"#fff":"#64748b",border:"1px solid "+(tab===k?"#ea6a1e":"#e2e8f0")}}>{l}</button>)}
         <button onClick={()=>setModal({type:tab})} className="ml-auto text-white px-4 py-1.5 rounded-full text-sm font-bold" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>+ Add</button>
       </div>
@@ -1421,7 +1421,7 @@ function VouchersView({initialQuery,onNav}){
   return (
     <div className="p-6 fade-in">
       <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
-        <h2 className="text-2xl font-extrabold text-slate-800">Sales & Transactions</h2>
+        <h2 className="text-2xl font-extrabold text-slate-800">{t("Sales & Transactions","बिक्री व लेनदेन")}</h2>
         <div className="flex gap-2 items-center">
           <div className="relative"><span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
             <input className="p-2.5 pl-9 text-sm rounded-xl border border-slate-200" style={{minWidth:220}} placeholder="Search no./party…" value={q} onChange={e=>setQ(e.target.value)} /></div>
@@ -1517,7 +1517,7 @@ function Settings({onSaved}){
   const inp="border border-slate-200 w-full p-2 rounded-lg text-sm mt-1";
   return (
     <div className="p-6 fade-in">
-      <h2 className="text-2xl font-extrabold text-slate-800 mb-4">Settings</h2>
+      <h2 className="text-2xl font-extrabold text-slate-800 mb-4">{t("Settings","सेटिंग्स")}</h2>
       {msg && <div className="rounded-xl p-2.5 mb-3 text-sm font-semibold" style={{background:"#ecfdf5",color:"#166534",border:"1px solid #a7f3d0"}}>{msg}</div>}
       <div className="flex flex-col md:flex-row gap-5">
         <div className="md:w-56 shrink-0">
@@ -1632,7 +1632,7 @@ function ReportsView(){
     if((start||end)&&DATE_REPORTS.includes(t)) url+=(url.includes("?")?"&":"?")+"start="+(start||"")+"&end="+(end||"");
     try{ setData(await api(url)); }catch(e){ setData({error:String(e)}); } };
   useEffect(()=>{ load("pnl"); },[]);
-  const tabs=[["pnl","P&L"],["bsheet","Balance Sheet"],["stock","Live Stock"],["reminders","Payment Reminders"],["aging","Receivables Aging"],["daybook","Day Book"],["gstr1","GSTR-1"],["gstr3b","GSTR-3B"],["hsn","HSN Summary"],["lowstock","Low Stock"],["purchase","Purchase Register"],["stmt","Party Statement"]];
+  const tabs=[["pnl",t("P&L","लाभ-हानि")],["bsheet",t("Balance Sheet","बैलेंस शीट")],["stock",t("Live Stock","लाइव स्टॉक")],["reminders",t("Payment Reminders","भुगतान रिमाइंडर")],["aging",t("Receivables Aging","प्राप्य एजिंग")],["daybook",t("Day Book","डे बुक")],["gstr1",t("GSTR-1","GSTR-1")],["gstr3b",t("GSTR-3B","GSTR-3B")],["hsn",t("HSN Summary","HSN सारांश")],["lowstock",t("Low Stock","लो स्टॉक")],["purchase",t("Purchase Register","खरीद रजिस्टर")],["stmt",t("Party Statement","पार्टी स्टेटमेंट")]];
   const D=data;
   const body=()=>{
     if(!D) return <div className="card p-6 text-slate-400">Loading…</div>;
@@ -1750,7 +1750,7 @@ function StaffView(){
   return (
     <div className="p-6 max-w-3xl fade-in">
       <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
-        <h2 className="text-2xl font-extrabold text-slate-800">App Users</h2>
+        <h2 className="text-2xl font-extrabold text-slate-800">{t("App Users","ऐप यूज़र")}</h2>
         <div className="text-sm font-semibold px-3 py-1.5 rounded-full" style={{background:limitReached?"#fee2e2":"#ecfdf5",color:limitReached?"#b91c1c":"#166534"}}>
           {meta.used}{meta.max_users>0?` / ${meta.max_users}`:""} users {meta.plan?`· ${meta.plan} plan`:""}</div>
       </div>
@@ -1795,7 +1795,7 @@ function WhatsAppView(){
     <div className="p-6 space-y-5 fade-in max-w-5xl">
       <div className="flex items-center gap-3">
         <div className="rounded-2xl flex items-center justify-center text-white" style={{width:48,height:48,background:"#25D366",fontSize:24}}>✆</div>
-        <div><h2 className="text-2xl font-extrabold text-slate-800">WhatsApp Connect</h2>
+        <div><h2 className="text-2xl font-extrabold text-slate-800">{t("WhatsApp Connect","WhatsApp कनेक्ट")}</h2>
           <div className="text-sm text-slate-500">Send invoices & documents directly to customers</div></div>
       </div>
       {msg && <div className="bg-green-50 text-green-700 p-3 rounded-xl text-sm">{msg}</div>}
@@ -1850,7 +1850,7 @@ function HRView(){
   const tabs=[["emp","Employees"],["att","Attendance"],["leave","Leave"],["pay","Payroll"]];
   return (
     <div className="p-6">
-      <h2 className="text-xl font-bold text-slate-700 mb-3">HR / Payroll</h2>
+      <h2 className="text-xl font-bold text-slate-700 mb-3">{t("HR / Payroll","HR / पेरोल")}</h2>
       <div className="flex flex-wrap gap-2 mb-4">
         {tabs.map(([k,l])=><button key={k} onClick={()=>setSub(k)} className={"px-3 py-1 rounded text-sm "+(sub===k?"bg-blue-900 text-white":"bg-slate-200")}>{l}</button>)}
       </div>
@@ -2150,7 +2150,7 @@ function AccountingView(){
   return (
     <div className="p-6 fade-in">
       <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
-        <h2 className="text-2xl font-extrabold text-slate-800">Accounting</h2>
+        <h2 className="text-2xl font-extrabold text-slate-800">{t("Accounting","लेखांकन")}</h2>
         <div className="flex gap-2">
           {tab==="coa" && <button onClick={()=>setNewAcc({code:"",name:"",account_type:"EXPENSE",opening_balance:0})} className="text-white px-4 py-2 rounded-xl text-sm font-bold" style={{background:"#ea6a1e"}}>+ Account</button>}
           {tab==="journal" && <button onClick={()=>setJe({date:new Date().toISOString().slice(0,10),narration:"",lines:[{account:"",debit:"",credit:""},{account:"",debit:"",credit:""}]})} className="text-white px-4 py-2 rounded-xl text-sm font-bold" style={{background:"#ea6a1e"}}>+ Journal Entry</button>}
@@ -2158,7 +2158,7 @@ function AccountingView(){
       </div>
       {msg && <div className="rounded-xl p-2.5 mb-3 text-sm font-semibold" style={{background:"#ecfdf5",color:"#166534",border:"1px solid #a7f3d0"}}>{msg}</div>}
       <div className="flex gap-2 flex-wrap mb-4">
-        {[["coa","Chart of Accounts"],["journal","Manual Journals"],["tb","Trial Balance"]].map(([k,l])=>
+        {[["coa",t("Chart of Accounts","खातों की सूची")],["journal",t("Manual Journals","मैनुअल जर्नल")],["tb",t("Trial Balance","ट्रायल बैलेंस")]].map(([k,l])=>
           <button key={k} onClick={()=>setTab(k)} className="px-3.5 py-1.5 rounded-full text-sm font-semibold" style={{background:tab===k?"#ea6a1e":"#fff",color:tab===k?"#fff":"#64748b",border:"1px solid "+(tab===k?"#ea6a1e":"#e2e8f0")}}>{l}</button>)}
       </div>
       {tab==="coa" && <div className="card overflow-hidden"><table className="w-full text-sm">

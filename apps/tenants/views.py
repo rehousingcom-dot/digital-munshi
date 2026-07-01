@@ -106,21 +106,56 @@ def _tokens(user):
     return {"access": str(r.access_token), "refresh": str(r)}
 
 
+def _send_via_resend(email, otp):
+    """Send OTP over Resend's HTTPS API (works on Railway, unlike SMTP). Returns (sent, err)."""
+    from django.conf import settings
+    key = getattr(settings, "RESEND_API_KEY", "") or ""
+    if not key:
+        return False, "no RESEND_API_KEY"
+    try:
+        import requests
+        r = requests.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+            json={
+                "from": getattr(settings, "RESEND_FROM", "onboarding@resend.dev"),
+                "to": [email],
+                "subject": "Your Digital Munshi OTP",
+                "text": f"Your OTP is {otp}. It is valid for 10 minutes.\n\n— Digital Munshi ERP",
+            },
+            timeout=10,
+        )
+        if r.status_code in (200, 201):
+            return True, ""
+        return False, f"Resend {r.status_code}: {r.text[:200]}"
+    except Exception as e:
+        return False, f"{type(e).__name__}: {e}"
+
+
 def _send_email_otp(email):
-    """Generate + cache an OTP for the email and try to send it.
-    Returns (otp, sent, error_str)."""
+    """Generate + cache an OTP and try to send it. Prefers Resend (HTTPS) since Railway
+    blocks SMTP; falls back to SMTP for other hosts. Returns (otp, sent, error_str)."""
     import random
     from django.core.cache import cache
     from django.core.mail import send_mail
     from django.conf import settings
     otp = f"{random.randint(0, 999999):06d}"
     cache.set(f"otp:{email}", otp, 600)  # 10 min
-    sent, err = False, ""
+
+    # 1) Resend (HTTPS) — preferred
+    if getattr(settings, "RESEND_API_KEY", ""):
+        sent, err = _send_via_resend(email, otp)
+        if sent:
+            return otp, True, ""
+        # fall through to SMTP only if Resend not the cause
+        resend_err = err
+    else:
+        resend_err = ""
+
+    # 2) SMTP fallback
     host = getattr(settings, "EMAIL_HOST", "") or ""
     configured = bool(getattr(settings, "EMAIL_HOST_USER", "")) or host not in ("", "localhost")
-    if not configured:
-        err = "EMAIL_* env vars not set (EMAIL_HOST/EMAIL_HOST_USER/EMAIL_HOST_PASSWORD)."
-    else:
+    if configured:
         try:
             send_mail(
                 "Your Digital Munshi OTP",
@@ -128,10 +163,11 @@ def _send_email_otp(email):
                 getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@digitalmunshi.in"),
                 [email], fail_silently=False,
             )
-            sent = True
+            return otp, True, ""
         except Exception as e:
-            err = f"{type(e).__name__}: {e}"
-    return otp, sent, err
+            return otp, False, resend_err or f"{type(e).__name__}: {e}"
+
+    return otp, False, resend_err or "No email provider set (add RESEND_API_KEY)."
 
 
 @api_view(["POST"])

@@ -202,3 +202,9 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
 EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=8)  # fail fast if SMTP is slow/blocked
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Digital Munshi <no-reply@digitalmunshi.in>")
+
+# Resend (HTTPS email API) — Railway blocks outbound SMTP, so we send email over HTTPS.
+# Sign up free at resend.com, put the key here. From-address must be a verified domain
+# (e.g. noreply@reloaddigital.in) or "onboarding@resend.dev" for testing to your own inbox.
+RESEND_API_KEY = env("RESEND_API_KEY", default="")
+RESEND_FROM = env("RESEND_FROM", default="Digital Munshi <onboarding@resend.dev>")

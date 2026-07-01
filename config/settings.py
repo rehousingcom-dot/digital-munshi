@@ -187,3 +187,15 @@ CORS_ALLOW_ALL_ORIGINS = DEBUG  # local dev only; server pe restrict karenge
 # Razorpay — .env mein set karein. Khaali = DEV MODE (test without real payment).
 RAZORPAY_KEY_ID = env("RAZORPAY_KEY_ID", default="")
 RAZORPAY_KEY_SECRET = env("RAZORPAY_KEY_SECRET", default="")
+
+# Email (signup OTP, invoice email). Set these env vars to enable real sending;
+# jab tak set nahi, OTP dev-mode me screen par dikhta hai.
+# Gmail: EMAIL_HOST=smtp.gmail.com, EMAIL_PORT=587, EMAIL_USE_TLS=True,
+#        EMAIL_HOST_USER=<gmail>, EMAIL_HOST_PASSWORD=<app password>.
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env.int("EMAIL_PORT", default=25)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Digital Munshi <no-reply@digitalmunshi.in>")

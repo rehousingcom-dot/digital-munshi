@@ -110,6 +110,7 @@ from apps.hr import views as hr_views
 from apps.hr import print_views as hr_print
 from apps.cashbank import views as cashbank_views
 from apps.accounting import views as acc_views
+from apps.committee import views as committee_views
 
 
 def health(request):
@@ -151,6 +152,11 @@ router.register("employees", hr_views.EmployeeViewSet)
 router.register("attendance", hr_views.AttendanceViewSet)
 router.register("leaves", hr_views.LeaveRequestViewSet)
 router.register("payslips", hr_views.SalarySlipViewSet)
+# Committee / BC / Chit
+router.register("committees", committee_views.CommitteeViewSet)
+router.register("committee-members", committee_views.CommitteeMemberViewSet)
+router.register("committee-rounds", committee_views.CommitteeRoundViewSet)
+router.register("committee-payments", committee_views.CommitteePaymentViewSet)
 # Cash & Bank
 router.register("bank-accounts", cashbank_views.BankAccountViewSet)
 router.register("bank-transactions", cashbank_views.BankTransactionViewSet)

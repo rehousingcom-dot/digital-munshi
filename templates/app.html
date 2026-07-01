@@ -210,6 +210,7 @@ const PATHS = {
   utils:'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-2.4-.6-.6-2.4z',
   pos:'M2 7h20l-2 13H4zM2 7l2-4h16l2 4M9 11v5M15 11v5',
   accounting:'M3 3v18h18M7 16V9M12 16V5M17 16v-7M3 3h18',
+  committee:'M17 20h5v-2a3 3 0 0 0-5.4-1.8M9 20H2v-2a4 4 0 0 1 6-3.5M9 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM17 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12.5 22a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM12.5 16.6v2.4M11.4 18.2h2.2',
 };
 function Icon({n, size=18, color="currentColor", stroke=2}){
   return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
@@ -2082,6 +2083,205 @@ function PayrollTab({emps}){
   </div>);
 }
 
+// ---------- Committee / BC / Chit ----------
+function CommitteeView(){
+  const [list,setList]=useState([]),[sel,setSel]=useState(null),[creating,setCreating]=useState(false);
+  const load=()=>apiList("/committees/?page_size=200").then(setList);
+  useEffect(()=>{ load(); },[]);
+  if(sel) return <CommitteeDetail c={sel} onBack={()=>{setSel(null);load();}} />;
+  return (<div className="p-6">
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-xl font-bold text-slate-700">{t("Committee / BC / Chit","कमेटी / BC / चिट")}</h2>
+      <button onClick={()=>setCreating(!creating)} className="bg-blue-900 text-white px-4 py-2 rounded text-sm">{creating?t("Close","बंद"):t("+ New Committee","+ नई कमेटी")}</button>
+    </div>
+    {creating && <CommitteeForm onSaved={()=>{setCreating(false);load();}} />}
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+      {list.length===0 && <div className="text-slate-400 text-sm">{t("No committees yet. Create one.","abhi koi committee nahi. ek banao.")}</div>}
+      {list.map(c=><button key={c.id} onClick={()=>setSel(c)} className="card p-4 text-left hover:shadow">
+        <div className="flex justify-between items-start"><div className="font-bold text-slate-800">{c.name}</div>
+          <span className="text-xs px-2 py-0.5 rounded-full" style={{background:c.status==="ACTIVE"?"#dcfce7":"#f1f5f9",color:c.status==="ACTIVE"?"#166534":"#64748b"}}>{c.status}</span></div>
+        <div className="text-2xl font-extrabold mt-1" style={{color:"#c2410c"}}>{money(c.total_value)}</div>
+        <div className="text-xs text-slate-500 mt-1">{c.members_count} {t("members","सदस्य")} · {c.members_total} {t("added","जोड़े")} · {c.rounds_done}/{c.members_count} {t("rounds done","राउंड")}</div>
+        <div className="text-xs text-slate-400 mt-0.5">{t("Per head base","प्रति सदस्य")}: {money(c.monthly_base)}</div>
+      </button>)}
+    </div>
+  </div>);
+}
+
+function CommitteeForm({onSaved}){
+  const blank={name:"",total_value:"",members_count:12,start_date:"",coupon1:2000,coupon2:1000,coupon1_holder:"",coupon2_holder:"",late_fee_per_day:500,bid_increment:1000,bid_day:5,due_day:10};
+  const [f,setF]=useState(blank),[msg,setMsg]=useState("");
+  const set=k=>e=>setF({...f,[k]:e.target.value});
+  const save=async()=>{ if(!f.name||!f.total_value){setMsg(t("Name and value required","naam aur value zaroori"));return;}
+    try{ await api("/committees/",{method:"POST",body:JSON.stringify(f)}); setMsg(""); onSaved(); }
+    catch(e){ setMsg("Error: "+JSON.stringify(e)); } };
+  return (<div className="card p-4 mb-4">
+    {msg && <div className="bg-red-50 text-red-600 p-2 rounded mb-2 text-sm">{msg}</div>}
+    <div className="grid md:grid-cols-3 gap-2">
+      <input className="border p-2 rounded" placeholder={t("Committee name","कमेटी का नाम")} value={f.name} onChange={set("name")} />
+      <input className="border p-2 rounded" type="number" placeholder={t("Total value (e.g. 600000)","कुल वैल्यू")} value={f.total_value} onChange={set("total_value")} />
+      <input className="border p-2 rounded" type="number" placeholder={t("Members / months","सदस्य / महीने")} value={f.members_count} onChange={set("members_count")} />
+      <input className="border p-2 rounded" type="date" title={t("Start date","शुरू तारीख")} value={f.start_date} onChange={set("start_date")} />
+      <input className="border p-2 rounded" type="number" placeholder={t("1st coupon (₹)","पहला कूपन")} value={f.coupon1} onChange={set("coupon1")} />
+      <input className="border p-2 rounded" placeholder={t("1st coupon holder","पहला कूपन किसका")} value={f.coupon1_holder} onChange={set("coupon1_holder")} />
+      <input className="border p-2 rounded" type="number" placeholder={t("2nd coupon (₹)","दूसरा कूपन")} value={f.coupon2} onChange={set("coupon2")} />
+      <input className="border p-2 rounded" placeholder={t("2nd coupon holder","दूसरा कूपन किसका")} value={f.coupon2_holder} onChange={set("coupon2_holder")} />
+      <input className="border p-2 rounded" type="number" placeholder={t("Late fee / day (₹)","लेट फीस/दिन")} value={f.late_fee_per_day} onChange={set("late_fee_per_day")} />
+      <input className="border p-2 rounded" type="number" placeholder={t("Bid increment (₹)","बोली वृद्धि")} value={f.bid_increment} onChange={set("bid_increment")} />
+      <input className="border p-2 rounded" type="number" placeholder={t("Bid day","बोली दिन")} value={f.bid_day} onChange={set("bid_day")} />
+      <input className="border p-2 rounded" type="number" placeholder={t("Due day","भुगतान दिन")} value={f.due_day} onChange={set("due_day")} />
+    </div>
+    <button onClick={save} className="bg-blue-900 text-white px-4 py-2 rounded mt-2 text-sm">{t("Create committee","कमेटी बनाओ")}</button>
+  </div>);
+}
+
+function CommitteeDetail({c,onBack}){
+  const [sub,setSub]=useState("members");
+  const [members,setMembers]=useState([]);
+  const reloadMembers=()=>apiList("/committee-members/?committee="+c.id+"&page_size=200").then(setMembers);
+  useEffect(()=>{ reloadMembers(); },[]);
+  const tabs=[["members",t("Members","सदस्य")],["rounds",t("Boli / Rounds","बोली / राउंड")],["payments",t("Payments","भुगतान")],["ledger",t("Interest Ledger","ब्याज लेजर")]];
+  return (<div className="p-6">
+    <button onClick={onBack} className="text-blue-700 text-sm mb-2">← {t("All committees","सभी कमेटी")}</button>
+    <div className="flex flex-wrap items-baseline gap-3 mb-1">
+      <h2 className="text-xl font-bold text-slate-800">{c.name}</h2>
+      <span className="text-lg font-extrabold" style={{color:"#c2410c"}}>{money(c.total_value)}</span>
+      <span className="text-sm text-slate-500">{c.members_count} {t("members","सदस्य")} · {t("coupon","कूपन")} {money(c.coupon_total)} · {t("per-head base","बेस")} {money(c.monthly_base)}</span>
+    </div>
+    <div className="flex flex-wrap gap-2 my-3">
+      {tabs.map(([k,l])=><button key={k} onClick={()=>setSub(k)} className={"px-3 py-1 rounded text-sm "+(sub===k?"bg-blue-900 text-white":"bg-slate-200")}>{l}</button>)}
+    </div>
+    {sub==="members" && <MembersTab c={c} members={members} reload={reloadMembers} />}
+    {sub==="rounds" && <RoundsTab c={c} members={members} />}
+    {sub==="payments" && <PaymentsTab c={c} members={members} />}
+    {sub==="ledger" && <LedgerTab c={c} />}
+  </div>);
+}
+
+function MembersTab({c,members,reload}){
+  const [f,setF]=useState({name:"",phone:""}),[bulk,setBulk]=useState(""),[msg,setMsg]=useState("");
+  const add=async()=>{ if(!f.name.trim())return;
+    await api("/committee-members/",{method:"POST",body:JSON.stringify({committee:c.id,name:f.name.trim(),phone:f.phone.trim()})});
+    setF({name:"",phone:""}); reload(); };
+  const addBulk=async()=>{ const names=bulk.split("\n").map(s=>s.trim()).filter(Boolean); if(!names.length)return;
+    await api("/committees/"+c.id+"/add_members/",{method:"POST",body:JSON.stringify({names})}); setBulk(""); setMsg(names.length+" "+t("added","जोड़े")); reload(); setTimeout(()=>setMsg(""),2000); };
+  const del=async(id)=>{ if(!confirm(t("Remove member?","सदस्य हटाएं?")))return; await api("/committee-members/"+id+"/",{method:"DELETE"}); reload(); };
+  return (<div className="grid md:grid-cols-3 gap-4">
+    <div className="md:col-span-2 card overflow-hidden"><table className="w-full text-sm">
+      <thead className="bg-slate-100"><tr><th className="text-left p-2">#</th><th className="text-left p-2">{t("Name","नाम")}</th><th className="text-left p-2">{t("Phone","फोन")}</th><th></th></tr></thead>
+      <tbody>{members.length===0&&<tr><td colSpan="4" className="p-3 text-slate-400">{t("No members yet","abhi koi sadasya nahi")}</td></tr>}
+        {members.map((m,i)=><tr key={m.id} className="border-b"><td className="p-2 text-slate-400">{i+1}</td><td className="p-2 font-medium">{m.name}</td><td className="p-2">{m.phone||"—"}</td>
+          <td className="p-2 text-right"><button onClick={()=>del(m.id)} className="text-red-500 text-xs">✕</button></td></tr>)}</tbody>
+    </table></div>
+    <div className="space-y-3">
+      <div className="card p-3">
+        <div className="font-semibold text-sm mb-2">{t("Add member","सदस्य जोड़ें")}</div>
+        <input className="border p-2 rounded w-full mb-2" placeholder={t("Name","नाम")} value={f.name} onChange={e=>setF({...f,name:e.target.value})} />
+        <input className="border p-2 rounded w-full mb-2" placeholder={t("Phone (optional)","फोन")} value={f.phone} onChange={e=>setF({...f,phone:e.target.value})} />
+        <button onClick={add} className="bg-blue-900 text-white px-3 py-1.5 rounded text-sm w-full">{t("Add","जोड़ें")}</button>
+      </div>
+      <div className="card p-3">
+        <div className="font-semibold text-sm mb-1">{t("Bulk add (one name per line)","एक लाइन में एक नाम")}</div>
+        {msg&&<div className="text-green-600 text-xs mb-1">{msg}</div>}
+        <textarea className="border p-2 rounded w-full text-sm" rows="4" value={bulk} onChange={e=>setBulk(e.target.value)} placeholder={"Satish Bhai\nMantu Babu\n..."} />
+        <button onClick={addBulk} className="bg-slate-700 text-white px-3 py-1.5 rounded text-sm w-full mt-1">{t("Add all","सब जोड़ें")}</button>
+      </div>
+    </div>
+  </div>);
+}
+
+function RoundsTab({c,members}){
+  const [rounds,setRounds]=useState([]),[msg,setMsg]=useState("");
+  const load=()=>apiList("/committee-rounds/?committee="+c.id+"&page_size=200").then(setRounds);
+  useEffect(()=>{ load(); },[]);
+  const byMonth={}; rounds.forEach(r=>byMonth[r.month_no]=r);
+  const [draft,setDraft]=useState({});
+  const setD=(mn,k,v)=>setDraft(d=>({...d,[mn]:{...(d[mn]||{}),[k]:v}}));
+  const record=async(mn)=>{ const r=byMonth[mn]||{}; const d=draft[mn]||{};
+    const body={month_no:mn, winner:(d.winner!==undefined?d.winner:r.winner)||null, bid_amount:(d.bid_amount!==undefined?d.bid_amount:r.bid_amount)||0, date:(d.date!==undefined?d.date:r.date)||null};
+    await api("/committees/"+c.id+"/record_bid/",{method:"POST",body:JSON.stringify(body)}); setMsg(t("Saved month","सेव") +" "+mn); load(); setTimeout(()=>setMsg(""),1500); };
+  const rows=[]; for(let mn=1;mn<=c.members_count;mn++)rows.push(mn);
+  return (<div>
+    {msg&&<div className="text-green-600 text-sm mb-2">{msg} ✓</div>}
+    <p className="text-xs text-slate-500 mb-2">{t("Enter each month's winner and boli (discount). Net payable & per-head auto-calculate.","har month ka winner aur boli daalo — net payable aur per-head auto.")}</p>
+    <div className="card overflow-x-auto"><table className="w-full text-sm">
+      <thead className="bg-slate-100"><tr>
+        <th className="p-2 text-left">{t("Month","महीना")}</th><th className="p-2 text-left">{t("Date","तारीख")}</th><th className="p-2 text-left">{t("Winner","विजेता")}</th>
+        <th className="p-2 text-right">{t("Boli (₹)","बोली")}</th><th className="p-2 text-right">{t("Net payable","नेट देय")}</th><th className="p-2 text-right">{t("Per head","प्रति सदस्य")}</th><th></th></tr></thead>
+      <tbody>{rows.map(mn=>{const r=byMonth[mn]||{}; const d=draft[mn]||{};
+        return (<tr key={mn} className="border-b">
+          <td className="p-2 font-semibold">{mn}</td>
+          <td className="p-2"><input type="date" className="border p-1 rounded text-xs" value={d.date!==undefined?d.date:(r.date||"")} onChange={e=>setD(mn,"date",e.target.value)} /></td>
+          <td className="p-2"><select className="border p-1 rounded text-xs" value={d.winner!==undefined?d.winner:(r.winner||"")} onChange={e=>setD(mn,"winner",e.target.value)}>
+            <option value="">—</option>{members.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}</select></td>
+          <td className="p-2 text-right"><input type="number" className="border p-1 rounded text-xs w-24 text-right" value={d.bid_amount!==undefined?d.bid_amount:(r.bid_amount||"")} onChange={e=>setD(mn,"bid_amount",e.target.value)} /></td>
+          <td className="p-2 text-right font-medium">{r.net_payable?money(r.net_payable):"—"}</td>
+          <td className="p-2 text-right" style={{color:"#c2410c"}}>{r.per_head?money(r.per_head):"—"}</td>
+          <td className="p-2 text-right"><button onClick={()=>record(mn)} className="bg-blue-900 text-white px-2 py-1 rounded text-xs">{t("Save","सेव")}</button></td>
+        </tr>);})}</tbody>
+    </table></div>
+  </div>);
+}
+
+function PaymentsTab({c,members}){
+  const [rounds,setRounds]=useState([]),[rid,setRid]=useState(""),[pays,setPays]=useState([]),[msg,setMsg]=useState("");
+  useEffect(()=>{ apiList("/committee-rounds/?committee="+c.id+"&page_size=200").then(rs=>{setRounds(rs); if(rs.length&&!rid)setRid(String(rs[0].id));}); },[]);
+  const loadPays=()=>{ if(rid)apiList("/committee-payments/?round="+rid+"&page_size=200").then(setPays); };
+  useEffect(()=>{ loadPays(); },[rid]);
+  const round=rounds.find(r=>String(r.id)===String(rid));
+  const markPaid=async(p,full)=>{ const paid_on=prompt(t("Paid on (YYYY-MM-DD), blank=today","भुगतान तारीख, khali=aaj"),new Date().toISOString().slice(0,10)); if(paid_on===null)return;
+    await api("/committee-payments/"+p.id+"/mark_paid/",{method:"POST",body:JSON.stringify({paid_on:paid_on||undefined})}); setMsg(t("Marked paid","भुगतान दर्ज")); loadPays(); setTimeout(()=>setMsg(""),1500); };
+  const badge=s=>{const c2=s==="PAID"?["#dcfce7","#166534"]:s==="PARTIAL"?["#fef9c3","#854d0e"]:["#fee2e2","#b91c1c"];return <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{background:c2[0],color:c2[1]}}>{s}</span>;};
+  return (<div>
+    <div className="flex items-center gap-2 mb-3">
+      <label className="text-sm text-slate-500">{t("Month","महीना")}:</label>
+      <select className="border p-2 rounded text-sm" value={rid} onChange={e=>setRid(e.target.value)}>
+        {rounds.length===0&&<option value="">{t("record a boli first","pehle boli record karo")}</option>}
+        {rounds.map(r=><option key={r.id} value={r.id}>{t("Month","महीना")} {r.month_no} — {t("per head","प्रति सदस्य")} {money(r.per_head)}{r.winner_name?" ("+r.winner_name+" won)":""}</option>)}</select>
+      {msg&&<span className="text-green-600 text-sm">{msg} ✓</span>}
+    </div>
+    {round && <div className="text-xs text-slate-500 mb-2">{t("Net payable","नेट देय")}: {money(round.net_payable)} · {t("due by","देय")} {round.due_date||"—"} · {t("late fee","लेट फीस")} ₹{c.late_fee_per_day}/{t("day","दिन")}</div>}
+    <div className="card overflow-hidden"><table className="w-full text-sm">
+      <thead className="bg-slate-100"><tr><th className="text-left p-2">{t("Member","सदस्य")}</th><th className="text-right p-2">{t("Due","देय")}</th><th className="text-right p-2">{t("Late fee","लेट फीस")}</th><th className="text-right p-2">{t("Paid","भुगतान")}</th><th className="p-2">{t("Status","स्थिति")}</th><th></th></tr></thead>
+      <tbody>{pays.length===0&&<tr><td colSpan="6" className="p-3 text-slate-400">{t("No payment rows — record the boli for this month first.","is month ki boli record karo pehle.")}</td></tr>}
+        {pays.map(p=><tr key={p.id} className="border-b"><td className="p-2">{p.member_name}</td><td className="p-2 text-right">{money(p.amount_due)}</td>
+          <td className="p-2 text-right">{p.late_fee>0?money(p.late_fee):"—"}</td><td className="p-2 text-right font-medium">{money(p.amount_paid)}</td>
+          <td className="p-2">{badge(p.status)}</td>
+          <td className="p-2 text-right">{p.status!=="PAID"&&<button onClick={()=>markPaid(p)} className="text-green-600 text-xs font-semibold">{t("Mark paid","भुगतान")}</button>}</td></tr>)}</tbody>
+    </table></div>
+  </div>);
+}
+
+function LedgerTab({c}){
+  const [d,setD]=useState(null);
+  useEffect(()=>{ api("/committees/"+c.id+"/ledger/").then(setD).catch(()=>{}); },[]);
+  if(!d) return <div className="text-slate-400 text-sm">{t("Loading…","लोड हो रहा…")}</div>;
+  return (<div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <Stat label={t("One member pays (total)","एक सदस्य कुल")} v={money(d.one_member_contribution)} />
+      <Stat label={t("Total collected","कुल जमा")} v={money(d.total_collected)} />
+      <Stat label={t("Rounds done","राउंड पूरे")} v={d.rounds_done+"/"+d.members} />
+      <Stat label={t("Committee value","कमेटी वैल्यू")} v={money(d.total_value)} />
+    </div>
+    <div className="card overflow-x-auto"><table className="w-full text-sm">
+      <thead className="bg-slate-100"><tr><th className="text-left p-2">{t("Member","सदस्य")}</th><th className="text-center p-2">{t("Won month","जीता महीना")}</th>
+        <th className="text-right p-2">{t("Received","मिला")}</th><th className="text-right p-2">{t("Total pays","कुल देय")}</th><th className="text-right p-2">{t("Gain / (cost)","लाभ/(लागत)")}</th><th className="text-right p-2">{t("Interest/yr","ब्याज/वर्ष")}</th></tr></thead>
+      <tbody>{d.members_ledger.map(m=>{const g=Number(m.gain);return (<tr key={m.member} className="border-b">
+        <td className="p-2 font-medium">{m.name}</td>
+        <td className="p-2 text-center">{m.won_month||<span className="text-slate-400">—</span>}</td>
+        <td className="p-2 text-right">{m.won_month?money(m.received):"—"}</td>
+        <td className="p-2 text-right">{money(m.total_contribution)}</td>
+        <td className="p-2 text-right font-semibold" style={{color:g<0?"#dc2626":"#059669"}}>{g<0?"-":""}{money(Math.abs(g))}</td>
+        <td className="p-2 text-right font-semibold" style={{color:m.annual_interest<0?"#dc2626":"#059669"}}>{m.annual_interest==null?"—":(m.annual_interest>0?"+":"")+m.annual_interest+"%"}</td></tr>);})}</tbody>
+    </table></div>
+    <p className="text-xs text-slate-400 mt-2">{t("Early taker (low month) pays interest; late taker earns. Interest is approximate annualised on the recorded rounds.","jaldi lene wala interest deta, baad wala kamata. Approx annual figure.")}</p>
+  </div>);
+}
+
+function Stat({label,v}){
+  return <div className="card p-3"><div className="text-xs text-slate-500">{label}</div><div className="text-lg font-extrabold text-slate-800">{v}</div></div>;
+}
+
 // ---------- Trial / subscription banner ----------
 function Banner({sub,onUpgrade}){
   if(!sub) return null;
@@ -2457,7 +2657,7 @@ function App(){
   const isAdmin = me && me.is_platform_admin;
   const toggleTheme=()=>setTheme(t=>t==="dark"?"light":"dark");
   const logout=()=>{ clearAuth(); setAuthed(false); setSub(null); };
-  const nav=[["dash",t("Dashboard","डैशबोर्ड")],["pos",t("POS Billing","POS बिलिंग")],["sale",t("New Sale","नई बिक्री")],["vouchers",t("Sales & Transactions","बिक्री व लेन-देन")],["items",t("Items","आइटम")],["parties",t("Parties","पार्टी")],["cashbank",t("Cash & Bank","कैश व बैंक")],["accounting",t("Accounting","अकाउंटिंग")],["reports",t("Reports","रिपोर्ट")],["utils",t("Utilities","यूटिलिटीज़")],["whatsapp",t("WhatsApp","व्हाट्सएप")],["hr",t("HR / Payroll","HR / पेरोल")],["staff",t("App Users","ऐप यूज़र")],["settings",t("Settings","सेटिंग्स")],["plan",t("Subscription","सब्सक्रिप्शन")]];
+  const nav=[["dash",t("Dashboard","डैशबोर्ड")],["pos",t("POS Billing","POS बिलिंग")],["sale",t("New Sale","नई बिक्री")],["vouchers",t("Sales & Transactions","बिक्री व लेन-देन")],["items",t("Items","आइटम")],["parties",t("Parties","पार्टी")],["cashbank",t("Cash & Bank","कैश व बैंक")],["accounting",t("Accounting","अकाउंटिंग")],["reports",t("Reports","रिपोर्ट")],["utils",t("Utilities","यूटिलिटीज़")],["whatsapp",t("WhatsApp","व्हाट्सएप")],["hr",t("HR / Payroll","HR / पेरोल")],["committee",t("Committee / BC","कमेटी / BC")],["staff",t("App Users","ऐप यूज़र")],["settings",t("Settings","सेटिंग्स")],["plan",t("Subscription","सब्सक्रिप्शन")]];
   if(isAdmin) nav.push(["admin","Platform Admin"]);
   const onActivated=s=>{ setSub(s); setTab("dash"); };
   const go=(k,mode)=>{ setTab(k); if(mode)setSaleMode(mode); setOpen(false); };
@@ -2500,6 +2700,7 @@ function App(){
             {tab==="reports" && <ReportsView/>}
             {tab==="whatsapp" && <WhatsAppView/>}
             {tab==="hr" && <HRView/>}
+            {tab==="committee" && <CommitteeView/>}
             {tab==="staff" && <StaffView/>}
             {tab==="settings" && <Settings onSaved={()=>{}} />}
             {tab==="admin" && <AdminPanel/>}

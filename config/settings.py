@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "apps.cashbank",
     "apps.accounting",
     "apps.hr",
+    "apps.committee",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

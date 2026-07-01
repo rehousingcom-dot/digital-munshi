@@ -83,3 +83,9 @@ GitHub → Settings → Developer settings → Personal access tokens.
 
 Purane docs (reference): `PROJECT_PLAN.md`, `IMPROVEMENTS.md`,
 `MARKET_AND_MARKETING_PLAN.md`, `TESTING_CHECKLIST.md`, `DEPLOY_GUIDE.md`, `README.md`.
+
+## 8. i18n — Hindi / English toggle (added)
+- `templates/app.html` me `t("English","हिंदी")` helper hai. `DM_LANG` (localStorage `dm_lang`) se decide hota hai.
+- Top bar + login pe **EN / हिं** button (`setLang()` → localStorage set + reload).
+- **Naye UI text ko `t("...","...")` me wrap karo.** Jo wrap nahi hai woh dono modes me English dikhega.
+- Translation **phased** hai: nav, top bar, login/signup done. Baaki screens (dashboard, billing, items, reports…) screen-by-screen wrap karni hain.

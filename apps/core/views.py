@@ -389,3 +389,7 @@ def tool_barcode(request):
 
 def tool_upi_qr(request):
     return _tool(request, "tool_upi_qr.html")
+
+
+def tool_chit(request):
+    return _tool(request, "tool_chit.html")

@@ -86,7 +86,7 @@ def sitemap_xml(request):
     from apps.core.marketing import COMPARISONS
     urls += [base + "/compare/" + s + "/" for s in COMPARISONS]
     urls += [base + "/tools/", base + "/tools/gst-calculator/", base + "/tools/invoice-generator/", base + "/tools/hsn-code-finder/"]
-    urls += [base + "/tools/emi-calculator/", base + "/tools/discount-calculator/", base + "/tools/profit-margin-calculator/", base + "/tools/rupees-in-words/", base + "/tools/barcode-generator/", base + "/tools/upi-qr-code-generator/"]
+    urls += [base + "/tools/emi-calculator/", base + "/tools/discount-calculator/", base + "/tools/profit-margin-calculator/", base + "/tools/rupees-in-words/", base + "/tools/barcode-generator/", base + "/tools/upi-qr-code-generator/", base + "/tools/chit-fund-calculator/"]
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     for u in urls:
         body += f"<url><loc>{u}</loc><changefreq>weekly</changefreq></url>"
@@ -223,6 +223,7 @@ urlpatterns = [
     path("tools/rupees-in-words/", core_views.tool_words, name="tool_words"),
     path("tools/barcode-generator/", core_views.tool_barcode, name="tool_barcode"),
     path("tools/upi-qr-code-generator/", core_views.tool_upi_qr, name="tool_upi_qr"),
+    path("tools/chit-fund-calculator/", core_views.tool_chit, name="tool_chit"),
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),

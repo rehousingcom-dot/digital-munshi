@@ -164,7 +164,7 @@ def catalog_shop(request, catalog_uuid):
         "shop_name": (company.name if company else org.name),
         "shop_phone": (company.phone if company else ""),
         "shop_address": (company.address if company else ""),
-        "wa": wa, "logo": logo, "items": items,
+        "wa": wa, "logo": logo, "items": items, "catalog_uuid": str(catalog_uuid),
     }
     return render(request, "catalog.html", ctx)
 

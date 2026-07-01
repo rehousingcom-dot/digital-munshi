@@ -3,21 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ shop_name }} — Online Catalog</title>
-<meta name="description" content="{{ shop_name }} ka online catalog — products dekho aur WhatsApp par order karo.">
-<meta property="og:title" content="{{ shop_name }} — Online Catalog">
+<title>{{ shop_name }} — Online Store & Product Catalog</title>
+<meta name="description" content="{{ shop_name }} online store — browse products, prices and order instantly on WhatsApp.{% if shop_address %} {{ shop_address }}.{% endif %}">
+<link rel="canonical" href="https://erp.reloaddigital.in/shop/{{ catalog_uuid }}/">
+<meta property="og:title" content="{{ shop_name }} — Online Store">
+<meta property="og:description" content="Browse products and order on WhatsApp — {{ shop_name }}.">
 <meta property="og:type" content="website">
+<meta name="robots" content="index, follow">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Store","name":"{{ shop_name|escapejs }}","telephone":"{{ shop_phone|escapejs }}","address":"{{ shop_address|escapejs }}"}
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>body{background:#f8fafc}</style>
 </head>
 <body class="text-slate-800">
 <header class="bg-white border-b sticky top-0 z-10">
   <div class="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
-    {% if logo %}<img src="{{ logo }}" alt="" class="w-10 h-10 rounded-lg object-cover border">{% else %}
+    {% if logo %}<img src="{{ logo }}" alt="{{ shop_name }} logo" class="w-10 h-10 rounded-lg object-cover border">{% else %}
     <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">{{ shop_name|slice:":1" }}</div>{% endif %}
     <div>
       <div class="font-extrabold text-lg leading-tight">{{ shop_name }}</div>
-      <div class="text-xs text-slate-400">{% if shop_phone %}📞 {{ shop_phone }} · {% endif %}Online Catalog</div>
+      <div class="text-xs text-slate-400">{% if shop_phone %}📞 {{ shop_phone }} · {% endif %}Online Store</div>
     </div>
   </div>
 </header>
@@ -56,6 +62,13 @@
   </div>
 </div>
 
+<footer class="max-w-4xl mx-auto px-4 py-8 text-center">
+  <a href="https://erp.reloaddigital.in/welcome/?ref=shop" target="_blank" rel="noopener"
+     class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-orange-600">
+    ⚡ Powered by <b class="text-slate-500">Digital Munshi</b> — Create your free online store →
+  </a>
+</footer>
+
 <script>
 var WA = "{{ wa }}";
 var SHOP = "{{ shop_name|escapejs }}";
@@ -65,14 +78,14 @@ function step(btn,d){ var row=btn.closest("[data-price]"); var span=row.querySel
   var q=Math.max(0,(parseInt(span.textContent)||0)+d); span.textContent=q; recalc(); }
 function recalc(){ var items=0,total=0,lines=[];
   document.querySelectorAll("[data-price]").forEach(function(row){ var q=parseInt(row.querySelector(".qty").textContent)||0;
-    if(q>0){ var name=row.dataset.name2, price=parseFloat(row.dataset.price)||0; items+=q; total+=q*price; lines.push(q+" x "+name+" = ₹"+(q*price).toFixed(0)); } });
+    if(q>0){ var name=row.dataset.name2, price=parseFloat(row.dataset.price)||0; items+=q; total+=q*price; lines.push(q+" x "+name+" = Rs "+(q*price).toFixed(0)); } });
   document.getElementById("citems").textContent=items;
   document.getElementById("ctotal").textContent=total.toFixed(0);
   document.getElementById("bar").classList.toggle("hidden", items===0);
-  var msg="Namaste "+SHOP+"%0A%0AMujhe ye order chahiye:%0A"+encodeURIComponent(lines.join("\n"))+"%0A%0ATotal: Rs "+total.toFixed(0)+"%0A%0AMera naam: ";
+  var msg="Hello "+SHOP+",%0A%0AI would like to order:%0A"+encodeURIComponent(lines.join("\n"))+"%0A%0ATotal: Rs "+total.toFixed(0)+"%0A%0AMy name: ";
   var btn=document.getElementById("waBtn");
   btn.href = WA ? ("https://wa.me/"+WA+"?text="+msg) : "#";
-  if(!WA){ btn.textContent="Shop ka WhatsApp number set nahi"; btn.style.background="#94a3b8"; }
+  if(!WA){ btn.textContent="WhatsApp number not set"; btn.style.background="#94a3b8"; }
 }
 </script>
 </body>

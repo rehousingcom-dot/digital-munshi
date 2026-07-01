@@ -2446,6 +2446,30 @@ function Stat({label,v}){
 }
 
 // ---------- Online Orders (store) ----------
+function StoreLinkCard(){
+  const [me,setMe]=useState(null),[msg,setMsg]=useState("");
+  useEffect(()=>{ api("/me/").then(setMe).catch(()=>{}); },[]);
+  if(!me||!me.catalog_uuid) return null;
+  const link=window.location.origin+"/shop/"+me.catalog_uuid+"/";
+  const copy=()=>{ navigator.clipboard.writeText(link); setMsg(t("Link copied!","लिंक कॉपी!")); setTimeout(()=>setMsg(""),1500); };
+  const wa=()=>{ const txt=t("Hamari online dukaan dekho aur ghar baithe order karo","Order from our online store")+": "+link; window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank"); };
+  const toggle=async()=>{ const r=await api("/catalog/toggle/",{method:"POST",body:JSON.stringify({enabled:!me.catalog_enabled})}); setMe({...me,catalog_enabled:r.catalog_enabled}); };
+  return (<div className="card p-4 mb-4" style={{background:"linear-gradient(135deg,#fff7ed,#fff)"}}>
+    <div className="flex items-center justify-between flex-wrap gap-2">
+      <div className="font-bold text-slate-700">🔗 {t("Aapka online store link","Your store link")}</div>
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!me.catalog_enabled} onChange={toggle} /> {me.catalog_enabled?t("Live","चालू"):t("Band","बंद")}</label>
+    </div>
+    <div className="bg-white rounded-lg p-2 text-xs break-all border mt-2">{link}</div>
+    <div className="flex flex-wrap gap-2 mt-2">
+      <button onClick={copy} className="bg-slate-700 text-white px-3 py-1.5 rounded-lg text-sm">{t("Copy","कॉपी")}</button>
+      <button onClick={wa} className="text-white px-3 py-1.5 rounded-lg text-sm" style={{background:"#25D366"}}>{t("WhatsApp","व्हाट्सएप")}</button>
+      <a href={link} target="_blank" className="bg-blue-900 text-white px-3 py-1.5 rounded-lg text-sm">{t("Open","खोलो")}</a>
+      {msg&&<span className="text-green-600 text-sm self-center font-semibold">{msg}</span>}
+    </div>
+    <p className="text-xs text-slate-400 mt-2">{t("Ye link customers ko bhejo — woh products dekh ke ghar baithe order karein. Items 'Items' me add karo, phir yahan dikhеinge.","Share this link with customers to receive orders.")}</p>
+  </div>);
+}
+
 function OrdersView(){
   const [rows,setRows]=useState([]),[fil,setFil]=useState(""),[msg,setMsg]=useState(""),[exp,setExp]=useState(null);
   const load=()=>apiList("/orders/"+(fil?("?status="+fil):"")+(fil?"&":"?")+"page_size=200").then(setRows);
@@ -2458,6 +2482,7 @@ function OrdersView(){
   return (<div className="p-6">
     <h2 className="text-xl font-bold text-slate-700 mb-1">{t("Online Orders","ऑनलाइन ऑर्डर")}</h2>
     <p className="text-sm text-slate-500 mb-3">{t("Aapke online store se aaye orders. Status update karo ya ek click me invoice banao.","Orders from your online store.")}</p>
+    <StoreLinkCard/>
     {msg&&<div className="bg-green-50 text-green-700 p-2 rounded mb-3 text-sm">{msg}</div>}
     <div className="flex flex-wrap gap-2 mb-4">{stages.map(([k,l])=><button key={k} onClick={()=>setFil(k)} className={"px-3 py-1 rounded text-sm "+(fil===k?"bg-blue-900 text-white":"bg-slate-200")}>{l}</button>)}</div>
     <div className="space-y-3">

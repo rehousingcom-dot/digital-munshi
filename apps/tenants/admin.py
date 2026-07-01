@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Organization, Plan, Subscription, SubscriptionPayment
+from .models import Organization, Plan, Subscription, SubscriptionPayment, Lead
 
 
 @admin.register(Organization)
@@ -24,3 +24,11 @@ class SubscriptionAdmin(admin.ModelAdmin):
 class SubscriptionPaymentAdmin(admin.ModelAdmin):
     list_display = ("subscription", "plan", "cycle", "amount", "status", "paid_at")
     list_filter = ("status", "gateway")
+
+
+@admin.register(Lead)
+class LeadAdmin(admin.ModelAdmin):
+    list_display = ("name", "phone", "business", "source", "created_at")
+    search_fields = ("name", "phone", "business")
+    list_filter = ("created_at",)
+    readonly_fields = ("created_at",)

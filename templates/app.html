@@ -1323,7 +1323,7 @@ function CashBankModal({modal,parties,expCats,onClose,onSaved}){
 
 // ---------- Sales / Transactions hub (Vyapar parity: type tabs + convert) ----------
 function VouchersView({initialQuery,onNav}){
-  const TABS=[["","All"],["SALE","Invoices"],["ESTIMATE","Estimates"],["PROFORMA","Proforma"],["SALE_ORDER","Sale Orders"],["DELIVERY_CHALLAN","Delivery Challan"],["SALE_RETURN","Credit Notes"],["PURCHASE","Purchases"],["RECURRING","↻ Recurring"]];
+  const TABS=[["","All"],["SALE","Invoices"],["ESTIMATE","Estimates"],["PROFORMA","Proforma"],["SALE_ORDER","Sale Orders"],["DELIVERY_CHALLAN","Delivery Challan"],["SALE_RETURN","Credit Notes"],["PURCHASE","Purchases"],["RECURRING","↻ Auto Invoice"]];
   const [type,setType]=useState(""),[rows,setRows]=useState([]),[parties,setParties]=useState([]),[q,setQ]=useState(initialQuery||""),[msg,setMsg]=useState("");
   const [recs,setRecs]=useState([]),[recFor,setRecFor]=useState(null);
   const load=()=>apiList("/vouchers/?page_size=500"+(type?"&type="+type:"")).then(setRows);
@@ -1334,8 +1334,8 @@ function VouchersView({initialQuery,onNav}){
   const toggleRec=async r=>{ try{ await api(`/recurring-invoices/${r.id}/`,{method:"PATCH",body:JSON.stringify({is_active:!r.is_active})}); loadRecs();}catch(e){} };
   const pName=id=>{const p=parties.find(x=>x.id==id);return p?p.name:"—";};
   const convert=async(r,to)=>{ try{ const x=await api(`/vouchers/${r.id}/convert/`,{method:"POST",body:JSON.stringify({to})});
-    setMsg(`✓ ${r.number} → ${x.number} (${to==="SALE"?"Invoice":to}) ban gaya`); load(); setTimeout(()=>setMsg(""),3500);
-  }catch(e){ setMsg("Convert fail"); } };
+    setMsg(`✓ ${r.number} → ${x.number} (${to==="SALE"?"Invoice":"Order"}) ban gaya`); load(); setTimeout(()=>setMsg(""),3500);
+  }catch(e){ setMsg((e&&e.detail)||"Convert fail"); setTimeout(()=>setMsg(""),4000); } };
   const canConvert=t=>["ESTIMATE","PROFORMA","SALE_ORDER","DELIVERY_CHALLAN"].includes(t);
   const filt=rows.filter(r=>!q||JSON.stringify(r).toLowerCase().includes(q.toLowerCase())||pName(r.party).toLowerCase().includes(q.toLowerCase()));
   const total=filt.reduce((a,r)=>a+Number(r.grand_total||0),0);
@@ -1356,7 +1356,7 @@ function VouchersView({initialQuery,onNav}){
       {type==="RECURRING"
         ? <div className="card overflow-x-auto"><table className="w-full text-sm" style={{minWidth:760}}>
             <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Name</th><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">Frequency</th><th className="text-left p-2.5">Next Run</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Generated</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Actions</th></tr></thead>
-            <tbody>{recs.length===0 && <tr><td className="p-3 text-slate-400" colSpan={8}>Koi recurring invoice nahi — kisi Invoice ke "↻ Recur" se banao (monthly AMC, rent, contracts)</td></tr>}
+            <tbody>{recs.length===0 && <tr><td className="p-3 text-slate-400" colSpan={8}>Koi auto invoice nahi — kisi Invoice ke "↻ Auto" se banao (monthly AMC, rent, contracts)</td></tr>}
               {recs.map(r=><tr key={r.id} className="border-b hover:bg-slate-50"><td className="p-2.5 font-semibold">{r.name}</td><td className="p-2.5">{r.party_name}</td>
                 <td className="p-2.5 text-xs">{r.frequency}</td><td className="p-2.5 text-xs">{r.next_run}</td><td className="p-2.5 text-right font-semibold">{money(r.amount)}</td>
                 <td className="p-2.5 text-center">{r.generated_count}</td>
@@ -1378,8 +1378,10 @@ function VouchersView({initialQuery,onNav}){
               <td className="p-2.5 text-right font-semibold">{money(r.grand_total)}</td>
               <td className="p-2.5 text-center">{r.is_posted?<span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Posted</span>:<span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Open</span>}</td>
               <td className="p-2.5 text-right whitespace-nowrap">
-                {canConvert(r.voucher_type) && <button onClick={()=>convert(r,"SALE")} className="text-xs font-bold text-orange-700 mr-3 hover:underline">→ Invoice</button>}
-                {r.voucher_type==="SALE" && <button onClick={()=>setRecFor(r)} className="text-xs font-semibold text-purple-700 mr-3" title="Recurring banao">↻ Recur</button>}
+                {r.converted_to && <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 mr-3" title="Invoice ban chuka">✓ Invoiced</span>}
+                {canConvert(r.voucher_type) && !r.converted_to && <button onClick={()=>convert(r,"SALE")} className="text-xs font-bold text-orange-700 mr-3 hover:underline">→ Invoice</button>}
+                {r.voucher_type==="ESTIMATE" && !r.converted_to && <button onClick={()=>convert(r,"SALE_ORDER")} className="text-xs font-bold text-indigo-600 mr-3 hover:underline">→ Order</button>}
+                {r.voucher_type==="SALE" && <button onClick={()=>setRecFor(r)} className="text-xs font-semibold text-purple-700 mr-3" title="Auto Invoice banao">↻ Auto</button>}
                 <button onClick={async()=>{try{const x=await api(`/vouchers/${r.id}/email/`,{method:"POST",body:JSON.stringify({})});setMsg(x.sent?`✓ Email bheja ${x.to}`:`Email: ${x.to||"party ka email nahi"}`);setTimeout(()=>setMsg(""),3000);}catch(e){setMsg("Email fail — party ka email add karein");setTimeout(()=>setMsg(""),3000);}}} className="text-blue-600 text-xs font-semibold mr-3">Email</button>
                 <button onClick={()=>shareWhatsApp(r.id)} className="text-emerald-600 text-xs font-semibold mr-3">WhatsApp</button>
                 <a className="text-blue-700 text-xs font-semibold" href={`/invoice/${r.id}/?token=`+getToken()} target="_blank">Print</a>
@@ -1403,7 +1405,7 @@ function RecurringModal({voucher,onClose,onSaved}){
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-24" style={{background:"rgba(15,23,42,.45)"}} onClick={onClose}>
       <div className="card w-full max-w-md overflow-hidden" onClick={e=>e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 py-4" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}><h3 className="text-white font-bold">↻ Make Recurring</h3><button onClick={onClose} className="text-white text-xl">×</button></div>
+        <div className="flex items-center justify-between px-6 py-4" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}><h3 className="text-white font-bold">↻ Make Auto Invoice</h3><button onClick={onClose} className="text-white text-xl">×</button></div>
         <div className="p-6 space-y-3">
           {err && <div className="bg-red-50 text-red-700 text-sm p-2 rounded-lg">{err}</div>}
           <div className="text-sm text-slate-500">Source: <b>{voucher.number}</b> — {money(voucher.grand_total)}</div>

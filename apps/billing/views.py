@@ -75,7 +75,10 @@ class VoucherViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
         """Estimate/Challan ko Sale Invoice mein convert karta hai."""
         voucher = self.get_object()
         new_type = (request.data.get("to") or "SALE").upper()
-        new_v = voucher.convert_to(new_type)
+        try:
+            new_v = voucher.convert_to(new_type)
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=400)
         return Response({"status": "converted", "new_id": new_v.id,
                          "number": new_v.number, "grand_total": str(new_v.grand_total)})
 

@@ -49,6 +49,9 @@ class Voucher(OrgOwned):
 
     notes = models.TextField(blank=True)
     is_posted = models.BooleanField(default=False, help_text="Stock update ho chuka?")
+    converted_to = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL,
+                                     related_name="converted_from",
+                                     help_text="Estimate/Order/Challan ka banaya hua invoice (ek hi baar convert ho)")
     share_uuid = models.UUIDField(default=uuid.uuid4, editable=False,
                                   help_text="Public share link ke liye (token leak ke bina)")
 
@@ -195,7 +198,10 @@ class Voucher(OrgOwned):
         self.save(update_fields=["is_posted"])
 
     def convert_to(self, new_type):
-        """Estimate/Challan ko Sale Invoice mein convert karta hai (lines copy)."""
+        """Estimate/Order/Challan ko Sale Invoice/Order mein convert karta hai (lines copy).
+        Ek source ko invoice sirf EK BAAR banaya ja sakta hai (converted_to guard)."""
+        if new_type == "SALE" and self.converted_to_id:
+            raise ValueError(f"{self.number} ka invoice pehle hi ban chuka hai ({self.converted_to.number}).")
         new_v = Voucher.objects.create(
             voucher_type=new_type, date=self.date, party=self.party,
             godown=self.godown, company_state_code=self.company_state_code,
@@ -207,6 +213,9 @@ class Voucher(OrgOwned):
             ln.voucher = new_v
             ln.save()
         new_v.recalculate()
+        if new_type == "SALE":
+            self.converted_to = new_v
+            self.save(update_fields=["converted_to"])
         return new_v
 
 

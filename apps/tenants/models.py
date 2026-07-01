@@ -20,9 +20,26 @@ class Organization(models.Model):
     # Online catalog (public shop link)
     catalog_uuid = models.UUIDField(default=_uuid.uuid4, editable=False, unique=True)
     catalog_enabled = models.BooleanField(default=True)
+    # Referral (refer & earn)
+    referral_code = models.CharField(max_length=16, unique=True, null=True, blank=True)
+    referred_by = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True,
+                                    related_name="referrals")
 
     def __str__(self):
         return self.name
+
+    def ensure_referral_code(self):
+        if self.referral_code:
+            return self.referral_code
+        import random, string
+        base = "".join(ch for ch in (self.name or "DM").upper() if ch.isalpha())[:4] or "DM"
+        for _ in range(20):
+            code = base + "".join(random.choices(string.digits + string.ascii_uppercase, k=4))
+            if not Organization.objects.filter(referral_code=code).exists():
+                self.referral_code = code
+                self.save(update_fields=["referral_code"])
+                return code
+        return None
 
 
 class Plan(models.Model):
@@ -112,6 +129,19 @@ class Subscription(models.Model):
         self.billing_cycle = cycle
         self.status = self.Status.ACTIVE
         self.current_period_end = base + timedelta(days=days)
+        self.save()
+
+    def grant_bonus(self, days=30):
+        """Referral bonus — free din add karta hai (trial ya paid period pe)."""
+        now = timezone.now()
+        if self.status == self.Status.TRIAL and self.trial_ends_at:
+            base = self.trial_ends_at if self.trial_ends_at > now else now
+            self.trial_ends_at = base + timedelta(days=days)
+        else:
+            base = self.current_period_end if (self.current_period_end and self.current_period_end > now) else now
+            self.current_period_end = base + timedelta(days=days)
+            if self.status in (self.Status.EXPIRED, self.Status.PAST_DUE):
+                self.status = self.Status.ACTIVE
         self.save()
 
     def refresh_status(self):

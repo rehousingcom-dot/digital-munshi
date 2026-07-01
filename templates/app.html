@@ -219,8 +219,9 @@ function Icon({n, size=18, color="currentColor", stroke=2}){
 
 // ---------- Login / Signup ----------
 function Login({onLogin}){
-  const [mode,setMode]=useState("login");
-  const [f,setF]=useState({username:"",password:"",email:"",org_name:"",business_type:"RETAIL",phone:"",otp:""});
+  const refFromUrl=(()=>{try{return new URLSearchParams(window.location.search).get("ref")||"";}catch(e){return "";}})();
+  const [mode,setMode]=useState(refFromUrl?"signup":"login");
+  const [f,setF]=useState({username:"",password:"",email:"",org_name:"",business_type:"RETAIL",phone:"",otp:"",ref:refFromUrl});
   const [err,setErr]=useState(""),[busy,setBusy]=useState(false);
   const [showPass,setShowPass]=useState(false);
   const [otpSent,setOtpSent]=useState(false),[devOtp,setDevOtp]=useState(""),[mailErr,setMailErr]=useState("");
@@ -308,6 +309,7 @@ function Login({onLogin}){
                 {BTYPES.map(([c,l])=><option key={c} value={c}>{l}</option>)}</select>}
               <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder={t("Username","यूज़रनेम")} value={f.username} onChange={set("username")} />
               {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder={t("Mobile number (optional)","मोबाइल नंबर (वैकल्पिक)")} value={f.phone} onChange={set("phone")} />}
+              {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder={t("Referral code (optional) — 1 month free!","रेफरल कोड (वैकल्पिक) — 1 माह फ्री!")} value={f.ref} onChange={set("ref")} />}
               {mode==="signup" && <div className="mb-3">
                 <div className="flex gap-2">
                   <input className="flex-1 p-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder={t("Email address *","ईमेल पता *")} value={f.email} onChange={set("email")} />
@@ -340,6 +342,32 @@ function Login({onLogin}){
 }
 
 // ---------- Subscribe / Plans ----------
+function ReferCard(){
+  const [r,setR]=useState(null),[msg,setMsg]=useState("");
+  useEffect(()=>{ api("/referral/me/").then(setR).catch(()=>{}); },[]);
+  if(!r) return null;
+  const copy=()=>{ navigator.clipboard.writeText(r.link); setMsg(t("Link copied!","लिंक कॉपी!")); setTimeout(()=>setMsg(""),1500); };
+  const wa=()=>{ const txt=t("Digital Munshi try karo — billing, GST, udhaar, committee sab ek app me! Mere link se signup karo, dono ko 1 mahina FREE","Digital Munshi try karo! Mere link se signup, dono ko 1 month free")+": "+r.link; window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank"); };
+  return (<div className="rounded-2xl p-4 mb-5" style={{background:"linear-gradient(135deg,#fff7ed,#ffedd5)",border:"1px solid #fed7aa"}}>
+    <div className="flex items-center justify-between flex-wrap gap-2">
+      <div>
+        <div className="font-extrabold text-orange-800">🎁 {t("Refer & Earn","रेफ़र करो, कमाओ")}</div>
+        <div className="text-sm text-slate-600">{t("Har dost jo aapke code se judega — aapko aur unhe 1 mahina FREE!","Har referral pe aapko aur dost ko 1 month free!")}</div>
+      </div>
+      <div className="text-right">
+        <div className="text-xs text-slate-500">{t("Your code","आपका कोड")}</div>
+        <div className="font-extrabold text-lg tracking-wider" style={{color:"#c2410c"}}>{r.code}</div>
+      </div>
+    </div>
+    <div className="flex items-center gap-2 mt-3 flex-wrap">
+      <div className="bg-white/70 rounded-lg px-2 py-1.5 text-xs break-all border flex-1 min-w-[180px]">{r.link}</div>
+      <button onClick={copy} className="bg-slate-700 text-white px-3 py-1.5 rounded-lg text-sm">{t("Copy","कॉपी")}</button>
+      <button onClick={wa} className="text-white px-3 py-1.5 rounded-lg text-sm" style={{background:"#25D366"}}>{t("WhatsApp","व्हाट्सएप")}</button>
+    </div>
+    <div className="text-xs text-slate-600 mt-2">{t("Refer kiye","रेफर किए")}: <b>{r.referred_count}</b> · {t("Free din kamaye","फ्री दिन")}: <b>{r.days_earned}</b>{msg&&<span className="text-green-600 font-semibold ml-2">{msg}</span>}</div>
+  </div>);
+}
+
 function Subscribe({sub,onActivated}){
   const [plans,setPlans]=useState([]),[cycle,setCycle]=useState("MONTHLY"),[busy,setBusy]=useState(""),[err,setErr]=useState("");
   useEffect(()=>{ api("/plans/").then(setPlans).catch(console.error); },[]);
@@ -368,6 +396,7 @@ function Subscribe({sub,onActivated}){
         ? <div className="bg-red-50 text-red-600 p-3 rounded mb-4">Your trial/plan has ended. Choose a plan to continue.</div>
         : <p className="text-slate-500 mb-4">Trial chal raha hai — kabhi bhi upgrade kar sakte hain.</p>}
       {err && <div className="bg-red-50 text-red-600 p-2 rounded mb-3 text-sm">{err}</div>}
+      <ReferCard/>
       <div className="inline-flex bg-slate-200 rounded-lg p-1 mb-5">
         {["MONTHLY","YEARLY"].map(cy=><button key={cy} onClick={()=>setCycle(cy)} className={"px-4 py-1 rounded-md text-sm font-medium "+(cycle===cy?"bg-white shadow":"text-slate-500")}>{cy==="MONTHLY"?"Monthly":"Yearly (2 mahine free)"}</button>)}
       </div>

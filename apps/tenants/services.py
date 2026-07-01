@@ -37,8 +37,10 @@ def provision_default_masters(org, business_type="GENERAL"):
 
 
 @transaction.atomic
-def signup_organization(*, username, password, email, org_name, phone="", business_type="GENERAL"):
-    """Naya business register: user + organization + 7-day trial + default masters."""
+def signup_organization(*, username, password, email, org_name, phone="", business_type="GENERAL",
+                        referral_code=None):
+    """Naya business register: user + organization + 7-day trial + default masters.
+    referral_code diya ho to referrer + naye dono ko 30 din free bonus."""
     if User.objects.filter(username=username).exists():
         raise ValueError("Username pehle se exist karta hai.")
     org = Organization.objects.create(name=org_name)
@@ -48,8 +50,24 @@ def signup_organization(*, username, password, email, org_name, phone="", busine
     )
     org.owner = user
     org.save(update_fields=["owner"])
+    org.ensure_referral_code()
 
     default_plan = Plan.objects.filter(is_active=True).order_by("sort_order").first()
     sub = Subscription.start_trial(org, plan=default_plan)
     provision_default_masters(org, business_type=business_type)
+
+    # Referral bonus — dono ko 30 din free
+    code = (referral_code or "").strip().upper()
+    if code:
+        referrer = Organization.objects.filter(referral_code=code).exclude(pk=org.pk).first()
+        if referrer:
+            org.referred_by = referrer
+            org.save(update_fields=["referred_by"])
+            try:
+                sub.grant_bonus(30)
+                rsub = getattr(referrer, "subscription", None)
+                if rsub:
+                    rsub.grant_bonus(30)
+            except Exception:
+                pass
     return user, org, sub

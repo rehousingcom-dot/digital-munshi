@@ -220,6 +220,7 @@ def signup(request):
             username=d["username"], password=d["password"],
             email=email, org_name=d["org_name"], phone=d.get("phone", ""),
             business_type=d.get("business_type", "GENERAL"),
+            referral_code=d.get("ref") or d.get("referral_code"),
         )
     except ValueError as e:
         return Response({"detail": str(e)}, status=400)
@@ -236,6 +237,26 @@ def signup(request):
 @permission_classes([AllowAny])
 def plans(request):
     return Response(PlanSerializer(Plan.objects.filter(is_active=True), many=True).data)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def referral_me(request):
+    """Meri referral details — code, link, kitne refer hue, kitne din free mile."""
+    org = getattr(request.user, "organization", None)
+    if not org:
+        return Response({"detail": "no org"}, status=400)
+    code = org.ensure_referral_code()
+    referred = org.referrals.all()
+    origin = request.build_absolute_uri("/").rstrip("/")
+    return Response({
+        "code": code,
+        "link": f"{origin}/?ref={code}",
+        "referred_count": referred.count(),
+        "referred_names": [r.name for r in referred[:20]],
+        "bonus_days_per_referral": 30,
+        "days_earned": referred.count() * 30,
+    })
 
 
 def _sub(request):

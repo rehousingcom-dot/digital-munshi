@@ -183,6 +183,7 @@ urlpatterns = [
     path("api/send-otp/", tenant_views.send_otp, name="send_otp"),
     path("api/signup/", tenant_views.signup, name="signup"),
     path("api/plans/", tenant_views.plans, name="plans"),
+    path("api/referral/me/", tenant_views.referral_me, name="referral_me"),
     path("api/subscription/", tenant_views.subscription_status, name="subscription"),
     path("api/subscription/create_order/", tenant_views.create_order, name="create_order"),
     path("api/subscription/verify/", tenant_views.verify_payment, name="verify_payment"),

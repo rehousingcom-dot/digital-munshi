@@ -260,7 +260,7 @@ function Login({onLogin}){
             <div className="mt-8 bg-white/10 rounded-2xl p-4 flex items-start gap-3" style={{maxWidth:490,backdropFilter:"blur(6px)"}}>
               <div className="w-9 h-9 rounded-full bg-orange-200 text-orange-900 flex items-center justify-center font-bold shrink-0">R</div>
               <div>
-                <p className="text-sm text-orange-50">"Tally chhod ke Digital Munshi pe aaya. Billing ab 3x fast, GST report ek click me."</p>
+                <p className="text-sm text-orange-50">"Switched from Tally to Digital Munshi. Billing is 3x faster now, GST report in one click."</p>
                 <p className="text-xs text-orange-200 mt-1">— Rajesh, Kirana & Wholesale, Jaipur</p>
               </div>
             </div>
@@ -419,8 +419,8 @@ function Dashboard({onNav}){
     receivables:{label:t("To Collect","लेना है"),icon:"coins",accent:"#0891b2",val:money(d.cash_flow.receivables),sub:<span className="text-slate-400">{t("from customers","ग्राहकों से बकाया")}</span>},
     payables:{label:t("To Pay","देना है"),icon:"profit",accent:"#dc2626",val:money(d.cash_flow.payables),sub:<span className="text-slate-400">{t("to suppliers","सप्लायर को देना")}</span>},
     tax:{label:t("Tax Collected","टैक्स जमा"),icon:"tax",accent:"#7C3AED",val:money(s.total_tax),sub:<span className="text-slate-400">GST</span>},
-    invoices:{label:t("Invoices","इनवॉइस"),icon:"invoices",accent:"#7C3AED",val:s.invoice_count,sub:<span className="text-slate-400">{t("this month","इस महीने")}</span>},
-    purchases:{label:t("Purchases","खरीद"),icon:"vouchers",accent:"#d97706",val:money(s.total_purchases),sub:<span className="text-slate-400">{t("this month","इस महीने")}</span>},
+    invoices:{label:t("Invoices","इनवॉइस"),icon:"invoices",accent:"#7C3AED",val:s.invoice_count,sub:<span className="text-slate-400">{t("ththis month","इस महीने")}</span>},
+    purchases:{label:t("Purchases","खरीद"),icon:"vouchers",accent:"#d97706",val:money(s.total_purchases),sub:<span className="text-slate-400">{t("ththis month","इस महीने")}</span>},
     stock_value:{label:"Stock Value",icon:"items",accent:"#0891b2",val:money(s.stock_value),sub:<span className="text-slate-400">current</span>},
   };
   const W=(k)=>{ const w=WIDGETS[k]; if(!w) return null; return (
@@ -510,7 +510,7 @@ function Dashboard({onNav}){
           <div className="rounded-2xl flex items-center justify-center text-white" style={{width:46,height:46,background:"#25D366",fontSize:22}}>✆</div>
           <div className="flex-1">
             <div className="flex items-center gap-2"><div className="font-bold text-slate-800">WhatsApp Connect</div><span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background:"#dcfce7",color:"#16a34a"}}>ENABLED</span></div>
-            <div className="text-sm text-slate-500 mt-1">Invoices, estimates aur reminders seedha customer ko WhatsApp pe bhejein.</div>
+            <div className="text-sm text-slate-500 mt-1">Send invoices, estimates and reminders directly to customers on WhatsApp.</div>
             <button onClick={()=>onNav&&onNav("settings")} className="text-sm font-semibold text-green-700 mt-2">Set number →</button>
           </div>
         </div>
@@ -626,7 +626,7 @@ function PartyForm({party,onClose,onSaved}){
         legal_name:r.legal_name||s.legal_name,pan:r.pan||s.pan,
         address:r.address||s.address,city:r.city||s.city,pincode:r.pincode||s.pincode,
         name:s.name||r.trade_name||r.legal_name||""})); }
-    }catch(e){ setGst({valid:false,detail:"Verify nahi ho paaya"}); } };
+    }catch(e){ setGst({valid:false,detail:"Could not verify"}); } };
   const save=async()=>{ if(!f.name){setErr("Party name is required");return;} setBusy(true);setErr("");
     try{ const method=party?"PATCH":"POST"; const path=party?`/parties/${party.id}/`:"/parties/";
       const saved=await api(path,{method,body:JSON.stringify(f)});
@@ -867,7 +867,7 @@ function ItemForm({item,onClose,onSaved}){
               <div className="grid md:grid-cols-3 gap-3">{I("Size","size")}{I("Colour","colour")}{I("Model","model")}</div>
               {v0&&v0.item_code && <div className="text-xs text-green-700">Current code: <b>{v0.item_code}</b> · barcode: {v0.barcode}</div>}
               <div className="border-t pt-3">
-                <label className="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={!!f.is_combo} onChange={e=>set("is_combo",e.target.checked)}/> Combo / Bundle / BOM (dusre items se bana)</label>
+                <label className="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={!!f.is_combo} onChange={e=>set("is_combo",e.target.checked)}/> Combo / Bundle / BOM (made from other items)</label>
                 {f.is_combo && <div className="mt-2">
                   <div className="text-xs text-slate-400 mb-1">Components — bechne pe inka stock kam hoga:</div>
                   {(f.components||[]).map((c,i)=><div key={i} className="flex gap-2 mb-1">
@@ -997,7 +997,7 @@ function NewSale({initialDoc}){
           <select className={cell} value={party} onChange={e=>setParty(e.target.value)}>
             <option value="">— select —</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>
           {qpOpen && <div className="mt-2 p-2 rounded-lg bg-orange-50 border border-orange-100">
-            <input className={cell+" mb-2"} placeholder={(docType==="PURCHASE"?"Supplier":"Customer")+" ka naam *"} value={qpName} onChange={e=>setQpName(e.target.value)} />
+            <input className={cell+" mb-2"} placeholder={(docType==="PURCHASE"?"Supplier":"Customer")+" name *"} value={qpName} onChange={e=>setQpName(e.target.value)} />
             <input className={cell+" mb-2"} placeholder="Phone (optional)" value={qpPhone} onChange={e=>setQpPhone(e.target.value)} />
             <button type="button" onClick={saveQuickParty} className="w-full text-white text-sm font-bold py-2 rounded-lg" style={{background:"linear-gradient(135deg,#f97316,#ea580c)"}}>Save & Select</button>
           </div>}
@@ -1016,7 +1016,7 @@ function NewSale({initialDoc}){
           <button type="button" onClick={()=>setQiOpen(!qiOpen)} className="text-sm font-bold text-orange-600 whitespace-nowrap px-2">{qiOpen?"✕ Close":"+ New Item"}</button>
         </div>
         {qiOpen && <div className="mt-2 p-2 rounded-lg bg-orange-50 border border-orange-100 grid md:grid-cols-4 gap-2 items-end">
-          <div className="md:col-span-2"><label className="text-xs font-semibold text-slate-500">Item ka naam *</label><input className={cell} value={qiName} onChange={e=>setQiName(e.target.value)} /></div>
+          <div className="md:col-span-2"><label className="text-xs font-semibold text-slate-500">Item name *</label><input className={cell} value={qiName} onChange={e=>setQiName(e.target.value)} /></div>
           <div><label className="text-xs font-semibold text-slate-500">Sale price</label><input type="number" className={cell} value={qiRate} onChange={e=>setQiRate(e.target.value)} /></div>
           <div><label className="text-xs font-semibold text-slate-500">GST %</label><input type="number" className={cell} value={qiTax} onChange={e=>setQiTax(e.target.value)} /></div>
           <div className="md:col-span-4"><button type="button" onClick={saveQuickItem} className="text-white text-sm font-bold py-2 px-4 rounded-lg" style={{background:"linear-gradient(135deg,#f97316,#ea580c)"}}>Save & Add to bill</button></div>
@@ -1518,10 +1518,10 @@ function Settings({onSaved}){
           </div>}
           {stab==="whatsapp" && <div className="card p-5">
             <div className="font-semibold text-slate-600 mb-2">WhatsApp Sharing</div>
-            <Toggle k="whatsapp_enabled" label="WhatsApp se documents share karna enable" />
-            <div className="mt-2"><label className="text-xs font-semibold text-slate-500">WhatsApp Business number (country code ke saath, e.g. 9198XXXXXXXX)</label>
+            <Toggle k="whatsapp_enabled" label="Enable sharing documents via WhatsApp" />
+            <div className="mt-2"><label className="text-xs font-semibold text-slate-500">WhatsApp Business number (with country code, e.g. 9198XXXXXXXX)</label>
               <input className={inp} value={p.whatsapp_business_number||""} onChange={e=>set("whatsapp_business_number",e.target.value)} /></div>
-            <p className="text-xs text-slate-400 mt-2">Invoice par "Share on WhatsApp" button se customer ko seedha document bhej sakte hain.</p>
+            <p className="text-xs text-slate-400 mt-2">Use the "Share on WhatsApp" button on an invoice to send documents directly to the customer.</p>
           </div>}
           {stab==="data" && <div className="card p-5">
             <div className="font-semibold text-slate-600 mb-2">Logo & Data</div>
@@ -1545,7 +1545,7 @@ function Settings({onSaved}){
 // ---------- Platform Admin (SaaS owner) ----------
 function AdminPanel(){
   const [m,setM]=useState(null),[err,setErr]=useState("");
-  useEffect(()=>{ api("/admin/metrics/").then(setM).catch(()=>setErr("Sirf platform admin ke liye")); },[]);
+  useEffect(()=>{ api("/admin/metrics/").then(setM).catch(()=>setErr("Platform admin only")); },[]);
   if(err) return <div className="p-6 text-slate-500">{err}</div>;
   if(!m) return <div className="p-6">Loading…</div>;
   const K=(t,v,c)=> <div className="card p-4"><div className="text-xs text-slate-500">{t}</div><div className={"text-2xl font-bold "+(c||"text-slate-700")}>{v}</div></div>;
@@ -1737,7 +1737,7 @@ function StaffView(){
             <td className="p-2.5 text-right"><button onClick={()=>toggleActive(r)} className="text-xs font-semibold text-blue-700">{r.is_active?"Deactivate":"Activate"}</button></td></tr>;})}
         </tbody></table>
       </div>
-      <div className="text-xs text-slate-400 mt-3">Roles: <b>Admin</b> sab kuch · <b>Accountant</b> reports/accounts · <b>Operator</b> sirf billing · <b>Viewer</b> sirf dekh sakta hai.</div>
+      <div className="text-xs text-slate-400 mt-3">Roles: <b>Admin</b> sab kuch · <b>Accountant</b> reports/accounts · <b>Operator</b> sirf billing · <b>Viewer</b> can only view.</div>
     </div>);
 }
 
@@ -1750,14 +1750,14 @@ function WhatsAppView(){
   const cloudReady = p.whatsapp_api_token && p.whatsapp_phone_id;
   const saveCfg=async()=>{ const d=await api("/business-profile/",{method:"PUT",body:JSON.stringify(p)}); setP(d); setMsg("WhatsApp settings saved ✓"); setTimeout(()=>setMsg(""),2500); };
   const send=async(v)=>{ const r=await api(`/vouchers/${v.id}/share_link/`);
-    if(r.auto_send && r.auto_send.mode==="cloud_api" && r.auto_send.sent){ setMsg("✓ "+v.number+" auto-send ho gaya (Cloud API)"); }
+    if(r.auto_send && r.auto_send.mode==="cloud_api" && r.auto_send.sent){ setMsg("✓ "+v.number+" auto-sent (Cloud API)"); }
     else { window.open(r.whatsapp_url,"_blank"); } };
   return (
     <div className="p-6 space-y-5 fade-in max-w-5xl">
       <div className="flex items-center gap-3">
         <div className="rounded-2xl flex items-center justify-center text-white" style={{width:48,height:48,background:"#25D366",fontSize:24}}>✆</div>
         <div><h2 className="text-2xl font-extrabold text-slate-800">WhatsApp Connect</h2>
-          <div className="text-sm text-slate-500">Invoices & documents seedha customer ko bhejein</div></div>
+          <div className="text-sm text-slate-500">Send invoices & documents directly to customers</div></div>
       </div>
       {msg && <div className="bg-green-50 text-green-700 p-3 rounded-xl text-sm">{msg}</div>}
 
@@ -1770,7 +1770,7 @@ function WhatsAppView(){
         <div className="card p-5">
           <div className="flex items-center justify-between"><div className="font-bold text-slate-700">Auto-Send (Cloud API)</div>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background:cloudReady?"#dcfce7":"#fef3c7",color:cloudReady?"#16a34a":"#b45309"}}>{cloudReady?"CONFIGURED":"NOT SET"}</span></div>
-          <p className="text-sm text-slate-500 mt-2">Official WhatsApp Business API se documents <b>bina click</b> auto-send. Requires a token from Meta (compliant, no ban risk).</p>
+          <p className="text-sm text-slate-500 mt-2">Send documents via the official WhatsApp Business API <b>bina click</b> auto-send. Requires a token from Meta (compliant, no ban risk).</p>
         </div>
       </div>
 

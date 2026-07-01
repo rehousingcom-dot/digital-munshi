@@ -160,6 +160,10 @@ async function api(path, opts={}, _retried){
   return data;
 }
 const money = n => "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+// ---------- i18n (Hindi / English toggle) ----------
+let DM_LANG = (typeof window!=="undefined" && window.localStorage && localStorage.getItem("dm_lang")) || "en";
+function t(en,hi){ return DM_LANG==="hi" ? (hi||en) : en; }   // wrap UI text: t("English","हिंदी")
+function setLang(l){ try{ localStorage.setItem("dm_lang",l); }catch(e){} location.reload(); }
 // Paginated ya plain array — dono se array nikaalta hai
 const asList = d => Array.isArray(d) ? d : (d && d.results ? d.results : []);
 const apiList = async (path) => asList(await api(path));
@@ -1945,14 +1949,18 @@ function TopBar({me,sub,onNav,theme,toggleTheme,onLogout,onSearch}){
     <div className="topbar sticky top-0 z-30 flex items-center gap-4 px-6 py-3">
       <div className="hidden lg:block" style={{minWidth:150}}>
         <div className="text-base font-extrabold text-slate-800 truncate">{me?me.organization:"Digital Munshi"}</div>
-        <div className="text-xs text-slate-400">Welcome back, {name} 👋</div>
+        <div className="text-xs text-slate-400">{t("Welcome back","वापस स्वागत है")}, {name} 👋</div>
       </div>
       <div className="relative flex-1 max-w-md">
         <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
         <input value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")onSearch&&onSearch(q);}}
-          placeholder="Search invoices, parties, items…" className="w-full pl-10 pr-4 py-2.5 rounded-full text-sm" style={{background:"#f1f5f9",border:"1px solid transparent"}} />
+          placeholder={t("Search invoices, parties, items…","इनवॉइस, पार्टी, आइटम खोजें…")} className="w-full pl-10 pr-4 py-2.5 rounded-full text-sm" style={{background:"#f1f5f9",border:"1px solid transparent"}} />
       </div>
       <div className="flex items-center gap-2.5 ml-auto">
+        <div className="flex rounded-full overflow-hidden border border-slate-200 text-xs font-bold" title="Language">
+          <button onClick={()=>setLang("en")} className="px-2.5 py-1" style={{background:DM_LANG!=="hi"?"#ea6a1e":"#fff",color:DM_LANG!=="hi"?"#fff":"#64748b"}}>EN</button>
+          <button onClick={()=>setLang("hi")} className="px-2.5 py-1" style={{background:DM_LANG==="hi"?"#ea6a1e":"#fff",color:DM_LANG==="hi"?"#fff":"#64748b"}}>हिं</button>
+        </div>
         <button onClick={()=>location.reload()} title="Refresh" className="iconbtn text-slate-500" style={{fontSize:17}}>↻</button>
         <button onClick={toggleTheme} title="Light / Dark mode" className="iconbtn" style={{fontSize:16}}>{theme==="dark"?"☀️":"🌙"}</button>
         {planLabel && <span onClick={()=>onNav("plan")} className="plan-badge" style={{background:planGrad}}>{planIcon} {planLabel}<span style={{opacity:.85,fontWeight:600}}>{days}</span></span>}
@@ -2248,7 +2256,7 @@ function App(){
   const isAdmin = me && me.is_platform_admin;
   const toggleTheme=()=>setTheme(t=>t==="dark"?"light":"dark");
   const logout=()=>{ clearAuth(); setAuthed(false); setSub(null); };
-  const nav=[["dash","Dashboard"],["pos","POS Billing"],["sale","New Sale"],["vouchers","Sales & Transactions"],["items","Items"],["parties","Parties"],["cashbank","Cash & Bank"],["accounting","Accounting"],["reports","Reports"],["utils","Utilities"],["whatsapp","WhatsApp"],["hr","HR / Payroll"],["staff","App Users"],["settings","Settings"],["plan","Subscription"]];
+  const nav=[["dash",t("Dashboard","डैशबोर्ड")],["pos",t("POS Billing","POS बिलिंग")],["sale",t("New Sale","नई बिक्री")],["vouchers",t("Sales & Transactions","बिक्री व लेन-देन")],["items",t("Items","आइटम")],["parties",t("Parties","पार्टी")],["cashbank",t("Cash & Bank","कैश व बैंक")],["accounting",t("Accounting","अकाउंटिंग")],["reports",t("Reports","रिपोर्ट")],["utils",t("Utilities","यूटिलिटीज़")],["whatsapp",t("WhatsApp","व्हाट्सएप")],["hr",t("HR / Payroll","HR / पेरोल")],["staff",t("App Users","ऐप यूज़र")],["settings",t("Settings","सेटिंग्स")],["plan",t("Subscription","सब्सक्रिप्शन")]];
   if(isAdmin) nav.push(["admin","Platform Admin"]);
   const onActivated=s=>{ setSub(s); setTab("dash"); };
   const go=(k,mode)=>{ setTab(k); if(mode)setSaleMode(mode); setOpen(false); };

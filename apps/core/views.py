@@ -143,7 +143,8 @@ def catalog_shop(request, catalog_uuid):
         except Exception:
             img = ""
         items.append({"name": it.name, "price": price, "img": img,
-                      "type": it.item_type, "code": (v.item_code if v else "")})
+                      "type": it.item_type, "code": (v.item_code if v else ""),
+                      "variant": (v.id if v else "")})
 
     wa = ""
     if company:

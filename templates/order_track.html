@@ -1,0 +1,54 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order {{ order.order_no }} — {{ shop }}</title>
+<meta name="robots" content="noindex">
+<script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-md mx-auto px-4 py-6">
+  <div class="flex items-center gap-2 mb-4">
+    <div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div>
+    <div><div class="font-extrabold leading-tight">{{ shop }}</div><div class="text-xs text-slate-400 leading-tight">Order tracking</div></div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
+    <div class="flex justify-between items-start">
+      <div><div class="text-xs text-slate-400 uppercase font-semibold">Order</div><div class="text-xl font-extrabold">{{ order.order_no }}</div></div>
+      <div class="text-right"><div class="text-xs text-slate-400">Total</div><div class="text-xl font-extrabold" style="color:#c2410c">₹{{ order.total|floatformat:0 }}</div></div>
+    </div>
+    <div class="text-sm text-slate-500 mt-1">{{ order.customer_name }}{% if order.customer_phone %} · {{ order.customer_phone }}{% endif %}</div>
+  </div>
+
+  <!-- Status stepper -->
+  <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
+    <div class="font-bold mb-3">📦 Status</div>
+    {% if cancelled %}
+      <div class="text-center text-red-600 font-bold py-3">Order Cancelled ✕</div>
+    {% else %}
+    <div class="space-y-3">
+      {% for s in steps %}
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:{% if forloop.counter0 <= cur_idx %}#16a34a{% else %}#cbd5e1{% endif %}">{% if forloop.counter0 <= cur_idx %}✓{% else %}{{ forloop.counter }}{% endif %}</div>
+        <div class="font-semibold {% if forloop.counter0 <= cur_idx %}text-slate-800{% else %}text-slate-400{% endif %}">
+          {% if s == "NEW" %}Order mila{% elif s == "CONFIRMED" %}Confirm hua{% elif s == "PACKED" %}Pack ho gaya{% else %}Deliver ho gaya{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Items -->
+  <div class="bg-white rounded-2xl border border-slate-100 p-5">
+    <div class="font-bold mb-2">🛒 Items</div>
+    {% for i in items %}
+    <div class="flex justify-between text-sm py-1.5 border-b border-slate-50">
+      <span>{{ i.name }} <span class="text-slate-400">× {{ i.qty|floatformat:0 }}</span></span>
+      <span class="font-semibold">₹{{ i.amount|floatformat:0 }}</span>
+    </div>
+    {% endfor %}
+    <div class="flex justify-between font-extrabold mt-2 pt-1"><span>Total</span><span style="color:#c2410c">₹{{ order.total|floatformat:0 }}</span></div>
+  </div>
+
+  <div class="text-center text-xs text-slate-400 mt-4">Powered by <a href="/welcome/" class="text-orange-600 font-semibold">Digital Munshi</a></div>
+</div>
+</body></html>

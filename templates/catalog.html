@@ -38,7 +38,7 @@
       </div>
       <div class="font-semibold text-sm leading-tight flex-1">{{ it.name }}</div>
       <div class="text-orange-600 font-extrabold mt-1">₹{{ it.price }}</div>
-      <div class="flex items-center justify-between mt-2" data-name2="{{ it.name }}" data-price="{{ it.price }}">
+      <div class="flex items-center justify-between mt-2" data-name2="{{ it.name }}" data-price="{{ it.price }}" data-variant="{{ it.variant }}">
         <div class="flex items-center gap-2">
           <button onclick="step(this,-1)" class="w-7 h-7 rounded-lg bg-slate-100 font-bold">−</button>
           <span class="qty w-5 text-center text-sm font-semibold">0</span>
@@ -53,12 +53,40 @@
 </main>
 
 <div id="bar" class="fixed bottom-0 inset-x-0 bg-white border-t p-3 hidden">
-  <div class="max-w-4xl mx-auto flex items-center gap-3">
+  <div class="max-w-4xl mx-auto flex items-center gap-2">
     <div class="flex-1">
       <div class="text-xs text-slate-400"><span id="citems">0</span> items</div>
       <div class="font-extrabold text-lg">Total: ₹<span id="ctotal">0</span></div>
     </div>
-    <a id="waBtn" href="#" class="text-white px-5 py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#22c55e,#16a34a)">Order on WhatsApp →</a>
+    <a id="waBtn" href="#" class="text-white px-4 py-3 rounded-xl font-bold text-sm" style="background:linear-gradient(135deg,#22c55e,#16a34a)">WhatsApp</a>
+    <button onclick="openCheckout()" class="text-white px-5 py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">🛒 Place Order</button>
+  </div>
+</div>
+
+<!-- Checkout modal -->
+<div id="checkout" class="fixed inset-0 bg-black/40 z-30 hidden items-end sm:items-center justify-center" style="display:none">
+  <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5">
+    <div id="coForm">
+      <div class="font-extrabold text-lg mb-1">Order place karein</div>
+      <div class="text-sm text-slate-500 mb-3">Total: ₹<span id="coTotal">0</span> · <span id="coItems">0</span> items</div>
+      <input id="cname" placeholder="Aapka naam*" class="w-full p-3 mb-2 border border-slate-200 rounded-xl">
+      <input id="cphone" placeholder="Mobile number" class="w-full p-3 mb-2 border border-slate-200 rounded-xl">
+      <textarea id="caddr" rows="2" placeholder="Delivery address" class="w-full p-3 mb-2 border border-slate-200 rounded-xl"></textarea>
+      <input id="cnote" placeholder="Note (optional)" class="w-full p-3 mb-3 border border-slate-200 rounded-xl">
+      <div id="coMsg" class="text-sm mb-2"></div>
+      <div class="flex gap-2">
+        <button onclick="closeCheckout()" class="flex-1 py-3 rounded-xl bg-slate-100 font-semibold">Cancel</button>
+        <button onclick="placeOrder()" class="flex-1 py-3 rounded-xl text-white font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Confirm Order</button>
+      </div>
+    </div>
+    <div id="coDone" class="text-center hidden">
+      <div class="text-5xl mb-2">✅</div>
+      <div class="font-extrabold text-lg">Order mil gaya!</div>
+      <div class="text-sm text-slate-500 mt-1">Order no: <b id="coOrderNo"></b></div>
+      <a id="coTrack" href="#" target="_blank" class="block mt-4 text-white py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">📦 Order track karein</a>
+      <a id="coWa" href="#" target="_blank" class="block mt-2 text-white py-3 rounded-xl font-bold" style="background:#25D366">💬 Dukaan ko WhatsApp karein</a>
+      <button onclick="location.reload()" class="block w-full mt-2 py-2 text-slate-500 text-sm">Naya order</button>
+    </div>
   </div>
 </div>
 
@@ -72,6 +100,33 @@
 <script>
 var WA = "{{ wa }}";
 var SHOP = "{{ shop_name|escapejs }}";
+var CU = "{{ catalog_uuid }}";
+function cartLines(){ var lines=[];
+  document.querySelectorAll("[data-price]").forEach(function(row){ var q=parseInt(row.querySelector(".qty").textContent)||0;
+    if(q>0){ lines.push({variant:row.dataset.variant||null, name:row.dataset.name2, price:parseFloat(row.dataset.price)||0, qty:q}); } });
+  return lines; }
+function openCheckout(){ var l=cartLines(); if(!l.length)return;
+  document.getElementById("coTotal").textContent=document.getElementById("ctotal").textContent;
+  document.getElementById("coItems").textContent=document.getElementById("citems").textContent;
+  document.getElementById("coForm").classList.remove("hidden"); document.getElementById("coDone").classList.add("hidden");
+  document.getElementById("checkout").style.display="flex"; }
+function closeCheckout(){ document.getElementById("checkout").style.display="none"; }
+async function placeOrder(){
+  var name=document.getElementById("cname").value.trim(); var msg=document.getElementById("coMsg");
+  if(!name){ msg.textContent="Naam daalo"; msg.className="text-sm mb-2 text-red-600"; return; }
+  var body={ name:name, phone:document.getElementById("cphone").value.trim(),
+    address:document.getElementById("caddr").value.trim(), note:document.getElementById("cnote").value.trim(), items:cartLines() };
+  msg.textContent="Bhej rahe hain…"; msg.className="text-sm mb-2 text-slate-500";
+  try{ var r=await fetch("/shop/"+CU+"/order/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    var d=await r.json();
+    if(r.ok){ document.getElementById("coOrderNo").textContent=d.order_no;
+      document.getElementById("coTrack").href="/order/"+d.token+"/";
+      var wtxt="Namaste "+SHOP+", maine order kiya hai — "+d.order_no+" (₹"+d.total+"). Naam: "+name;
+      document.getElementById("coWa").href = WA?("https://wa.me/"+WA+"?text="+encodeURIComponent(wtxt)):("https://wa.me/?text="+encodeURIComponent(wtxt));
+      document.getElementById("coForm").classList.add("hidden"); document.getElementById("coDone").classList.remove("hidden"); }
+    else { msg.textContent=d.detail||"Error"; msg.className="text-sm mb-2 text-red-600"; } }
+  catch(e){ msg.textContent="Network error"; msg.className="text-sm mb-2 text-red-600"; }
+}
 function filter(){ var q=document.getElementById("q").value.toLowerCase();
   document.querySelectorAll(".prod").forEach(function(p){ p.style.display = p.dataset.name.indexOf(q)>=0?"":"none"; }); }
 function step(btn,d){ var row=btn.closest("[data-price]"); var span=row.querySelector(".qty");

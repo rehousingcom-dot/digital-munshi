@@ -134,6 +134,8 @@ from apps.committee import views as committee_views
 from apps.committee import public_views as committee_public
 from apps.marketplace import views as market_views
 from apps.marketplace import public_views as market_public
+from apps.store import views as store_views
+from apps.store import public_views as store_public
 
 
 def health(request):
@@ -182,6 +184,7 @@ router.register("committee-rounds", committee_views.CommitteeRoundViewSet)
 router.register("committee-payments", committee_views.CommitteePaymentViewSet)
 router.register("committee-bids", committee_views.CommitteeBidViewSet)
 router.register("committee-join-requests", committee_views.CommitteeJoinRequestViewSet)
+router.register("orders", store_views.OrderViewSet)
 # Cash & Bank
 router.register("bank-accounts", cashbank_views.BankAccountViewSet)
 router.register("bank-transactions", cashbank_views.BankTransactionViewSet)
@@ -259,6 +262,8 @@ urlpatterns = [
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),
+    path("shop/<uuid:catalog_uuid>/order/", store_public.api_place_order, name="store_place_order"),
+    path("order/<uuid:token>/", store_public.order_track, name="order_track"),
     path("api/catalog/toggle/", tenant_views.catalog_toggle, name="catalog_toggle"),
     path("api/munshi/ask/", __import__("apps.core.munshi", fromlist=["munshi_ask"]).munshi_ask, name="munshi_ask"),
     path("api/alerts/", __import__("apps.core.alerts", fromlist=["alerts"]).alerts, name="alerts"),

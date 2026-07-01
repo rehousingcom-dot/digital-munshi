@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "apps.hr",
     "apps.committee",
     "apps.marketplace",
+    "apps.store",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

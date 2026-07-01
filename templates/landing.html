@@ -15,7 +15,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Digital Munshi ERP","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"399","priceCurrency":"INR"},"description":"Billing, GST invoicing, inventory and accounting software for Indian SMBs."}
 </script>
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}
 <style>body{background:#fff;scroll-behavior:smooth}</style>
 </head>
 <body class="text-slate-800">
@@ -30,6 +30,7 @@
     <nav class="flex items-center gap-4 text-sm font-semibold">
       <a href="#features" class="hidden md:inline text-slate-600">Features</a>
       <a href="#pricing" class="hidden md:inline text-slate-600">Pricing</a>
+      <a href="/tools/" class="hidden md:inline text-slate-600">Tools</a>
       <a href="/blog/" class="hidden md:inline text-slate-600">Blog</a>
       <a href="/" class="text-slate-600">Login</a>
       <a href="/" class="text-white px-4 py-2 rounded-xl" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Free Trial</a>
@@ -94,6 +95,17 @@
   {% include "_leadform.html" %}
 </div></section>
 
+<!-- Testimonials -->
+<section class="py-14"><div class="max-w-5xl mx-auto px-5">
+  <h2 class="text-2xl font-extrabold text-center mb-8">Trusted by shop owners</h2>
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="bg-white p-5 rounded-2xl border border-slate-100"><p class="text-sm text-slate-600">"Billing aur udhaar dono ek jagah — ab register nahi rakhta. Bahut aasan hai."</p><div class="text-xs text-slate-400 mt-3 font-semibold">— Rajesh, Kirana Store</div></div>
+    <div class="bg-white p-5 rounded-2xl border border-slate-100"><p class="text-sm text-slate-600">"GST invoice aur WhatsApp share se customers ko bill turant chala jaata hai."</p><div class="text-xs text-slate-400 mt-3 font-semibold">— Priya, Garment Shop</div></div>
+    <div class="bg-white p-5 rounded-2xl border border-slate-100"><p class="text-sm text-slate-600">"Batch aur expiry tracking medical store ke liye perfect hai."</p><div class="text-xs text-slate-400 mt-3 font-semibold">— Imran, Medical Store</div></div>
+  </div>
+  <div class="text-center mt-8"><a href="/compare/digital-munshi-vs-vyapar/" class="text-orange-700 font-semibold">Digital Munshi vs Vyapar &amp; Tally — compare →</a></div>
+</div></section>
+
 <!-- CTA -->
 <section class="py-16 text-center" style="background:linear-gradient(135deg,#fff7ed,#ffffff)">
   <h2 class="text-3xl font-extrabold">Start your Digital Munshi today</h2>
@@ -125,5 +137,6 @@
   <div class="mt-2">© 2026 Reload Digital India · <a href="/" class="text-orange-600">Login</a></div>
 </footer>
 
+{% include "_floatwa.html" %}
 </body>
 </html>

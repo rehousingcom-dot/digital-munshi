@@ -322,3 +322,41 @@ def blog_post(request, slug):
 
 def blog_post_hi(request, slug):
     return _blog_post(request, slug, "hi")
+
+
+def _comparison(request, slug, lang):
+    from django.shortcuts import render
+    from django.http import HttpResponseNotFound
+    m, L, lc, pre = _mods(lang)
+    comps = getattr(m, "COMPARISONS", None)
+    from . import marketing as EN
+    comps = EN.COMPARISONS  # comparisons English-only for now
+    c = comps.get(slug)
+    if not c:
+        return HttpResponseNotFound("Not found")
+    other = [(s, cc["h1"]) for s, cc in comps.items() if s != slug]
+    return render(request, "comparison_page.html", {"c": c, "slug": slug, "other": other})
+
+
+def comparison_page(request, slug):
+    return _comparison(request, slug, "en")
+
+
+def tools_index(request):
+    from django.shortcuts import render
+    return render(request, "tools_index.html", {})
+
+
+def tool_gst_calculator(request):
+    from django.shortcuts import render
+    return render(request, "tool_gst_calculator.html", {})
+
+
+def tool_invoice_generator(request):
+    from django.shortcuts import render
+    return render(request, "tool_invoice_generator.html", {})
+
+
+def tool_hsn_finder(request):
+    from django.shortcuts import render
+    return render(request, "tool_hsn_finder.html", {})

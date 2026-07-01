@@ -83,6 +83,9 @@ def sitemap_xml(request):
     urls += [base + "/hi/software/" + s + "/" for s in MH.KEYWORD_PAGES]
     urls += [base + "/hi/blog/" + s + "/" for s in MH.BLOG_POSTS]
     urls += [base + "/hi/billing-software-in-" + s + "/" for s in MH.CITIES]
+    from apps.core.marketing import COMPARISONS
+    urls += [base + "/compare/" + s + "/" for s in COMPARISONS]
+    urls += [base + "/tools/", base + "/tools/gst-calculator/", base + "/tools/invoice-generator/", base + "/tools/hsn-code-finder/"]
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     for u in urls:
         body += f"<url><loc>{u}</loc><changefreq>weekly</changefreq></url>"
@@ -208,6 +211,11 @@ urlpatterns = [
     path("hi/billing-software-in-<slug:slug>/", core_views.city_page_hi, name="city_page_hi"),
     path("hi/blog/", core_views.blog_index_hi, name="blog_index_hi"),
     path("hi/blog/<slug:slug>/", core_views.blog_post_hi, name="blog_post_hi"),
+    path("compare/<slug:slug>/", core_views.comparison_page, name="comparison_page"),
+    path("tools/", core_views.tools_index, name="tools_index"),
+    path("tools/gst-calculator/", core_views.tool_gst_calculator, name="tool_gst_calculator"),
+    path("tools/invoice-generator/", core_views.tool_invoice_generator, name="tool_invoice_generator"),
+    path("tools/hsn-code-finder/", core_views.tool_hsn_finder, name="tool_hsn_finder"),
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),

@@ -127,6 +127,9 @@ CITIES = {
     "delhi": "Delhi", "mumbai": "Mumbai", "jaipur": "Jaipur",
     "bangalore": "Bangalore", "ahmedabad": "Ahmedabad", "surat": "Surat",
     "lucknow": "Lucknow", "indore": "Indore", "pune": "Pune", "hyderabad": "Hyderabad",
+    "kanpur": "Kanpur", "nagpur": "Nagpur", "bhopal": "Bhopal", "patna": "Patna",
+    "kochi": "Kochi", "coimbatore": "Coimbatore", "ludhiana": "Ludhiana", "agra": "Agra",
+    "varanasi": "Varanasi", "rajkot": "Rajkot", "nashik": "Nashik", "vadodara": "Vadodara",
 }
 
 

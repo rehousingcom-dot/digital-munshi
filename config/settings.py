@@ -82,6 +82,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.core.context.seo",
             ],
         },
     },
@@ -255,3 +256,7 @@ SMS_OTP_TID = env("SMS_OTP_TID", default="")
 
 # Marketing: naye leads is email par notify honge (Resend). Khaali = BACKUP_EMAIL.
 LEADS_EMAIL = env("LEADS_EMAIL", default="rehousing.com@gmail.com")
+
+# Analytics + support (marketing pages). Set in env to enable.
+GA_MEASUREMENT_ID = env("GA_MEASUREMENT_ID", default="")
+SUPPORT_WHATSAPP = env("SUPPORT_WHATSAPP", default="")

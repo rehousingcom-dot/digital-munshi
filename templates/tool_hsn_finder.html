@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HSN Code Finder — Search HSN Codes & GST Rates | Digital Munshi</title>
+<meta name="description" content="Free HSN code finder. Search common HSN/SAC codes and GST rates by product name. For Indian businesses. No signup.">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/hsn-code-finder/">
+<meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}
+</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a>
+</div></header>
+
+<section class="max-w-2xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold">HSN Code Finder</h1>
+  <p class="text-slate-500 mt-2 mb-5">Search common HSN codes and GST rates by product. Free, no signup.</p>
+  <input id="q" placeholder="Type a product… e.g. rice, mobile, medicine" oninput="search()" class="w-full p-3 border border-slate-200 rounded-xl mb-4">
+  <div id="res" class="space-y-2"></div>
+  <p class="text-xs text-slate-400 mt-4">Note: These are common/indicative HSN codes and rates for reference. Please verify on the GST portal for your exact product.</p>
+</section>
+
+<section class="max-w-2xl mx-auto px-5 pb-6 text-sm text-slate-600">
+  <h2 class="text-xl font-extrabold mb-2 text-slate-800">About HSN codes</h2>
+  <p>HSN (Harmonized System of Nomenclature) codes classify goods under GST and determine the applicable tax rate. Businesses must mention the correct HSN on GST invoices. In Digital Munshi, you save the HSN once per item and it appears on every invoice automatically.</p>
+</section>
+<section class="bg-slate-50 py-10"><div class="px-5">{% include "_leadform.html" %}</div></section>
+<footer class="border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+{% include "_floatwa.html" %}
+<script>
+var DATA=[
+ ["Rice","1006","5%"],["Wheat / Atta","1101","5% (branded)"],["Sugar","1701","5%"],["Tea","0902","5%"],["Milk","0401","0%"],
+ ["Biscuits","1905","18%"],["Namkeen / Snacks","2106","12%"],["Cooking oil","1507","5%"],["Spices / Masala","0910","5%"],
+ ["Mobile phone","8517","18%"],["Laptop / Computer","8471","18%"],["Charger / Cable","8504","18%"],["LED bulb","8539","12%"],
+ ["Medicine (general)","3004","12%"],["Ayurvedic medicine","3004","12%"],["Surgical / Mask","6307","5%"],
+ ["Readymade garment (< Rs 1000)","6109","5%"],["Readymade garment (> Rs 1000)","6109","12%"],["Footwear (< Rs 1000)","6403","12%"],
+ ["Cement","2523","28%"],["Paint","3208","18%"],["Iron / Steel","7213","18%"],["Plywood","4412","18%"],["Hardware / Tools","8205","18%"],
+ ["Furniture","9403","18%"],["Stationery / Notebook","4820","12%"],["Cosmetics","3304","18%"],["Soap","3401","18%"],
+ ["Restaurant service","9963","5%"],["Software service (SAC)","9983","18%"],["Transport service (SAC)","9965","5%"]
+];
+function search(){var q=(document.getElementById("q").value||"").toLowerCase().trim();var r=document.getElementById("res");
+ if(!q){r.innerHTML="";return;}
+ var out=DATA.filter(function(d){return d[0].toLowerCase().indexOf(q)>=0;});
+ if(!out.length){r.innerHTML='<div class="text-slate-400 text-sm p-3">No match. Try another word (e.g. rice, mobile).</div>';return;}
+ r.innerHTML=out.map(function(d){return '<div class="flex items-center justify-between border border-slate-100 rounded-xl p-3"><div><div class="font-semibold">'+d[0]+'</div><div class="text-xs text-slate-400">HSN/SAC</div></div><div class="text-right"><div class="font-extrabold" style="color:#c2410c">'+d[1]+'</div><div class="text-xs text-green-700">GST '+d[2]+'</div></div></div>';}).join("");
+}
+</script>
+</body></html>

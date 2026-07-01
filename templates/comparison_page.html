@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ c.title }}</title>
+<meta name="description" content="{{ c.desc }}">
+<link rel="canonical" href="https://erp.reloaddigital.in/compare/{{ slug }}/">
+<meta property="og:title" content="{{ c.title }}"><meta property="og:description" content="{{ c.desc }}"><meta property="og:type" content="article">
+<meta name="robots" content="index, follow">
+{% if c.faqs %}<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{% for f in c.faqs %}{"@type":"Question","name":"{{ f.q|escapejs }}","acceptedAnswer":{"@type":"Answer","text":"{{ f.a|escapejs }}"}}{% if not forloop.last %},{% endif %}{% endfor %}]}
+</script>{% endif %}
+<script src="https://cdn.tailwindcss.com"></script>
+{% include "_analytics.html" %}
+</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20">
+  <div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+    <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+    <a href="/" class="text-white px-4 py-2 rounded-xl text-sm font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Free Trial</a>
+  </div>
+</header>
+
+<section class="max-w-3xl mx-auto px-5 py-12">
+  <h1 class="text-3xl md:text-4xl font-extrabold leading-tight">{{ c.h1 }}</h1>
+  <p class="text-lg text-slate-500 mt-4">{{ c.intro }}</p>
+
+  <div class="overflow-x-auto mt-8 rounded-2xl border border-slate-100">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50"><tr>
+        <th class="text-left p-3 font-bold">Feature</th>
+        <th class="text-left p-3 font-bold" style="color:#c2410c">Digital Munshi</th>
+        <th class="text-left p-3 font-bold text-slate-500">{{ c.competitor }}</th>
+      </tr></thead>
+      <tbody>
+        {% for feat, us, them in c.rows %}
+        <tr class="border-t border-slate-100">
+          <td class="p-3 font-medium">{{ feat }}</td>
+          <td class="p-3 text-green-700 font-semibold">{{ us }}</td>
+          <td class="p-3 text-slate-500">{{ them }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-6 p-5 rounded-2xl" style="background:linear-gradient(135deg,#fff7ed,#fff)">
+    <div class="font-bold text-slate-800 mb-1">Verdict</div>
+    <p class="text-sm text-slate-600">{{ c.verdict }}</p>
+    <a href="/" class="inline-block mt-3 text-white px-6 py-2.5 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Try Digital Munshi free →</a>
+  </div>
+</section>
+
+{% if c.faqs %}<section class="max-w-3xl mx-auto px-5 pb-6">
+  <h2 class="text-2xl font-extrabold mb-5">FAQ</h2>
+  <div class="space-y-3">{% for f in c.faqs %}<div class="border border-slate-100 rounded-xl p-4"><div class="font-bold text-slate-800">{{ f.q }}</div><p class="text-sm text-slate-500 mt-1">{{ f.a }}</p></div>{% endfor %}</div>
+</section>{% endif %}
+
+<section class="bg-slate-50 py-12"><div class="px-5">{% include "_leadform.html" %}</div></section>
+
+<section class="max-w-3xl mx-auto px-5 py-8">
+  <div class="font-bold text-slate-700 mb-3">More comparisons</div>
+  <div class="flex flex-wrap gap-2">{% for s, h in other %}<a href="/compare/{{ s }}/" class="text-sm bg-slate-100 px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">{{ h }}</a>{% endfor %}</div>
+</section>
+<footer class="border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+{% include "_floatwa.html" %}
+</body>
+</html>

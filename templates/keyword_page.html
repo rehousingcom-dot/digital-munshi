@@ -15,7 +15,7 @@
 {% if p.faqs %}<script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{% for f in p.faqs %}{"@type":"Question","name":"{{ f.q|escapejs }}","acceptedAnswer":{"@type":"Answer","text":"{{ f.a|escapejs }}"}}{% if not forloop.last %},{% endif %}{% endfor %}]}
 </script>{% endif %}
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}
 <style>.prose h2{font-size:1.4rem;font-weight:800;margin:1.6rem 0 .5rem}.prose p{margin:.7rem 0;line-height:1.75;color:#334155}.prose ul{margin:.6rem 0;padding-left:1.2rem;list-style:disc}.prose li{margin:.3rem 0;color:#334155}</style>
 </head>
 <body class="text-slate-800 bg-white">
@@ -77,5 +77,6 @@
   <div class="mt-1">Billing · GST · Inventory · Accounting · POS</div>
   <div class="mt-2">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a> · <a href="/" class="text-orange-600">Login</a></div>
 </footer>
+{% include "_floatwa.html" %}
 </body>
 </html>

@@ -13,7 +13,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Store","name":"{{ shop_name|escapejs }}","telephone":"{{ shop_phone|escapejs }}","address":"{{ shop_address|escapejs }}"}
 </script>
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}
 <style>body{background:#f8fafc}</style>
 </head>
 <body class="text-slate-800">
@@ -88,5 +88,6 @@ function recalc(){ var items=0,total=0,lines=[];
   if(!WA){ btn.textContent="WhatsApp number not set"; btn.style.background="#94a3b8"; }
 }
 </script>
+{% include "_floatwa.html" %}
 </body>
 </html>

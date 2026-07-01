@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free GST Calculator — Add or Remove GST (CGST/SGST/IGST) | Digital Munshi</title>
+<meta name="description" content="Free online GST calculator. Add or remove GST at 5%, 12%, 18%, 28% and get CGST/SGST/IGST breakdown instantly. No signup.">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/gst-calculator/">
+<meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}
+</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a>
+</div></header>
+
+<section class="max-w-xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold">GST Calculator</h1>
+  <p class="text-slate-500 mt-2 mb-6">Add or remove GST and see the CGST/SGST/IGST split. Free, no signup.</p>
+  <div class="bg-white border border-slate-100 rounded-2xl p-6">
+    <label class="text-sm font-semibold text-slate-600">Amount (₹)</label>
+    <input id="amt" type="number" value="1000" oninput="calc()" class="w-full p-3 mt-1 mb-3 border border-slate-200 rounded-xl">
+    <label class="text-sm font-semibold text-slate-600">GST Rate</label>
+    <select id="rate" onchange="calc()" class="w-full p-3 mt-1 mb-3 border border-slate-200 rounded-xl">
+      <option value="5">5%</option><option value="12">12%</option><option value="18" selected>18%</option><option value="28">28%</option><option value="3">3%</option><option value="0.25">0.25%</option>
+    </select>
+    <div class="flex gap-2 mb-4">
+      <button onclick="setMode('add')" id="mAdd" class="flex-1 py-2 rounded-xl font-semibold text-white" style="background:#ea6a1e">Add GST</button>
+      <button onclick="setMode('rem')" id="mRem" class="flex-1 py-2 rounded-xl font-semibold bg-slate-100">Remove GST</button>
+    </div>
+    <label class="flex items-center gap-2 text-sm mb-4"><input id="inter" type="checkbox" onchange="calc()"> Inter-state (IGST)</label>
+    <div class="rounded-xl bg-slate-50 p-4 text-sm space-y-1">
+      <div class="flex justify-between"><span>Base amount</span><b id="rBase">₹0</b></div>
+      <div id="rCS" class="flex justify-between"><span>CGST</span><b id="rCgst">₹0</b></div>
+      <div id="rSS" class="flex justify-between"><span>SGST</span><b id="rSgst">₹0</b></div>
+      <div id="rIG" class="flex justify-between" style="display:none"><span>IGST</span><b id="rIgst">₹0</b></div>
+      <div class="flex justify-between text-lg font-extrabold pt-2 border-t mt-2" style="color:#c2410c"><span>Total</span><b id="rTotal">₹0</b></div>
+    </div>
+  </div>
+  <div class="mt-5 p-4 rounded-2xl text-sm" style="background:linear-gradient(135deg,#fff7ed,#fff)">Want automatic GST on every invoice? <a href="/" class="font-bold text-orange-700">Try Digital Munshi free →</a></div>
+</section>
+
+<section class="max-w-xl mx-auto px-5 pb-6 text-sm text-slate-600">
+  <h2 class="text-xl font-extrabold mb-2 text-slate-800">How to use the GST calculator</h2>
+  <p>Enter the amount and choose a GST rate. "Add GST" treats the amount as the base and adds GST on top. "Remove GST" treats the amount as GST-inclusive and extracts the base and tax. For same-state sales the tax splits into CGST + SGST; for inter-state, tick IGST.</p>
+</section>
+<section class="bg-slate-50 py-10"><div class="px-5">{% include "_leadform.html" %}</div></section>
+<footer class="border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+{% include "_floatwa.html" %}
+<script>
+var MODE="add";
+function setMode(m){MODE=m;document.getElementById("mAdd").style.background=m==="add"?"#ea6a1e":"";document.getElementById("mAdd").className="flex-1 py-2 rounded-xl font-semibold "+(m==="add"?"text-white":"bg-slate-100");document.getElementById("mRem").style.background=m==="rem"?"#ea6a1e":"";document.getElementById("mRem").className="flex-1 py-2 rounded-xl font-semibold "+(m==="rem"?"text-white":"bg-slate-100");calc();}
+function fmt(n){return "₹"+(Math.round(n*100)/100).toLocaleString("en-IN");}
+function calc(){var amt=parseFloat(document.getElementById("amt").value)||0;var r=parseFloat(document.getElementById("rate").value)||0;var inter=document.getElementById("inter").checked;var base,tax,total;
+ if(MODE==="add"){base=amt;tax=amt*r/100;total=base+tax;}else{base=amt/(1+r/100);tax=amt-base;total=amt;}
+ document.getElementById("rBase").textContent=fmt(base);document.getElementById("rTotal").textContent=fmt(total);
+ document.getElementById("rCS").style.display=inter?"none":"flex";document.getElementById("rSS").style.display=inter?"none":"flex";document.getElementById("rIG").style.display=inter?"flex":"none";
+ document.getElementById("rCgst").textContent=fmt(tax/2);document.getElementById("rSgst").textContent=fmt(tax/2);document.getElementById("rIgst").textContent=fmt(tax);}
+setMode("add");
+</script>
+</body></html>

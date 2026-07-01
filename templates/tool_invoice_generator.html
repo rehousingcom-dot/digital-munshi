@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Invoice Generator — Create & Print Invoices Online | Digital Munshi</title>
+<meta name="description" content="Free online invoice generator. Create a professional GST or non-GST invoice and print or save as PDF. No signup needed.">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/invoice-generator/">
+<meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}
+<style>@media print{.noprint{display:none!important}.sheet{box-shadow:none!important;border:none!important}}</style>
+</head>
+<body class="text-slate-800 bg-slate-50">
+<header class="noprint border-b bg-white"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a>
+</div></header>
+
+<section class="max-w-3xl mx-auto px-5 py-8">
+  <h1 class="noprint text-3xl font-extrabold mb-1">Free Invoice Generator</h1>
+  <p class="noprint text-slate-500 mb-6">Fill in the details, then Print or Save as PDF. Free, no signup.</p>
+
+  <div class="noprint grid md:grid-cols-2 gap-3 mb-4">
+    <input id="fFrom" placeholder="Your business name" class="p-3 border border-slate-200 rounded-xl">
+    <input id="fTo" placeholder="Customer name" class="p-3 border border-slate-200 rounded-xl">
+    <input id="fInv" placeholder="Invoice no." value="INV-001" class="p-3 border border-slate-200 rounded-xl">
+    <input id="fDate" type="date" class="p-3 border border-slate-200 rounded-xl">
+  </div>
+  <div id="rows" class="noprint space-y-2 mb-2"></div>
+  <div class="noprint flex gap-2 mb-4">
+    <button onclick="addRow()" class="bg-slate-100 px-4 py-2 rounded-xl font-semibold text-sm">+ Add item</button>
+    <label class="flex items-center gap-2 text-sm ml-2"><input id="gst" type="checkbox" onchange="render()" checked> GST</label>
+    <select id="gstr" onchange="render()" class="p-2 border border-slate-200 rounded-lg text-sm"><option value="5">5%</option><option value="12">12%</option><option value="18" selected>18%</option><option value="28">28%</option></select>
+    <button onclick="window.print()" class="ml-auto text-white px-5 py-2 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">🖨 Print / PDF</button>
+  </div>
+
+  <!-- Invoice sheet -->
+  <div class="sheet bg-white rounded-2xl border border-slate-200 p-8" style="box-shadow:0 4px 20px rgba(0,0,0,.05)">
+    <div class="flex justify-between items-start border-b-2 pb-3" style="border-color:#ea6a1e">
+      <div><div id="pFrom" class="text-xl font-extrabold" style="color:#c2410c">Your Business</div></div>
+      <div class="text-right"><div class="font-bold text-lg">INVOICE</div><div class="text-xs text-slate-500" id="pInv">INV-001</div><div class="text-xs text-slate-500" id="pDate"></div></div>
+    </div>
+    <div class="text-sm mt-3">Bill to: <b id="pTo">Customer</b></div>
+    <table class="w-full text-sm mt-4">
+      <thead><tr class="bg-slate-50"><th class="text-left p-2">Item</th><th class="p-2 text-right">Qty</th><th class="p-2 text-right">Rate</th><th class="p-2 text-right">Amount</th></tr></thead>
+      <tbody id="pBody"></tbody>
+    </table>
+    <div class="flex justify-end mt-4"><div class="w-56 text-sm space-y-1">
+      <div class="flex justify-between"><span>Subtotal</span><b id="pSub">₹0</b></div>
+      <div id="pGstRow" class="flex justify-between"><span>GST</span><b id="pGst">₹0</b></div>
+      <div class="flex justify-between text-lg font-extrabold pt-2 border-t" style="color:#c2410c"><span>Total</span><b id="pTotal">₹0</b></div>
+    </div></div>
+    <div class="text-xs text-slate-400 mt-6 text-center">Generated with Digital Munshi — free billing software</div>
+  </div>
+  <div class="noprint mt-5 p-4 rounded-2xl text-sm" style="background:linear-gradient(135deg,#fff7ed,#fff)">Want to save customers, stock and GST reports? <a href="/" class="font-bold text-orange-700">Try Digital Munshi free →</a></div>
+</section>
+<section class="noprint bg-slate-100 py-10"><div class="px-5">{% include "_leadform.html" %}</div></section>
+<footer class="noprint border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+{% include "_floatwa.html" %}
+<script>
+var ROWS=[{n:"",q:1,r:0}];
+function addRow(){ROWS.push({n:"",q:1,r:0});draw();}
+function draw(){var h="";ROWS.forEach(function(x,i){h+='<div class="flex gap-2"><input placeholder="Item" value="'+x.n+'" oninput="upd('+i+',\'n\',this.value)" class="flex-1 p-2 border border-slate-200 rounded-lg text-sm"><input type="number" value="'+x.q+'" oninput="upd('+i+',\'q\',this.value)" class="w-16 p-2 border border-slate-200 rounded-lg text-sm"><input type="number" value="'+x.r+'" oninput="upd('+i+',\'r\',this.value)" placeholder="Rate" class="w-24 p-2 border border-slate-200 rounded-lg text-sm"><button onclick="del('+i+')" class="text-red-500 px-2">×</button></div>';});document.getElementById("rows").innerHTML=h;render();}
+function upd(i,k,v){ROWS[i][k]=(k==="n")?v:(parseFloat(v)||0);render();}
+function del(i){ROWS.splice(i,1);if(!ROWS.length)ROWS.push({n:"",q:1,r:0});draw();}
+function fmt(n){return "₹"+(Math.round(n*100)/100).toLocaleString("en-IN");}
+function render(){
+ document.getElementById("pFrom").textContent=document.getElementById("fFrom").value||"Your Business";
+ document.getElementById("pTo").textContent=document.getElementById("fTo").value||"Customer";
+ document.getElementById("pInv").textContent=document.getElementById("fInv").value||"INV-001";
+ document.getElementById("pDate").textContent=document.getElementById("fDate").value||"";
+ var sub=0,b="";ROWS.forEach(function(x){var amt=(x.q||0)*(x.r||0);sub+=amt;b+='<tr class="border-t"><td class="p-2">'+(x.n||"-")+'</td><td class="p-2 text-right">'+(x.q||0)+'</td><td class="p-2 text-right">'+fmt(x.r||0)+'</td><td class="p-2 text-right">'+fmt(amt)+'</td></tr>';});
+ document.getElementById("pBody").innerHTML=b;
+ var useg=document.getElementById("gst").checked;var gr=parseFloat(document.getElementById("gstr").value)||0;var gst=useg?sub*gr/100:0;
+ document.getElementById("pGstRow").style.display=useg?"flex":"none";
+ document.getElementById("pSub").textContent=fmt(sub);document.getElementById("pGst").textContent=fmt(gst);document.getElementById("pTotal").textContent=fmt(sub+gst);}
+["fFrom","fTo","fInv","fDate"].forEach(function(id){document.getElementById(id).addEventListener("input",render);});
+document.getElementById("fDate").value=new Date().toISOString().slice(0,10);
+draw();
+</script>
+</body></html>

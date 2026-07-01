@@ -120,6 +120,107 @@ KEYWORD_PAGES = {
             {"q": "Is it cloud or desktop?", "a": "Cloud-based — on mobile and laptop, with automatic data backup."},
         ],
     },
+
+    "billing-software-for-pharmacy": {
+        "title": "Billing Software for Pharmacy & Medical Store | Digital Munshi",
+        "desc": "Pharmacy billing software with batch & expiry tracking, GST invoice, drug-wise stock, and low-stock alerts. Free trial for medical stores.",
+        "h1": "Billing Software for Pharmacy & Medical Stores",
+        "intro": "Purpose-built for chemists and medical stores — batch and expiry tracking, GST billing, fast barcode billing and low-stock alerts, all in one app.",
+        "points": ["Batch number + expiry tracking", "GST invoice + Bill of Supply", "Barcode billing + fast POS", "Low-stock & near-expiry alerts", "Supplier ledger & purchase register"],
+        "keyword": "pharmacy billing software",
+        "body": """
+<h2>Why pharmacies need batch & expiry tracking</h2>
+<p>Medicines have batches and expiry dates — selling expired stock is a serious risk. Digital Munshi tracks every batch and expiry, so you always sell the right stock first and get alerts before medicines expire.</p>
+<h2>Fast GST billing at the counter</h2>
+<p>Scan the barcode, and rate plus GST fill in automatically. Print a thermal or A4 GST invoice in seconds, even during a rush.</p>
+<h2>Stock, suppliers and reports</h2>
+<p>Track drug-wise stock across counters, manage supplier credit, and get GST-ready reports (GSTR-1/3B, HSN summary) at month-end.</p>
+""",
+        "faqs": [
+            {"q": "Does it track medicine batch and expiry?", "a": "Yes. Every batch and expiry date is tracked, with near-expiry alerts so you don't sell expired stock."},
+            {"q": "Is it GST compliant for pharmacies?", "a": "Yes — GST invoice, Bill of Supply, and GSTR-1/3B and HSN reports are built in."},
+        ],
+    },
+    "billing-software-for-restaurant": {
+        "title": "Restaurant Billing Software (POS + KOT) | Digital Munshi",
+        "desc": "Restaurant billing software with fast POS, GST invoice, thermal receipts and menu items. For cafes, dhabas and restaurants. Free trial.",
+        "h1": "Restaurant & Cafe Billing Software",
+        "intro": "Fast POS billing for restaurants, cafes and dhabas — menu items, GST invoice, 58mm thermal receipts, and daily sales summary.",
+        "points": ["Fast POS billing for dine-in & takeaway", "GST invoice + 58mm thermal receipt", "Menu items with rates & tax", "Daily sales & top-item report", "Online catalog — WhatsApp orders"],
+        "keyword": "restaurant billing software",
+        "body": """
+<h2>Fast billing for a busy counter</h2>
+<p>Pick menu items and print a receipt in seconds. GST is calculated automatically, and 58mm thermal receipts print instantly.</p>
+<h2>Know your best sellers</h2>
+<p>A daily summary shows your sales, cash and top items — so you know what's working and can plan your menu and stock.</p>
+<h2>Take orders online</h2>
+<p>Share your menu as an online catalog link — customers browse and order on WhatsApp.</p>
+""",
+        "faqs": [
+            {"q": "Does it print thermal receipts?", "a": "Yes, 58mm thermal receipts and A4 GST invoices."},
+            {"q": "Can customers order online?", "a": "Yes, share your menu as a catalog link and receive orders on WhatsApp."},
+        ],
+    },
+    "billing-software-for-garment-shop": {
+        "title": "Billing Software for Garment & Clothing Shops | Digital Munshi",
+        "desc": "Garment shop billing software with size/colour variants, barcode, GST invoice and stock. For clothing and fashion stores. Free trial.",
+        "h1": "Billing Software for Garment & Clothing Shops",
+        "intro": "Made for clothing and fashion retail — size/colour variants, barcode billing, GST invoices and stock tracking per variant.",
+        "points": ["Size / colour / design variants", "Barcode + label printing", "GST invoice + fast POS", "Variant-wise stock tracking", "Online catalog with photos"],
+        "keyword": "garment shop billing software",
+        "body": """
+<h2>Handle size and colour variants easily</h2>
+<p>Clothing comes in sizes, colours and designs. Digital Munshi tracks each variant separately with its own barcode and stock, so you always know what's in stock.</p>
+<h2>Barcode billing and labels</h2>
+<p>Design and print barcode labels, then scan at billing for fast, error-free invoices.</p>
+<h2>Show your collection online</h2>
+<p>Create an online catalog with product photos — customers browse and order on WhatsApp.</p>
+""",
+        "faqs": [
+            {"q": "Does it support size and colour variants?", "a": "Yes, each size/colour/design is tracked as a variant with its own barcode and stock."},
+            {"q": "Can I print barcode labels?", "a": "Yes, there's a built-in barcode and label designer."},
+        ],
+    },
+    "billing-software-for-hardware-store": {
+        "title": "Billing Software for Hardware & Electrical Shops | Digital Munshi",
+        "desc": "Hardware store billing software with GST invoice, multi-unit items, credit khata and stock. For hardware, electrical and paint shops. Free trial.",
+        "h1": "Billing Software for Hardware & Electrical Shops",
+        "intro": "Built for hardware, electrical and paint shops — multi-unit items, GST billing, customer credit (udhaar) and stock management.",
+        "points": ["Multi-unit items (piece/box/kg)", "GST invoice + estimate/quotation", "Customer credit (udhaar) khata", "Stock + low-stock alerts", "Supplier purchase register"],
+        "keyword": "hardware store billing software",
+        "body": """
+<h2>Multi-unit billing made simple</h2>
+<p>Hardware items sell by piece, box, kg or metre. Digital Munshi handles multiple units per item with automatic conversion, so billing is quick and accurate.</p>
+<h2>Estimates and credit</h2>
+<p>Send quotations/estimates and convert them to invoices in one click. Track customer credit (udhaar) and send reminders on WhatsApp.</p>
+<h2>Stock and suppliers</h2>
+<p>Track stock, get low-stock alerts, and manage supplier purchases and payments in one place.</p>
+""",
+        "faqs": [
+            {"q": "Can I bill in different units like box and piece?", "a": "Yes, multiple units per item with automatic conversion are supported."},
+            {"q": "Can I send quotations/estimates?", "a": "Yes, create estimates and convert them to invoices in one click."},
+        ],
+    },
+    "billing-software-for-wholesale-distributor": {
+        "title": "Billing Software for Wholesale & Distributors | Digital Munshi",
+        "desc": "Wholesale & distributor billing software with GST, price lists, credit khata, multi-godown stock and outstanding reports. Free trial.",
+        "h1": "Billing Software for Wholesale & Distributors",
+        "intro": "For wholesalers and distributors — bulk GST billing, party-wise price lists, credit (udhaar) management, multi-godown stock and outstanding reports.",
+        "points": ["Bulk GST billing + e-invoice/e-way bill", "Party-wise price lists (retail/wholesale)", "Credit (udhaar) + receivables aging", "Multi-godown stock", "Outstanding & purchase reports"],
+        "keyword": "wholesale billing software",
+        "body": """
+<h2>Bulk billing and price lists</h2>
+<p>Create GST invoices fast with party-wise price lists (retail, wholesale, distributor). e-Invoice and e-way bill JSON are ready for large consignments.</p>
+<h2>Manage credit and outstanding</h2>
+<p>Track who owes what with receivables aging, set credit limits, and send payment reminders and statements on WhatsApp.</p>
+<h2>Multi-godown stock</h2>
+<p>Track stock across multiple warehouses and get low-stock alerts to plan purchases.</p>
+""",
+        "faqs": [
+            {"q": "Does it support wholesale price lists?", "a": "Yes, party-wise price lists (retail/wholesale/distributor) are supported."},
+            {"q": "Can I track outstanding and credit limits?", "a": "Yes — receivables aging, credit limits, reminders and statements are built in."},
+        ],
+    },
 }
 
 # ---- City / local landing pages (/billing-software-in-<slug>/) ----
@@ -127,6 +228,9 @@ CITIES = {
     "delhi": "Delhi", "mumbai": "Mumbai", "jaipur": "Jaipur",
     "bangalore": "Bangalore", "ahmedabad": "Ahmedabad", "surat": "Surat",
     "lucknow": "Lucknow", "indore": "Indore", "pune": "Pune", "hyderabad": "Hyderabad",
+    "kanpur": "Kanpur", "nagpur": "Nagpur", "bhopal": "Bhopal", "patna": "Patna",
+    "kochi": "Kochi", "coimbatore": "Coimbatore", "ludhiana": "Ludhiana", "agra": "Agra",
+    "varanasi": "Varanasi", "rajkot": "Rajkot", "nashik": "Nashik", "vadodara": "Vadodara",
 }
 
 
@@ -319,5 +423,75 @@ BLOG_POSTS = {
 <h2>In Digital Munshi</h2>
 <p>For composition businesses, Digital Munshi creates a <b>Bill of Supply</b> and provides composition-friendly reports.</p>
 """,
+    },
+}
+
+
+# ---- Comparison pages (/compare/<slug>/) ----
+COMPARISONS = {
+    "digital-munshi-vs-vyapar": {
+        "title": "Digital Munshi vs Vyapar — Which Billing Software Is Better? (2026)",
+        "desc": "Digital Munshi vs Vyapar comparison — features, pricing, cloud vs desktop, online catalog and support. Find the best billing software for your business.",
+        "h1": "Digital Munshi vs Vyapar",
+        "competitor": "Vyapar",
+        "intro": "Both Digital Munshi and Vyapar are popular billing and accounting apps for Indian businesses. Here's an honest, feature-by-feature comparison to help you choose.",
+        "rows": [
+            ("GST billing & invoice", "Yes", "Yes"),
+            ("Cloud-based (access anywhere)", "Yes — full cloud", "Primarily mobile/desktop"),
+            ("Online catalog + WhatsApp orders", "Yes, built-in", "Limited"),
+            ("Loyalty points", "Yes", "No"),
+            ("Multi-firm (separate books)", "Yes", "Yes"),
+            ("Accounting (double-entry)", "Yes", "Basic"),
+            ("HR / Payroll", "Yes", "No"),
+            ("Free trial", "7 days", "Free tier + paid"),
+            ("Starting price", "Rs 399/mo", "Around Rs 3,599/yr"),
+        ],
+        "verdict": "If you want a fully cloud-based, all-in-one app (billing + accounting + inventory + HR + POS + online catalog) with WhatsApp orders and loyalty, Digital Munshi is a strong, modern and affordable choice. Vyapar is well-known and works well offline on mobile/desktop.",
+        "faqs": [
+            {"q": "Is Digital Munshi cheaper than Vyapar?", "a": "Digital Munshi starts at Rs 399/month with a 7-day free trial, and includes accounting, HR and online catalog in one plan."},
+            {"q": "Can I move from Vyapar to Digital Munshi?", "a": "Yes, items and parties can be imported via CSV to get started quickly."},
+        ],
+    },
+    "digital-munshi-vs-tally": {
+        "title": "Digital Munshi vs Tally — Which Is Better for Small Business? (2026)",
+        "desc": "Digital Munshi vs Tally comparison — cloud vs desktop, ease of use, GST billing, mobile access and price. Choose the right software.",
+        "h1": "Digital Munshi vs Tally",
+        "competitor": "Tally",
+        "intro": "Tally is a long-standing accounting software, while Digital Munshi is a modern cloud app. Here's how they compare for small and medium businesses.",
+        "rows": [
+            ("Ease of use", "Very easy, minimal training", "Steeper learning curve"),
+            ("Cloud + mobile access", "Yes — anywhere", "Mostly desktop"),
+            ("GST billing & e-invoice", "Yes", "Yes"),
+            ("Online catalog + WhatsApp", "Yes", "No"),
+            ("POS billing", "Yes", "Limited"),
+            ("Auto backup", "Yes (cloud)", "Manual"),
+            ("Setup time", "Minutes", "Longer"),
+            ("Starting price", "Rs 399/mo", "One-time/annual license"),
+        ],
+        "verdict": "Tally is powerful for deep accounting and is an industry standard for CAs. Digital Munshi is easier to use, cloud-based and mobile-first — better for shop owners who want quick billing, POS, online catalog and simple accounting without a learning curve.",
+        "faqs": [
+            {"q": "Is Digital Munshi easier than Tally?", "a": "Yes — it's designed for shop owners with a simple interface, so staff can use it with little training."},
+            {"q": "Does Digital Munshi work on mobile?", "a": "Yes, it's cloud-based and works on mobile and laptop, unlike desktop-first Tally."},
+        ],
+    },
+    "digital-munshi-vs-zoho-books": {
+        "title": "Digital Munshi vs Zoho Books — Comparison (2026) | Digital Munshi",
+        "desc": "Digital Munshi vs Zoho Books — GST billing, POS, online catalog, pricing and ease of use for Indian SMBs. Pick the right accounting software.",
+        "h1": "Digital Munshi vs Zoho Books",
+        "competitor": "Zoho Books",
+        "intro": "Zoho Books is a solid cloud accounting product; Digital Munshi is a simple, shop-friendly all-in-one. Here's the comparison.",
+        "rows": [
+            ("GST billing & reports", "Yes", "Yes"),
+            ("Simple for shop owners", "Yes — Hinglish-friendly", "More accounting-focused"),
+            ("POS + barcode billing", "Yes", "Limited"),
+            ("Online catalog + WhatsApp orders", "Yes", "No"),
+            ("Loyalty points", "Yes", "No"),
+            ("HR / Payroll", "Yes", "Add-on"),
+            ("Starting price", "Rs 399/mo", "Higher tiers"),
+        ],
+        "verdict": "Zoho Books is great for businesses that need advanced accounting and integrations. Digital Munshi is better for retail and shops that want fast POS/billing, online catalog, loyalty and simple accounting in one affordable app.",
+        "faqs": [
+            {"q": "Which is better for a retail shop?", "a": "Digital Munshi — it focuses on fast billing, POS, barcode, online catalog and loyalty, which retail shops need daily."},
+        ],
     },
 }

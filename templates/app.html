@@ -274,17 +274,23 @@ function Login({onLogin}){
         {/* RIGHT — auth card */}
         <div className="lg:w-[44%] flex items-center justify-center px-5 pb-10 lg:p-10">
           <div className="w-full bg-white rounded-3xl shadow-2xl p-7 sm:p-9 fade-in" style={{maxWidth:430}}>
-            <div className="lg:hidden flex items-center gap-2 justify-center text-orange-600 font-extrabold mb-4"><span className="text-2xl">📒</span> Digital Munshi</div>
-            <h2 className="text-2xl font-extrabold text-slate-900">{mode==="login"?"Welcome back 👋":"Start your free trial 🚀"}</h2>
-            <p className="text-sm text-slate-500 mt-1">{mode==="login"?"Login to your account":"Create a new business — 7 days free"}</p>
+            <div className="flex items-center justify-between mb-2">
+              <div className="lg:hidden flex items-center gap-2 text-orange-600 font-extrabold"><span className="text-2xl">📒</span> Digital Munshi</div>
+              <div className="flex rounded-full overflow-hidden border border-slate-200 text-xs font-bold ml-auto">
+                <button type="button" onClick={()=>setLang("en")} className="px-2.5 py-1" style={{background:DM_LANG!=="hi"?"#ea6a1e":"#fff",color:DM_LANG!=="hi"?"#fff":"#64748b"}}>EN</button>
+                <button type="button" onClick={()=>setLang("hi")} className="px-2.5 py-1" style={{background:DM_LANG==="hi"?"#ea6a1e":"#fff",color:DM_LANG==="hi"?"#fff":"#64748b"}}>हिं</button>
+              </div>
+            </div>
+            <h2 className="text-2xl font-extrabold text-slate-900">{mode==="login"?t("Welcome back 👋","वापस स्वागत है 👋"):t("Start your free trial 🚀","फ्री ट्रायल शुरू करें 🚀")}</h2>
+            <p className="text-sm text-slate-500 mt-1">{mode==="login"?t("Login to your account","अपने अकाउंट में लॉगिन करें"):t("Create a new business — 7 days free","नया बिज़नेस बनाएं — 7 दिन फ्री")}</p>
             {mode==="signup"
-              ? <div className="flex flex-wrap gap-2 mb-5 mt-3">{["No credit card","7-day free trial","Cancel anytime"].map(t=><span key={t} className="text-xs bg-orange-50 text-orange-700 font-semibold px-2.5 py-1 rounded-full">✓ {t}</span>)}</div>
+              ? <div className="flex flex-wrap gap-2 mb-5 mt-3">{[t("No credit card","कोई कार्ड नहीं"),t("7-day free trial","7 दिन फ्री ट्रायल"),t("Cancel anytime","कभी भी कैंसिल")].map(x=><span key={x} className="text-xs bg-orange-50 text-orange-700 font-semibold px-2.5 py-1 rounded-full">✓ {x}</span>)}</div>
               : <div className="mb-5"></div>}
 
             {err && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl mb-3 border border-red-100">{err}</div>}
 
             <form onSubmit={submit}>
-              {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Business / Shop name" value={f.org_name} onChange={set("org_name")} />}
+              {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder={t("Business / Shop name","बिज़नेस / दुकान का नाम")} value={f.org_name} onChange={set("org_name")} />}
               {mode==="signup" && <select className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-100" value={f.business_type} onChange={set("business_type")}>
                 {BTYPES.map(([c,l])=><option key={c} value={c}>{l}</option>)}</select>}
               <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Username" value={f.username} onChange={set("username")} />
@@ -298,16 +304,16 @@ function Login({onLogin}){
                 {devOtp && <div className="text-xs text-emerald-600 mt-1">Dev OTP: <b>{devOtp}</b> (SMS gateway lagne par yeh SMS me aayega)</div>}
               </div>}
               <div className="relative mb-5">
-                <input className="w-full p-3 pr-16 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" type={showPass?"text":"password"} placeholder="Password" value={f.password} onChange={set("password")} />
-                <button type="button" onClick={()=>setShowPass(!showPass)} className="absolute right-3 top-1/2 text-xs font-bold text-orange-600" style={{transform:"translateY(-50%)"}}>{showPass?"Hide":"Show"}</button>
+                <input className="w-full p-3 pr-16 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" type={showPass?"text":"password"} placeholder={t("Password","पासवर्ड")} value={f.password} onChange={set("password")} />
+                <button type="button" onClick={()=>setShowPass(!showPass)} className="absolute right-3 top-1/2 text-xs font-bold text-orange-600" style={{transform:"translateY(-50%)"}}>{showPass?t("Hide","छिपाएं"):t("Show","दिखाएं")}</button>
               </div>
-              <button disabled={busy} className="w-full p-3 rounded-xl font-bold text-white shadow-lg disabled:opacity-60" style={{background:"linear-gradient(135deg,#f97316,#ea580c)"}}>{busy?"One moment…":(mode==="login"?"Login":"Start Free Trial →")}</button>
+              <button disabled={busy} className="w-full p-3 rounded-xl font-bold text-white shadow-lg disabled:opacity-60" style={{background:"linear-gradient(135deg,#f97316,#ea580c)"}}>{busy?t("One moment…","एक पल…"):(mode==="login"?t("Login","लॉगिन"):t("Start Free Trial →","फ्री ट्रायल शुरू करें →"))}</button>
             </form>
 
             <p className="text-sm text-center mt-5 text-slate-500">
               {mode==="login"
-                ? <span>New business? <a className="text-orange-600 font-bold cursor-pointer hover:underline" onClick={()=>{setMode("signup");setErr("");}}>Sign up free</a></span>
-                : <span>Already have an account? <a className="text-orange-600 font-bold cursor-pointer hover:underline" onClick={()=>{setMode("login");setErr("");}}>Login</a></span>}
+                ? <span>{t("New business?","नया बिज़नेस?")} <a className="text-orange-600 font-bold cursor-pointer hover:underline" onClick={()=>{setMode("signup");setErr("");}}>{t("Sign up free","फ्री साइन अप")}</a></span>
+                : <span>{t("Already have an account?","पहले से अकाउंट है?")} <a className="text-orange-600 font-bold cursor-pointer hover:underline" onClick={()=>{setMode("login");setErr("");}}>{t("Login","लॉगिन")}</a></span>}
             </p>
             <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-center gap-4 text-xs text-slate-400">
               <span>🔒 Secure</span><span>🇮🇳 Made in India</span><span>☁️ Cloud backup</span>

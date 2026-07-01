@@ -867,7 +867,7 @@ function NewSale({initialDoc}){
   const applyPriceList=id=>{ setPlId(id); const pl=priceLists.find(x=>x.id==id); if(!pl)return;
     setLines(ls=>ls.map(l=>{ if(!l.variant)return l; const it=(pl.items||[]).find(x=>x.variant==l.variant); return it?{...l,rate:+it.price}:l; })); };
   const DOCS=[["SALE","Tax Invoice"],["PURCHASE","Purchase"],["ESTIMATE","Estimate / Quotation"],["PROFORMA","Proforma Invoice"],["SALE_ORDER","Sale Order"],["DELIVERY_CHALLAN","Delivery Challan"],["SALE_RETURN","Sale Return / Credit Note"]];
-  function blank(){ return {variant:"",unit:"",qty:1,rate:0,incl:false,mrp:0,disc1_pct:0,disc2_pct:0,disc3_pct:0,discount_amount:0,tax_percent:18,cess_percent:0,free_qty:0,batch:""}; }
+  function blank(){ return {variant:"",unit:"",qty:1,rate:0,incl:false,mrp:0,disc1_pct:0,disc2_pct:0,disc3_pct:0,discount_amount:0,tax_percent:0,cess_percent:0,free_qty:0,batch:""}; }
   useEffect(()=>{ apiList("/parties/?page_size=500").then(setParties); apiList("/godowns/").then(g=>{setGodowns(g);if(g[0])setGodown(g[0].id);});
     apiList("/units/").then(setUnits); apiList("/items/?page_size=500").then(setItems);
     apiList("/price-lists/").then(setPriceLists).catch(()=>{});
@@ -882,7 +882,7 @@ function NewSale({initialDoc}){
     if(v.item.secondary_unit&&v.item.secondary_unit!==v.item.primary_unit)out.push(v.item.secondary_unit); return out; };
   const priceFor=(v,unitId)=>{ const p=(v.prices||[]).find(x=>x.unit==unitId); if(p&&+p.sale_price)return +p.sale_price;
     return +v.item.mrp||0; };
-  const taxFor=v=>{ /* item.tax_rate is id; profile may carry default. fallback 18 */ return 18; };
+  const taxFor=v=>{ const t=v&&v.item&&v.item.tax_percent; return (t===0||t)?+t:0; };
   const setLine=(i,k,val)=>{ setLines(ls=>{ const n=ls.map((l,j)=>j===i?{...l,[k]:val}:l);
     if(k==="variant"){ const v=vById(val); if(v){ const u=v.item.primary_unit; n[i].unit=u; n[i].rate=priceFor(v,u); n[i].mrp=+v.item.mrp||0; n[i].tax_percent=taxFor(v); n[i].batch=""; } }
     if(k==="unit"){ const v=vById(n[i].variant); if(v) n[i].rate=priceFor(v,val); }
@@ -1907,7 +1907,7 @@ function POSView(){
   const scanRef=useRef(null);
   useEffect(()=>{ apiList("/items/?page_size=500").then(setItems); apiList("/godowns/").then(setGodowns);
     apiList("/parties/?page_size=500").then(setParties); if(scanRef.current)scanRef.current.focus(); },[]);
-  const variants=[]; items.forEach(it=>(it.variants||[]).forEach(v=>variants.push({id:v.id,label:it.name+(v.size||v.colour||v.model?` (${[v.size,v.colour,v.model].filter(Boolean).join(" ")})`:""),code:v.item_code,barcode:v.barcode,unit:it.primary_unit,rate:(v.unit_prices&&v.unit_prices[0]&&+v.unit_prices[0].sale_price)||+it.mrp||0,tax:18})));
+  const variants=[]; items.forEach(it=>(it.variants||[]).forEach(v=>variants.push({id:v.id,label:it.name+(v.size||v.colour||v.model?` (${[v.size,v.colour,v.model].filter(Boolean).join(" ")})`:""),code:v.item_code,barcode:v.barcode,unit:it.primary_unit,rate:(v.unit_prices&&v.unit_prices[0]&&+v.unit_prices[0].sale_price)||+it.mrp||0,tax:+it.tax_percent||0})));
   const add=v=>{ setCart(c=>{ const i=c.findIndex(x=>x.id===v.id); if(i>=0){ const n=[...c]; n[i]={...n[i],qty:n[i].qty+1}; return n; }
     return [...c,{id:v.id,label:v.label,unit:v.unit,rate:v.rate,tax:v.tax,qty:1}]; }); };
   const setQty=(i,d)=>setCart(c=>{ const n=[...c]; n[i]={...n[i],qty:Math.max(0,n[i].qty+d)}; return n.filter(x=>x.qty>0); });

@@ -66,10 +66,15 @@ class ItemVariantSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     variants = ItemVariantSerializer(many=True, read_only=True)
+    # Item ka actual GST % (tax_rate FK ka percent) — frontend billing me isse tax auto set hota hai.
+    tax_percent = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
         fields = "__all__"
+
+    def get_tax_percent(self, obj):
+        return float(obj.tax_rate.percent) if obj.tax_rate_id and obj.tax_rate else 0
 
 
 class StockSerializer(serializers.ModelSerializer):

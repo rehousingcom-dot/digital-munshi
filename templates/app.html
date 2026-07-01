@@ -864,6 +864,21 @@ function NewSale({initialDoc}){
   const [priceLists,setPriceLists]=useState([]),[plId,setPlId]=useState("");
   const [currency,setCurrency]=useState("INR"),[fx,setFx]=useState(1);
   const [lines,setLines]=useState([blank()]); const [done,setDone]=useState(null),[err,setErr]=useState("");
+  const [qpOpen,setQpOpen]=useState(false),[qpName,setQpName]=useState(""),[qpPhone,setQpPhone]=useState("");
+  const saveQuickParty=async()=>{ if(!qpName.trim()){setErr("Party ka naam daalein");return;}
+    try{ const pt=docType==="PURCHASE"?"SUPPLIER":"CUSTOMER";
+      const p=await api("/parties/",{method:"POST",body:JSON.stringify({name:qpName.trim(),phone:qpPhone.trim(),party_type:pt})});
+      setParties(x=>[...x,p]); setParty(String(p.id)); setQpOpen(false); setQpName(""); setQpPhone(""); setErr("");
+    }catch(e){ setErr("Party add nahi hua"); } };
+  const [qiOpen,setQiOpen]=useState(false),[qiName,setQiName]=useState(""),[qiRate,setQiRate]=useState(""),[qiTax,setQiTax]=useState("");
+  const saveQuickItem=async()=>{ if(!qiName.trim()){setErr("Item ka naam daalein");return;}
+    try{ const pu=(units[0]&&units[0].id)||null;
+      const it=await api("/items/",{method:"POST",body:JSON.stringify({name:qiName.trim(),mrp:String(qiRate||0),primary_unit:pu})});
+      setItems(x=>[...x,it]);
+      const vid=it.variants&&it.variants[0]&&it.variants[0].id;
+      if(vid){ setLines(ls=>{ const n=ls.filter(l=>l.variant); const b=blank(); b.variant=String(vid); b.unit=it.primary_unit||pu; b.rate=+qiRate||0; b.tax_percent=+(qiTax||0); n.push(b); n.push(blank()); return n; }); }
+      setQiOpen(false); setQiName(""); setQiRate(""); setQiTax(""); setErr("");
+    }catch(e){ setErr("Item add nahi hua — poora item Items page se banayein"); } };
   const applyPriceList=id=>{ setPlId(id); const pl=priceLists.find(x=>x.id==id); if(!pl)return;
     setLines(ls=>ls.map(l=>{ if(!l.variant)return l; const it=(pl.items||[]).find(x=>x.variant==l.variant); return it?{...l,rate:+it.price}:l; })); };
   const DOCS=[["SALE","Tax Invoice"],["PURCHASE","Purchase"],["ESTIMATE","Estimate / Quotation"],["PROFORMA","Proforma Invoice"],["SALE_ORDER","Sale Order"],["DELIVERY_CHALLAN","Delivery Challan"],["SALE_RETURN","Sale Return / Credit Note"]];
@@ -942,20 +957,35 @@ function NewSale({initialDoc}){
         </span></div>}
       {err && <div className="bg-red-50 text-red-600 p-2.5 rounded-lg mb-3 text-sm">{err}</div>}
       <div className="card p-4 grid md:grid-cols-3 gap-3 mb-4">
-        <div><label className="text-xs font-semibold text-slate-500">{docType==="PURCHASE"?"Supplier":"Customer / Party"}</label>
+        <div><div className="flex items-center justify-between"><label className="text-xs font-semibold text-slate-500">{docType==="PURCHASE"?"Supplier":"Customer / Party"}</label>
+            <button type="button" onClick={()=>setQpOpen(!qpOpen)} className="text-xs font-bold text-orange-600">{qpOpen?"✕ Close":"+ New"}</button></div>
           <select className={cell} value={party} onChange={e=>setParty(e.target.value)}>
             <option value="">— select —</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>
+          {qpOpen && <div className="mt-2 p-2 rounded-lg bg-orange-50 border border-orange-100">
+            <input className={cell+" mb-2"} placeholder={(docType==="PURCHASE"?"Supplier":"Customer")+" ka naam *"} value={qpName} onChange={e=>setQpName(e.target.value)} />
+            <input className={cell+" mb-2"} placeholder="Phone (optional)" value={qpPhone} onChange={e=>setQpPhone(e.target.value)} />
+            <button type="button" onClick={saveQuickParty} className="w-full text-white text-sm font-bold py-2 rounded-lg" style={{background:"linear-gradient(135deg,#f97316,#ea580c)"}}>Save & Select</button>
+          </div>}
           {interState && <div className="text-xs text-amber-600 mt-1">Inter-state → IGST lagega</div>}</div>
         <div><label className="text-xs font-semibold text-slate-500">Godown / Store</label>
           <select className={cell} value={godown} onChange={e=>setGodown(e.target.value)}>{godowns.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></div>
         <div><label className="text-xs font-semibold text-slate-500">Date</label>
           <input type="date" className={cell} value={date} onChange={e=>setDate(e.target.value)} /></div>
       </div>
-      <div className="card p-3 mb-3 flex gap-2 items-center">
-        <span className="text-sm text-slate-500">📷 Barcode / Item code:</span>
-        <input className="border border-slate-200 p-2 rounded-lg flex-1 text-sm" placeholder="Scan ya type karke Enter" value={barcode}
-          onChange={e=>setBarcode(e.target.value)} onKeyDown={async e=>{if(e.key==="Enter"){e.preventDefault();const code=barcode.trim();if(!code)return;
-            try{const r=await api("/scan/?code="+encodeURIComponent(code)); if(r.found){setLines(ls=>{const n=ls.filter(l=>l.variant);const b=blank();b.variant=String(r.variant_id);b.unit=String(r.unit);b.rate=r.sale_price;b.tax_percent=r.tax_percent;n.push(b);return n;});setBarcode("");} else setErr("Barcode '"+code+"' nahi mila");}catch(x){setErr("Scan fail");}}}} />
+      <div className="card p-3 mb-3">
+        <div className="flex gap-2 items-center">
+          <span className="text-sm text-slate-500">📷 Barcode / Item code:</span>
+          <input className="border border-slate-200 p-2 rounded-lg flex-1 text-sm" placeholder="Scan ya type karke Enter" value={barcode}
+            onChange={e=>setBarcode(e.target.value)} onKeyDown={async e=>{if(e.key==="Enter"){e.preventDefault();const code=barcode.trim();if(!code)return;
+              try{const r=await api("/scan/?code="+encodeURIComponent(code)); if(r.found){setLines(ls=>{const n=ls.filter(l=>l.variant);const b=blank();b.variant=String(r.variant_id);b.unit=String(r.unit);b.rate=r.sale_price;b.tax_percent=r.tax_percent;n.push(b);return n;});setBarcode("");} else setErr("Barcode '"+code+"' nahi mila");}catch(x){setErr("Scan fail");}}}} />
+          <button type="button" onClick={()=>setQiOpen(!qiOpen)} className="text-sm font-bold text-orange-600 whitespace-nowrap px-2">{qiOpen?"✕ Close":"+ New Item"}</button>
+        </div>
+        {qiOpen && <div className="mt-2 p-2 rounded-lg bg-orange-50 border border-orange-100 grid md:grid-cols-4 gap-2 items-end">
+          <div className="md:col-span-2"><label className="text-xs font-semibold text-slate-500">Item ka naam *</label><input className={cell} value={qiName} onChange={e=>setQiName(e.target.value)} /></div>
+          <div><label className="text-xs font-semibold text-slate-500">Sale price</label><input type="number" className={cell} value={qiRate} onChange={e=>setQiRate(e.target.value)} /></div>
+          <div><label className="text-xs font-semibold text-slate-500">GST %</label><input type="number" className={cell} value={qiTax} onChange={e=>setQiTax(e.target.value)} /></div>
+          <div className="md:col-span-4"><button type="button" onClick={saveQuickItem} className="text-white text-sm font-bold py-2 px-4 rounded-lg" style={{background:"linear-gradient(135deg,#f97316,#ea580c)"}}>Save & Add to bill</button></div>
+        </div>}
       </div>
       <div className="card overflow-x-auto mb-4">
         <table className="w-full text-sm" style={{minWidth:880}}>

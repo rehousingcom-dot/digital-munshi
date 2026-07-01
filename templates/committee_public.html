@@ -121,6 +121,6 @@ async function submitJoin(){
 }
 // Boli LIVE ho to page auto-refresh (nayi boli sabko dikhe) — jab tak koi field me type na kar raha ho
 var BIDDING_OPEN = {{ c.bidding_open|yesno:"true,false" }};
-if(BIDDING_OPEN){ setInterval(function(){ var a=document.activeElement; if(!a||(a.tagName!=="INPUT"&&a.tagName!=="SELECT")) location.reload(); }, 15000); }
+if(BIDDING_OPEN){ setInterval(function(){ var a=document.activeElement; if(!a||["INPUT","SELECT","TEXTAREA"].indexOf(a.tagName)<0) location.reload(); }, 15000); }
 </script>
 </body></html>

@@ -211,6 +211,7 @@ const PATHS = {
   pos:'M2 7h20l-2 13H4zM2 7l2-4h16l2 4M9 11v5M15 11v5',
   accounting:'M3 3v18h18M7 16V9M12 16V5M17 16v-7M3 3h18',
   committee:'M17 20h5v-2a3 3 0 0 0-5.4-1.8M9 20H2v-2a4 4 0 0 1 6-3.5M9 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM17 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12.5 22a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM12.5 16.6v2.4M11.4 18.2h2.2',
+  market:'M3 9h18l-1.5 11a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8zM3 9l2-5h14l2 5M9 13v4M15 13v4',
 };
 function Icon({n, size=18, color="currentColor", stroke=2}){
   return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
@@ -2367,6 +2368,98 @@ function Stat({label,v}){
   return <div className="card p-3"><div className="text-xs text-slate-500">{label}</div><div className="text-lg font-extrabold text-slate-800">{v}</div></div>;
 }
 
+// ---------- Marketplace / Supplier Network ----------
+function MarketplaceView(){
+  const [sub,setSub]=useState("browse");
+  const tabs=[["browse",t("Browse Suppliers","सप्लायर खोजें")],["listing",t("My Listing","मेरी लिस्टिंग")],["enq",t("Enquiries","पूछताछ")]];
+  return (<div className="p-6">
+    <h2 className="text-xl font-bold text-slate-700 mb-1">{t("Supplier Network","सप्लायर नेटवर्क")}</h2>
+    <p className="text-sm text-slate-500 mb-3">{t("Wholesalers/suppliers dhundo, ya apna business list karke naye retailers pao.","Find suppliers or list your business.")}</p>
+    <div className="flex flex-wrap gap-2 mb-4">
+      {tabs.map(([k,l])=><button key={k} onClick={()=>setSub(k)} className={"px-3 py-1 rounded text-sm "+(sub===k?"bg-blue-900 text-white":"bg-slate-200")}>{l}</button>)}
+    </div>
+    {sub==="browse" && <MarketBrowse/>}
+    {sub==="listing" && <MarketListing/>}
+    {sub==="enq" && <MarketEnquiries/>}
+  </div>);
+}
+
+function MarketBrowse(){
+  const [d,setD]=useState(null),[cat,setCat]=useState(""),[q,setQ]=useState(""),[msg,setMsg]=useState("");
+  const load=()=>{ let u="/marketplace/suppliers/?"; if(cat)u+="category="+cat+"&"; if(q)u+="q="+encodeURIComponent(q); api(u).then(setD).catch(()=>{}); };
+  useEffect(()=>{ load(); },[cat]);
+  const enquire=async(s)=>{ const m=prompt(t("Kya chahiye? (items/quantity) — message","Message to supplier"),""); if(m===null)return;
+    await api("/marketplace/send-enquiry/",{method:"POST",body:JSON.stringify({supplier:s.id,message:m})}); setMsg(t("Enquiry bhej di","Enquiry sent")+" — "+s.name); setTimeout(()=>setMsg(""),2500); };
+  if(!d) return <div className="text-slate-400 text-sm">Loading…</div>;
+  return (<div>
+    {msg&&<div className="bg-green-50 text-green-700 p-2 rounded mb-3 text-sm">{msg} ✓</div>}
+    <div className="flex flex-wrap gap-2 mb-3">
+      <select className="border p-2 rounded text-sm" value={cat} onChange={e=>setCat(e.target.value)}>
+        <option value="">{t("All categories","सभी श्रेणी")}</option>
+        {(d.categories||[]).map(c=><option key={c.code} value={c.code}>{c.label}</option>)}</select>
+      <input className="border p-2 rounded text-sm" placeholder={t("Search name","नाम खोजें")} value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==="Enter"&&load()} />
+      <button onClick={load} className="bg-blue-900 text-white px-3 py-1.5 rounded text-sm">{t("Search","खोजें")}</button>
+      <a href="/suppliers/" target="_blank" className="text-blue-700 text-sm py-1.5">{t("Public directory ↗","सार्वजनिक ↗")}</a>
+    </div>
+    <div className="grid md:grid-cols-2 gap-3">
+      {(d.suppliers||[]).length===0&&<div className="text-slate-400 text-sm">{t("Koi supplier nahi mila.","No suppliers found.")}</div>}
+      {(d.suppliers||[]).map(s=><div key={s.id} className="card p-4">
+        <div className="font-bold">{s.name}</div>
+        <div className="text-xs text-orange-700 font-semibold">{s.category_label}{s.city?" · "+s.city:""}</div>
+        {s.about&&<p className="text-sm text-slate-600 mt-1">{s.about}</p>}
+        <div className="flex gap-2 mt-2">
+          {s.catalog_enabled&&s.catalog_uuid&&<a href={"/shop/"+s.catalog_uuid+"/"} target="_blank" className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100">{t("Catalog","कैटलॉग")}</a>}
+          {s.whatsapp&&<a href={"https://wa.me/91"+s.whatsapp.replace(/\D/g,'').slice(-10)} target="_blank" className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white" style={{background:"#25D366"}}>WhatsApp</a>}
+          <button onClick={()=>enquire(s)} className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white bg-blue-900">{t("Send enquiry","पूछताछ भेजें")}</button>
+        </div>
+      </div>)}
+    </div>
+  </div>);
+}
+
+function MarketListing(){
+  const [p,setP]=useState(null),[msg,setMsg]=useState("");
+  useEffect(()=>{ api("/marketplace/profile/").then(setP).catch(()=>{}); },[]);
+  const save=async()=>{ const d=await api("/marketplace/profile/",{method:"PUT",body:JSON.stringify(p)}); setP({...d,categories:p.categories}); setMsg(t("Saved ✓","सेव ✓")); setTimeout(()=>setMsg(""),2000); };
+  if(!p) return <div className="text-slate-400 text-sm">Loading…</div>;
+  const set=(k,v)=>setP({...p,[k]:v});
+  return (<div className="max-w-xl">
+    <div className="card p-4">
+      <label className="flex items-center gap-2 mb-3"><input type="checkbox" checked={!!p.is_listed} onChange={e=>set("is_listed",e.target.checked)} /><span className="font-semibold">{t("Public directory me list karo","List in public directory")}</span></label>
+      <div className="grid md:grid-cols-2 gap-2">
+        <input className="border p-2 rounded" placeholder={t("Display name","नाम")} value={p.display_name||""} onChange={e=>set("display_name",e.target.value)} />
+        <select className="border p-2 rounded" value={p.category} onChange={e=>set("category",e.target.value)}>{(p.categories||[]).map(c=><option key={c.code} value={c.code}>{c.label}</option>)}</select>
+        <input className="border p-2 rounded" placeholder={t("City","शहर")} value={p.city||""} onChange={e=>set("city",e.target.value)} />
+        <input className="border p-2 rounded" placeholder={t("State","राज्य")} value={p.state||""} onChange={e=>set("state",e.target.value)} />
+        <input className="border p-2 rounded" placeholder={t("WhatsApp number","व्हाट्सएप")} value={p.whatsapp||""} onChange={e=>set("whatsapp",e.target.value)} />
+        <input className="border p-2 rounded" type="number" placeholder={t("Min order ₹","न्यूनतम ऑर्डर")} value={p.min_order||""} onChange={e=>set("min_order",e.target.value)} />
+      </div>
+      <textarea className="border p-2 rounded w-full mt-2" rows="2" placeholder={t("Aap kya supply karte ho? (short)","What do you supply?")} value={p.about||""} onChange={e=>set("about",e.target.value)} />
+      <button onClick={save} className="bg-blue-900 text-white px-4 py-2 rounded mt-2 text-sm">{t("Save listing","लिस्टिंग सेव")}</button>
+      {msg&&<span className="text-green-600 text-sm ml-2">{msg}</span>}
+    </div>
+    <p className="text-xs text-slate-500 mt-2">{t("List karne ke baad aap","Once listed you appear in the")} <a href="/suppliers/" target="_blank" className="text-orange-600 font-semibold">public supplier directory</a> {t("me dikhoge — naye retailers enquiry bhejenge.","— new retailers can send enquiries.")}</p>
+  </div>);
+}
+
+function MarketEnquiries(){
+  const [rows,setRows]=useState([]);
+  const load=()=>apiList("/marketplace/enquiries/").then(setRows);
+  useEffect(()=>{ load(); },[]);
+  const setStatus=async(id,s)=>{ await api("/marketplace/enquiries/"+id+"/status/",{method:"POST",body:JSON.stringify({status:s})}); load(); };
+  return (<div>
+    <p className="text-xs text-slate-500 mb-2">{t("Retailers jo aapse maal maang rahe hain.","Retailers who enquired for supply.")}</p>
+    <div className="card overflow-hidden"><table className="w-full text-sm">
+      <thead className="bg-slate-100"><tr><th className="text-left p-2">{t("Name","नाम")}</th><th className="text-left p-2">{t("Phone","फोन")}</th><th className="text-left p-2">{t("Message","संदेश")}</th><th className="p-2">{t("Status","स्थिति")}</th><th></th></tr></thead>
+      <tbody>{rows.length===0&&<tr><td colSpan="5" className="p-3 text-slate-400">{t("Abhi koi enquiry nahi.","No enquiries yet.")}</td></tr>}
+        {rows.map(r=><tr key={r.id} className="border-b"><td className="p-2 font-medium">{r.from_name}</td>
+          <td className="p-2">{r.from_phone?<a href={"https://wa.me/91"+r.from_phone.replace(/\D/g,'').slice(-10)} target="_blank" className="text-green-600">{r.from_phone}</a>:"—"}</td>
+          <td className="p-2 text-slate-600">{r.message||"—"}</td><td className="p-2">{r.status}</td>
+          <td className="p-2 text-right">{r.status!=="CLOSED"&&<span><button onClick={()=>setStatus(r.id,"CONTACTED")} className="text-blue-600 text-xs mr-2">{t("Contacted","संपर्क")}</button><button onClick={()=>setStatus(r.id,"CLOSED")} className="text-slate-500 text-xs">{t("Close","बंद")}</button></span>}</td></tr>)}</tbody>
+    </table></div>
+  </div>);
+}
+
 // ---------- Udhaar reminders (UPI pay-link + Bharosa score) ----------
 function UdhaarReminders({D}){
   const parties=D.parties||[];
@@ -2819,7 +2912,7 @@ function App(){
   const isAdmin = me && me.is_platform_admin;
   const toggleTheme=()=>setTheme(t=>t==="dark"?"light":"dark");
   const logout=()=>{ clearAuth(); setAuthed(false); setSub(null); };
-  const nav=[["dash",t("Dashboard","डैशबोर्ड")],["pos",t("POS Billing","POS बिलिंग")],["sale",t("New Sale","नई बिक्री")],["vouchers",t("Sales & Transactions","बिक्री व लेन-देन")],["items",t("Items","आइटम")],["parties",t("Parties","पार्टी")],["cashbank",t("Cash & Bank","कैश व बैंक")],["accounting",t("Accounting","अकाउंटिंग")],["reports",t("Reports","रिपोर्ट")],["utils",t("Utilities","यूटिलिटीज़")],["whatsapp",t("WhatsApp","व्हाट्सएप")],["hr",t("HR / Payroll","HR / पेरोल")],["committee",t("Committee / BC","कमेटी / BC")],["staff",t("App Users","ऐप यूज़र")],["settings",t("Settings","सेटिंग्स")],["plan",t("Subscription","सब्सक्रिप्शन")]];
+  const nav=[["dash",t("Dashboard","डैशबोर्ड")],["pos",t("POS Billing","POS बिलिंग")],["sale",t("New Sale","नई बिक्री")],["vouchers",t("Sales & Transactions","बिक्री व लेन-देन")],["items",t("Items","आइटम")],["parties",t("Parties","पार्टी")],["cashbank",t("Cash & Bank","कैश व बैंक")],["accounting",t("Accounting","अकाउंटिंग")],["reports",t("Reports","रिपोर्ट")],["utils",t("Utilities","यूटिलिटीज़")],["whatsapp",t("WhatsApp","व्हाट्सएप")],["hr",t("HR / Payroll","HR / पेरोल")],["committee",t("Committee / BC","कमेटी / BC")],["market",t("Marketplace","मार्केटप्लेस")],["staff",t("App Users","ऐप यूज़र")],["settings",t("Settings","सेटिंग्स")],["plan",t("Subscription","सब्सक्रिप्शन")]];
   if(isAdmin) nav.push(["admin","Platform Admin"]);
   const onActivated=s=>{ setSub(s); setTab("dash"); };
   const go=(k,mode)=>{ setTab(k); if(mode)setSaleMode(mode); setOpen(false); };
@@ -2863,6 +2956,7 @@ function App(){
             {tab==="whatsapp" && <WhatsAppView/>}
             {tab==="hr" && <HRView/>}
             {tab==="committee" && <CommitteeView/>}
+            {tab==="market" && <MarketplaceView/>}
             {tab==="staff" && <StaffView/>}
             {tab==="settings" && <Settings onSaved={()=>{}} />}
             {tab==="admin" && <AdminPanel/>}

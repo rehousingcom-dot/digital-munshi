@@ -1,0 +1,89 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wholesale Suppliers & Distributors Directory — Digital Munshi</title>
+<meta name="description" content="Find verified wholesale suppliers, distributors and manufacturers across India — kirana, pharmacy, garment, hardware, electronics and more. Connect and send enquiries free.">
+<link rel="canonical" href="https://erp.reloaddigital.in/suppliers/">
+<meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body class="bg-slate-50 text-slate-800">
+<header class="border-b bg-white sticky top-0 z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/" class="text-white px-4 py-2 rounded-xl text-sm font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">List your business</a>
+</div></header>
+
+<section class="max-w-5xl mx-auto px-5 py-8">
+  <h1 class="text-3xl font-extrabold">Supplier &amp; Wholesaler Directory</h1>
+  <p class="text-slate-500 mt-2">Bharat bhar ke wholesalers, distributors aur manufacturers dhundo — kirana, pharmacy, garment, hardware aur bahut kuch. Enquiry bhejo free.</p>
+
+  <form method="get" class="flex flex-wrap gap-2 mt-5">
+    <select name="category" class="p-2.5 border border-slate-200 rounded-xl bg-white text-sm">
+      <option value="">All categories</option>
+      {% for c in categories %}<option value="{{ c.code }}" {% if c.code == sel_cat %}selected{% endif %}>{{ c.label }}</option>{% endfor %}
+    </select>
+    <input name="city" value="{{ sel_city }}" placeholder="City" class="p-2.5 border border-slate-200 rounded-xl text-sm">
+    <input name="q" value="{{ q }}" placeholder="Search name" class="p-2.5 border border-slate-200 rounded-xl text-sm flex-1 min-w-[140px]">
+    <button class="text-white px-5 py-2.5 rounded-xl text-sm font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Search</button>
+  </form>
+
+  <div class="text-sm text-slate-400 mt-4">{{ count }} supplier{{ count|pluralize }} found</div>
+
+  <div class="grid md:grid-cols-2 gap-4 mt-3">
+    {% for s in suppliers %}
+    <div class="bg-white rounded-2xl border border-slate-100 p-5">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="font-bold text-lg">{{ s.name }}</div>
+          <div class="text-xs text-orange-700 font-semibold">{{ s.category }}{% if s.city %} · {{ s.city }}{% endif %}</div>
+        </div>
+        {% if s.min_order %}<div class="text-xs text-slate-400 text-right">Min order<br><b>₹{{ s.min_order|floatformat:0 }}</b></div>{% endif %}
+      </div>
+      {% if s.about %}<p class="text-sm text-slate-600 mt-2">{{ s.about }}</p>{% endif %}
+      <div class="flex flex-wrap gap-2 mt-3">
+        {% if s.catalog %}<a href="/shop/{{ s.catalog }}/" target="_blank" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100">View catalog</a>{% endif %}
+        {% if s.whatsapp %}<a href="https://wa.me/91{{ s.whatsapp|slice:'-10:' }}" target="_blank" class="text-xs font-semibold px-3 py-1.5 rounded-lg text-white" style="background:#25D366">WhatsApp</a>{% endif %}
+        <button onclick="openEnq({{ s.id }},'{{ s.name|escapejs }}')" class="text-xs font-semibold px-3 py-1.5 rounded-lg text-white" style="background:#1F4E79">Send enquiry</button>
+      </div>
+    </div>
+    {% empty %}
+    <div class="text-slate-400 text-sm">Koi supplier nahi mila. Filter badlo ya <a href="/" class="text-orange-600 font-semibold">apna business list karo</a>.</div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-8 p-5 rounded-2xl text-center" style="background:linear-gradient(135deg,#fff7ed,#fff)">
+    <div class="font-bold text-lg">Aap supplier/wholesaler ho?</div>
+    <p class="text-sm text-slate-500 mt-1">Digital Munshi pe free listing banao — naye retailers aapko dhundhenge.</p>
+    <a href="/" class="inline-block mt-3 text-white px-6 py-2.5 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">List your business free →</a>
+  </div>
+</section>
+
+<!-- Enquiry modal -->
+<div id="enqBox" class="fixed inset-0 bg-black/40 z-40 hidden items-center justify-center p-4" style="display:none">
+  <div class="bg-white rounded-2xl p-5 w-full max-w-sm">
+    <div class="font-bold text-lg mb-1">Enquiry — <span id="enqName"></span></div>
+    <input id="en" placeholder="Aapka naam" class="w-full p-3 mb-2 border border-slate-200 rounded-xl">
+    <input id="ep" placeholder="Mobile number" class="w-full p-3 mb-2 border border-slate-200 rounded-xl">
+    <textarea id="em" rows="3" placeholder="Kya chahiye? (items / quantity)" class="w-full p-3 mb-2 border border-slate-200 rounded-xl"></textarea>
+    <div id="enqMsg" class="text-sm mb-2"></div>
+    <div class="flex gap-2">
+      <button onclick="closeEnq()" class="flex-1 py-2.5 rounded-xl bg-slate-100 font-semibold">Cancel</button>
+      <button onclick="sendEnq()" class="flex-1 py-2.5 rounded-xl text-white font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Bhejo</button>
+    </div>
+  </div>
+</div>
+
+<footer class="border-t py-8 text-center text-sm text-slate-400 bg-white">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Digital Munshi</a></footer>
+<script>
+var curOrg=null;
+function openEnq(id,name){ curOrg=id; document.getElementById("enqName").textContent=name; document.getElementById("enqMsg").textContent=""; document.getElementById("enqBox").style.display="flex"; }
+function closeEnq(){ document.getElementById("enqBox").style.display="none"; }
+async function sendEnq(){
+  var n=document.getElementById("en").value, p=document.getElementById("ep").value, m=document.getElementById("em").value;
+  var msg=document.getElementById("enqMsg");
+  if(!n){msg.textContent="Naam daalo";msg.className="text-sm mb-2 text-red-600";return;}
+  try{ var r=await fetch("/suppliers/"+curOrg+"/enquiry/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:n,phone:p,message:m})});
+    var d=await r.json(); if(r.ok){msg.textContent="✓ Enquiry bhej di! Supplier aapse sampark karega.";msg.className="text-sm mb-2 text-green-600";document.getElementById("en").value="";document.getElementById("ep").value="";document.getElementById("em").value="";setTimeout(closeEnq,1800);}
+    else{msg.textContent=d.detail||"Error";msg.className="text-sm mb-2 text-red-600";} }
+  catch(e){msg.textContent="Network error";msg.className="text-sm mb-2 text-red-600";}
+}
+</script>
+</body></html>

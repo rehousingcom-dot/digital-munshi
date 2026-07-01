@@ -75,6 +75,7 @@ def sitemap_xml(request):
     base = "https://erp.reloaddigital.in"
     urls = [base + "/welcome/", base + "/", base + "/blog/"]
     from apps.core.marketing import CITIES
+    urls += [base + "/suppliers/"]
     urls += [base + "/software/" + s + "/" for s in KEYWORD_PAGES]
     urls += [base + "/blog/" + s + "/" for s in BLOG_POSTS]
     urls += [base + "/billing-software-in-" + s + "/" for s in CITIES]
@@ -112,6 +113,8 @@ from apps.cashbank import views as cashbank_views
 from apps.accounting import views as acc_views
 from apps.committee import views as committee_views
 from apps.committee import public_views as committee_public
+from apps.marketplace import views as market_views
+from apps.marketplace import public_views as market_public
 
 
 def health(request):
@@ -247,6 +250,14 @@ urlpatterns = [
     path("c/<uuid:public_uuid>/join/", committee_public.api_public_join, name="committee_public_join"),
     path("committee/member/<int:pk>/statement/", committee_public.member_statement_html, name="committee_stmt"),
     path("committee/member/<int:pk>/statement.pdf", committee_public.member_statement_pdf, name="committee_stmt_pdf"),
+    # Supplier network / marketplace
+    path("suppliers/", market_public.suppliers_directory, name="suppliers_directory"),
+    path("suppliers/<int:org_id>/enquiry/", market_public.api_public_enquiry, name="supplier_enquiry"),
+    path("api/marketplace/profile/", market_views.profile, name="market_profile"),
+    path("api/marketplace/suppliers/", market_views.suppliers, name="market_suppliers"),
+    path("api/marketplace/enquiries/", market_views.enquiries, name="market_enquiries"),
+    path("api/marketplace/enquiries/<int:pk>/status/", market_views.enquiry_status, name="market_enq_status"),
+    path("api/marketplace/send-enquiry/", market_views.send_enquiry, name="market_send_enquiry"),
     path("api/", include(router.urls)),
     path("api/reports/", include("apps.reports.urls")),
     # API docs (Swagger)

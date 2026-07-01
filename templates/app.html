@@ -414,13 +414,13 @@ function Dashboard({onNav}){
   const s=d.summary;
   const up=s.sales_change_pct>=0;
   const WIDGETS={
-    sales:{label:"Total Sales",icon:"sales",accent:"#ea6a1e",val:money(s.total_sales),sub:<span style={{color:up?"#059669":"#dc2626"}}>{up?"▲":"▼"} {Math.abs(s.sales_change_pct)}% vs pichla month</span>},
-    profit:{label:"Profit",icon:"profit",accent:"#059669",val:money(s.total_profit),sub:<span className="text-slate-400">{s.invoice_count} invoices</span>},
-    receivables:{label:"To Collect",icon:"coins",accent:"#0891b2",val:money(d.cash_flow.receivables),sub:<span className="text-slate-400">customers se baaki</span>},
-    payables:{label:"To Pay",icon:"profit",accent:"#dc2626",val:money(d.cash_flow.payables),sub:<span className="text-slate-400">suppliers ko dena</span>},
-    tax:{label:"Tax Collected",icon:"tax",accent:"#7C3AED",val:money(s.total_tax),sub:<span className="text-slate-400">GST</span>},
-    invoices:{label:"Invoices",icon:"invoices",accent:"#7C3AED",val:s.invoice_count,sub:<span className="text-slate-400">is month</span>},
-    purchases:{label:"Purchases",icon:"vouchers",accent:"#d97706",val:money(s.total_purchases),sub:<span className="text-slate-400">is month</span>},
+    sales:{label:t("Total Sales","कुल बिक्री"),icon:"sales",accent:"#ea6a1e",val:money(s.total_sales),sub:<span style={{color:up?"#059669":"#dc2626"}}>{up?"▲":"▼"} {Math.abs(s.sales_change_pct)}% {t("vs last month","पिछले महीने से")}</span>},
+    profit:{label:t("Profit","मुनाफ़ा"),icon:"profit",accent:"#059669",val:money(s.total_profit),sub:<span className="text-slate-400">{s.invoice_count} {t("invoices","इनवॉइस")}</span>},
+    receivables:{label:t("To Collect","लेना है"),icon:"coins",accent:"#0891b2",val:money(d.cash_flow.receivables),sub:<span className="text-slate-400">{t("from customers","ग्राहकों से बकाया")}</span>},
+    payables:{label:t("To Pay","देना है"),icon:"profit",accent:"#dc2626",val:money(d.cash_flow.payables),sub:<span className="text-slate-400">{t("to suppliers","सप्लायर को देना")}</span>},
+    tax:{label:t("Tax Collected","टैक्स जमा"),icon:"tax",accent:"#7C3AED",val:money(s.total_tax),sub:<span className="text-slate-400">GST</span>},
+    invoices:{label:t("Invoices","इनवॉइस"),icon:"invoices",accent:"#7C3AED",val:s.invoice_count,sub:<span className="text-slate-400">{t("this month","इस महीने")}</span>},
+    purchases:{label:t("Purchases","खरीद"),icon:"vouchers",accent:"#d97706",val:money(s.total_purchases),sub:<span className="text-slate-400">{t("this month","इस महीने")}</span>},
     stock_value:{label:"Stock Value",icon:"items",accent:"#0891b2",val:money(s.stock_value),sub:<span className="text-slate-400">current</span>},
   };
   const W=(k)=>{ const w=WIDGETS[k]; if(!w) return null; return (
@@ -455,34 +455,34 @@ function Dashboard({onNav}){
     <div className="p-6 space-y-5 fade-in">
       <div className="flex flex-wrap justify-between items-center gap-3">
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-extrabold text-slate-800">Dashboard</h2>
+          <h2 className="text-2xl font-extrabold text-slate-800">{t("Dashboard","डैशबोर्ड")}</h2>
           <select className="text-sm p-2 rounded-xl border border-slate-200" value={days} onChange={e=>setDays(+e.target.value)}>
-            <option value={7}>Last 7 days</option><option value={30}>Last 30 days</option>
-            <option value={90}>Last 90 days</option><option value={365}>Last 1 year</option></select>
+            <option value={7}>{t("Last 7 days","पिछले 7 दिन")}</option><option value={30}>{t("Last 30 days","पिछले 30 दिन")}</option>
+            <option value={90}>{t("Last 90 days","पिछले 90 दिन")}</option><option value={365}>{t("Last 1 year","पिछला 1 साल")}</option></select>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={()=>onNav&&onNav("sale","SALE")} className="text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2" style={{background:"linear-gradient(135deg,#ef4444,#dc2626)"}}><Icon n="sale" size={15}/> Add Sale</button>
-          <button onClick={()=>onNav&&onNav("sale","PURCHASE")} className="bg-blue-900 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"><Icon n="vouchers" size={15}/> Add Purchase</button>
-          <button onClick={()=>onNav&&onNav("reports")} className="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"><Icon n="reports" size={15}/> Reports</button>
+          <button onClick={()=>onNav&&onNav("sale","SALE")} className="text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2" style={{background:"linear-gradient(135deg,#ef4444,#dc2626)"}}><Icon n="sale" size={15}/> {t("Add Sale","बिक्री जोड़ें")}</button>
+          <button onClick={()=>onNav&&onNav("sale","PURCHASE")} className="bg-blue-900 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"><Icon n="vouchers" size={15}/> {t("Add Purchase","खरीद जोड़ें")}</button>
+          <button onClick={()=>onNav&&onNav("reports")} className="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"><Icon n="reports" size={15}/> {t("Reports","रिपोर्ट")}</button>
           <div className="relative">
-            <button onClick={()=>setPicker(!picker)} className="text-sm font-semibold text-blue-700 flex items-center gap-1 bg-white border border-slate-200 px-4 py-2 rounded-xl">+ Add Widget</button>
+            <button onClick={()=>setPicker(!picker)} className="text-sm font-semibold text-blue-700 flex items-center gap-1 bg-white border border-slate-200 px-4 py-2 rounded-xl">{t("+ Add Widget","+ विजेट जोड़ें")}</button>
             {picker && <div className="absolute right-0 mt-2 card p-2 z-20" style={{width:230}}>
-              {available.length===0 && <div className="text-xs text-slate-400 p-2">Saare widgets add ho chuke</div>}
+              {available.length===0 && <div className="text-xs text-slate-400 p-2">{t("All widgets added","सभी विजेट जुड़ चुके")}</div>}
               {available.map(k=><button key={k} onClick={()=>{setWkeys([...wkeys,k]);setPicker(false);}} className="flex items-center justify-between w-full text-left text-sm p-2 rounded-lg hover:bg-slate-50">
                 <span className="flex items-center gap-2"><Icon n={WIDGETS[k].icon} size={15} color={WIDGETS[k].accent}/> {WIDGETS[k].label}</span><span className="text-blue-600 font-bold">+</span></button>)}
             </div>}
           </div>
         </div>
       </div>
-      {low && low.count>0 && <div className="rounded-2xl p-3 text-sm flex items-center gap-2" style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#b91c1c"}}><Icon n="alert" size={16}/> <b>{low.count}</b> item low stock pe: {low.items.slice(0,5).map(x=>x.item+" ("+x.current_stock+")").join(", ")}</div>}
-      <div className="text-sm font-semibold text-slate-500">Overview</div>
+      {low && low.count>0 && <div className="rounded-2xl p-3 text-sm flex items-center gap-2" style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#b91c1c"}}><Icon n="alert" size={16}/> <b>{low.count}</b> {t("items low on stock","आइटम कम स्टॉक पर")}: {low.items.slice(0,5).map(x=>x.item+" ("+x.current_stock+")").join(", ")}</div>}
+      <div className="text-sm font-semibold text-slate-500">{t("Overview","ओवरव्यू")}</div>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {wkeys.map(k=>W(k))}
       </div>
       <div className="grid md:grid-cols-3 gap-4">
-        <div className="card p-5 md:col-span-2"><div className="font-bold text-slate-700 mb-2">Sales &amp; Profit Trend</div>
+        <div className="card p-5 md:col-span-2"><div className="font-bold text-slate-700 mb-2">{t("Sales & Profit Trend","बिक्री व मुनाफ़ा ट्रेंड")}</div>
           <div style={{height:230}}><canvas ref={cv}></canvas></div></div>
-        <div className="card p-5 hover-lift"><div className="font-bold text-slate-700 mb-2">Sales by Category</div>
+        <div className="card p-5 hover-lift"><div className="font-bold text-slate-700 mb-2">{t("Sales by Category","श्रेणी अनुसार बिक्री")}</div>
           <div className="relative" style={{height:230}}><canvas ref={dv}></canvas>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none" style={{paddingBottom:42}}>
               <div className="text-xs text-slate-400">Total</div>
@@ -492,18 +492,18 @@ function Dashboard({onNav}){
       </div>
       {/* Analytics tiles (deck slide 3) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {tile("Top Sellers","Hot selling items",(d.hot_selling||[]).slice(0,6).map(c=>[c.item,c.qty]),"#ea6a1e")}
-        {tile("Top Customers","Top buyers",(d.top_customers||[]).map(c=>[c.name,money(c.total)]),"#f59e0b")}
-        {tile("Low / Slow Selling","Kam bikne wale items",(d.slow_selling||[]).slice(0,6).map(c=>[c.item,c.qty]),"#0891b2")}
-        {tile("Dead Stock","Not selling at all",(d.dead_stock||[]).slice(0,6).map(c=>[c.item,c.stock_qty]),"#dc2626")}
+        {tile(t("Top Sellers","सबसे ज़्यादा बिकने वाले"),t("Hot selling items","हॉट सेलिंग आइटम"),(d.hot_selling||[]).slice(0,6).map(c=>[c.item,c.qty]),"#ea6a1e")}
+        {tile(t("Top Customers","टॉप ग्राहक"),t("Top buyers","सबसे ज़्यादा खरीदने वाले"),(d.top_customers||[]).map(c=>[c.name,money(c.total)]),"#f59e0b")}
+        {tile(t("Low / Slow Selling","कम / धीमी बिक्री"),t("Slow-moving items","कम बिकने वाले आइटम"),(d.slow_selling||[]).slice(0,6).map(c=>[c.item,c.qty]),"#0891b2")}
+        {tile(t("Dead Stock","डेड स्टॉक"),t("Not selling at all","बिल्कुल नहीं बिक रहा"),(d.dead_stock||[]).slice(0,6).map(c=>[c.item,c.stock_qty]),"#dc2626")}
       </div>
       {/* Cash Flow Risk + WhatsApp + Most Used Reports */}
       <div className="grid md:grid-cols-3 gap-4">
         <div className="card p-5 flex flex-col hover-lift">
-          <div className="font-bold text-slate-700">Cash Flow Risk</div>
-          <div className="text-xs text-slate-400">60+ din se baaki (overdue)</div>
+          <div className="font-bold text-slate-700">{t("Cash Flow Risk","कैश फ्लो रिस्क")}</div>
+          <div className="text-xs text-slate-400">{t("60+ days overdue","60+ दिन से बकाया")}</div>
           <div className="text-3xl font-extrabold mt-3" style={{color:(d.cash_flow_risk>0?"#dc2626":"#059669")}}>{money(d.cash_flow_risk||0)}</div>
-          <div className="text-xs mt-1" style={{color:(d.cash_flow_risk>0?"#dc2626":"#059669")}}>{d.cash_flow_risk>0?"⚠ Vasooli pe dhyan dein":"✓ Sab clear"}</div>
+          <div className="text-xs mt-1" style={{color:(d.cash_flow_risk>0?"#dc2626":"#059669")}}>{d.cash_flow_risk>0?t("⚠ Focus on collections","⚠ वसूली पर ध्यान दें"):t("✓ All clear","✓ सब क्लियर")}</div>
           <button onClick={()=>onNav("reports")} className="text-sm font-semibold text-blue-700 mt-auto pt-3 text-left">Aging report →</button>
         </div>
         <div className="card p-5 flex items-start gap-4 hover-lift" style={{background:"linear-gradient(135deg,#ecfdf5,#ffffff)"}}>
@@ -1925,14 +1925,14 @@ function Banner({sub,onUpgrade}){
     return <div className={wrap} style={{background:"linear-gradient(135deg,#ecfdf5,#d1fae5)",border:"1px solid #a7f3d0"}}>
       <span className="flex items-center gap-2.5 font-semibold text-green-800">
         <span className="rounded-full flex items-center justify-center text-white" style={{width:24,height:24,background:"#059669",fontSize:13}}>✓</span>
-        {sub.plan?sub.plan.name:"Plan"} <span className="font-extrabold">active</span> — <b>{sub.days_left} din</b> baaki <span className="text-green-600">({sub.billing_cycle})</span></span>
-      <button onClick={onUpgrade} className="text-green-700 font-bold text-xs hover:underline">Manage →</button></div>;
+        {sub.plan?sub.plan.name:"Plan"} <span className="font-extrabold">{t("active","एक्टिव")}</span> — <b>{sub.days_left} {t("days","दिन")}</b> {t("left","बचे")} <span className="text-green-600">({sub.billing_cycle})</span></span>
+      <button onClick={onUpgrade} className="text-green-700 font-bold text-xs hover:underline">{t("Manage →","मैनेज →")}</button></div>;
   if(sub.status==="TRIAL")
     return <div className={wrap} style={{background:"linear-gradient(135deg,#fff7ed,#ffedd5)",border:"1px solid #fed7aa"}}>
       <span className="flex items-center gap-2.5 font-semibold text-amber-900">
         <span className="rounded-full flex items-center justify-center" style={{width:24,height:24,background:"#f59e0b",fontSize:13}}>🎁</span>
-        Free trial — <b>{sub.days_left} din</b> baaki {sub.plan?`(${sub.plan.name})`:""}</span>
-      <button onClick={onUpgrade} className="bg-blue-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold">Upgrade Now</button></div>;
+        {t("Free trial","फ्री ट्रायल")} — <b>{sub.days_left} {t("days","दिन")}</b> {t("left","बचे")} {sub.plan?`(${sub.plan.name})`:""}</span>
+      <button onClick={onUpgrade} className="bg-blue-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold">{t("Upgrade Now","अभी अपग्रेड करें")}</button></div>;
   return <div className={wrap} style={{background:"linear-gradient(135deg,#fef2f2,#fee2e2)",border:"1px solid #fecaca"}}>
     <span className="font-semibold text-red-700">⚠ Plan expire ho gaya — features unlock karne ke liye upgrade karein</span>
     <button onClick={onUpgrade} className="bg-blue-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold">Upgrade</button></div>;

@@ -1948,6 +1948,28 @@ function Banner({sub,onUpgrade}){
 }
 
 // ---------- Top bar ----------
+function Notifications({sub,onNav}){
+  const [open,setOpen]=useState(false),[items,setItems]=useState([]);
+  useEffect(()=>{ (async()=>{ const list=[];
+    try{ const ls=await api("/reports/low-stock/"); (ls.items||[]).slice(0,12).forEach(x=>list.push({type:"stock",text:t("Low stock","कम स्टॉक")+`: ${x.item} (${x.current_stock})`,nav:"items"})); }catch(e){}
+    try{ const rem=await api("/reports/payment-reminders/"); (rem.parties||[]).slice(0,12).forEach(x=>list.push({type:"due",text:`${x.name} — ${money(x.amount)}${x.days_overdue>0?` (${x.days_overdue}d)`:""}`,nav:"reports"})); }catch(e){}
+    if(sub && sub.status==="TRIAL" && sub.days_left!=null && sub.days_left<=3) list.push({type:"plan",text:t("Trial ends in","ट्रायल खत्म")+` ${sub.days_left}d — `+t("upgrade","अपग्रेड"),nav:"plan"});
+    setItems(list); })(); },[sub]);
+  const dot={stock:"#dc2626",due:"#f59e0b",plan:"#7c3aed"};
+  return (<div className="relative">
+    <button onClick={()=>setOpen(!open)} className="iconbtn text-slate-500 relative" title={t("Notifications","सूचनाएं")} style={{fontSize:16}}>🔔
+      {items.length>0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full flex items-center justify-center" style={{fontSize:10,width:16,height:16}}>{items.length>9?"9+":items.length}</span>}</button>
+    {open && <div className="absolute right-0 mt-2 card p-0 z-40 overflow-hidden" style={{width:330}}>
+      <div className="px-4 py-2.5 font-bold text-slate-700 border-b flex items-center justify-between">{t("Notifications","सूचनाएं")}<button onClick={()=>setOpen(false)} className="text-slate-400">✕</button></div>
+      <div style={{maxHeight:340,overflowY:"auto"}}>
+        {items.length===0 && <div className="p-4 text-sm text-slate-400">{t("All caught up 🎉","सब अपडेट है 🎉")}</div>}
+        {items.map((n,i)=><button key={i} onClick={()=>{onNav&&onNav(n.nav);setOpen(false);}} className="flex items-start gap-2.5 w-full text-left px-4 py-2.5 border-b hover:bg-slate-50">
+          <span className="rounded-full mt-1.5 shrink-0" style={{width:8,height:8,background:dot[n.type]}}></span>
+          <span className="text-sm text-slate-700">{n.text}</span></button>)}
+      </div>
+    </div>}
+  </div>);
+}
 function TopBar({me,sub,onNav,theme,toggleTheme,onLogout,onSearch}){
   const [menu,setMenu]=useState(false);
   const [q,setQ]=useState("");
@@ -1977,6 +1999,7 @@ function TopBar({me,sub,onNav,theme,toggleTheme,onLogout,onSearch}){
           <button onClick={()=>setLang("hi")} className="px-2.5 py-1" style={{background:DM_LANG==="hi"?"#ea6a1e":"#fff",color:DM_LANG==="hi"?"#fff":"#64748b"}}>हिं</button>
         </div>
         <button onClick={()=>location.reload()} title="Refresh" className="iconbtn text-slate-500" style={{fontSize:17}}>↻</button>
+        <Notifications sub={sub} onNav={onNav}/>
         <button onClick={toggleTheme} title="Light / Dark mode" className="iconbtn" style={{fontSize:16}}>{theme==="dark"?"☀️":"🌙"}</button>
         {planLabel && <span onClick={()=>onNav("plan")} className="plan-badge" style={{background:planGrad}}>{planIcon} {planLabel}<span style={{opacity:.85,fontWeight:600}}>{days}</span></span>}
         <div className="relative">

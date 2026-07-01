@@ -934,6 +934,35 @@ function ItemForm({item,onClose,onSaved}){
     </div>);
 }
 
+// ---------- Camera barcode scanner (Chrome BarcodeDetector) ----------
+function CameraScan({onDetect,onClose}){
+  const vref=useRef(); const [err,setErr]=useState("");
+  useEffect(()=>{
+    let stream=null, raf=null, stop=false;
+    const cleanup=()=>{ stop=true; if(raf)cancelAnimationFrame(raf); if(stream)stream.getTracks().forEach(t=>t.stop()); };
+    (async()=>{
+      if(!("BarcodeDetector" in window)){ setErr(t("Is browser me camera-scan support nahi — barcode type karo (Chrome/Android best).","इस ब्राउज़र में कैमरा-स्कैन नहीं — बारकोड टाइप करें")); return; }
+      try{
+        const det=new window.BarcodeDetector({formats:["ean_13","ean_8","code_128","upc_a","upc_e","code_39","qr_code","itf"]});
+        stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
+        if(vref.current){ vref.current.srcObject=stream; await vref.current.play(); }
+        const tick=async()=>{ if(stop)return;
+          try{ const codes=await det.detect(vref.current); if(codes&&codes[0]&&codes[0].rawValue){ cleanup(); onDetect(codes[0].rawValue); return; } }catch(e){}
+          raf=requestAnimationFrame(tick); };
+        tick();
+      }catch(e){ setErr(t("Camera nahi mila — permission do ya barcode type karo.","कैमरा नहीं मिला — अनुमति दें या बारकोड टाइप करें")); }
+    })();
+    return cleanup;
+  },[]);
+  return (<div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:"rgba(0,0,0,.75)"}} onClick={onClose}>
+    <div className="card p-4 w-full max-w-md" onClick={e=>e.stopPropagation()}>
+      <div className="flex justify-between items-center mb-2"><div className="font-bold text-slate-700">{t("Scan barcode","बारकोड स्कैन करें")}</div><button onClick={onClose} className="text-slate-400 text-2xl leading-none">×</button></div>
+      {err ? <div className="text-sm text-red-600 p-3">{err}</div> :
+        <><video ref={vref} className="w-full rounded-xl bg-black" style={{maxHeight:340}} muted playsInline></video>
+        <div className="text-xs text-slate-400 mt-2 text-center">{t("Barcode camera ke saamne rakho","बारकोड कैमरे के सामने रखें")}</div></>}
+    </div></div>);
+}
+
 // ---------- New Sale / Transaction window (deck slide 7) ----------
 function NewSale({initialDoc}){
   const [parties,setParties]=useState([]),[godowns,setGodowns]=useState([]),[units,setUnits]=useState([]),[items,setItems]=useState([]);
@@ -942,6 +971,7 @@ function NewSale({initialDoc}){
   const [docType,setDocType]=useState(initialDoc||"SALE");
   const [payMode,setPayMode]=useState("CREDIT"),[received,setReceived]=useState(""),[mode,setMode]=useState("CASH");
   const [barcode,setBarcode]=useState(""),[expand,setExpand]=useState(-1);
+  const [camOpen,setCamOpen]=useState(false);
   const [priceLists,setPriceLists]=useState([]),[plId,setPlId]=useState("");
   const [currency,setCurrency]=useState("INR"),[fx,setFx]=useState(1);
   const [lines,setLines]=useState([blank()]); const [done,setDone]=useState(null),[err,setErr]=useState("");
@@ -998,6 +1028,10 @@ function NewSale({initialDoc}){
   const T=lines.reduce((a,l)=>{if(!l.variant)return a;const c=calc(l);a.gross+=c.gross;a.disc+=c.disc;a.taxable+=c.taxable;a.tax+=c.tax;a.cess+=c.cess;return a;},{gross:0,disc:0,taxable:0,tax:0,cess:0});
   const grand=Math.round(T.taxable+T.tax+T.cess); const roundOff=grand-(T.taxable+T.tax+T.cess);
   const balance=grand-(+received||0);
+  const doScan=async(code)=>{ code=(code||"").trim(); if(!code)return;
+    try{ const r=await api("/scan/?code="+encodeURIComponent(code));
+      if(r.found){ setLines(ls=>{const n=ls.filter(l=>l.variant);const b=blank();b.variant=String(r.variant_id);b.unit=String(r.unit);b.rate=r.sale_price;b.tax_percent=r.tax_percent;n.push(b);return n;}); setBarcode(""); setErr(""); }
+      else setErr("Barcode '"+code+"' "+t("nahi mila","नहीं मिला")); }catch(x){ setErr("Scan fail"); } };
   const submit=async()=>{ setErr("");
     if(!party||!godown){ setErr("Select party and godown"); return; }
     const used=lines.filter(l=>l.variant);
@@ -1056,9 +1090,9 @@ function NewSale({initialDoc}){
       <div className="card p-3 mb-3">
         <div className="flex gap-2 items-center">
           <span className="text-sm text-slate-500">📷 Barcode / Item code:</span>
-          <input className="border border-slate-200 p-2 rounded-lg flex-1 text-sm" placeholder="Scan or type, then Enter" value={barcode}
-            onChange={e=>setBarcode(e.target.value)} onKeyDown={async e=>{if(e.key==="Enter"){e.preventDefault();const code=barcode.trim();if(!code)return;
-              try{const r=await api("/scan/?code="+encodeURIComponent(code)); if(r.found){setLines(ls=>{const n=ls.filter(l=>l.variant);const b=blank();b.variant=String(r.variant_id);b.unit=String(r.unit);b.rate=r.sale_price;b.tax_percent=r.tax_percent;n.push(b);return n;});setBarcode("");} else setErr("Barcode '"+code+"' nahi mila");}catch(x){setErr("Scan fail");}}}} />
+          <input className="border border-slate-200 p-2 rounded-lg flex-1 text-sm" placeholder={t("Scan or type, then Enter","स्कैन करें या टाइप करके Enter")} value={barcode}
+            onChange={e=>setBarcode(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();doScan(barcode);}}} />
+          <button type="button" onClick={()=>setCamOpen(true)} title={t("Scan with camera","कैमरे से स्कैन")} className="text-sm font-bold text-white whitespace-nowrap px-3 py-2 rounded-lg" style={{background:"linear-gradient(135deg,#0891b2,#0e7490)"}}>📷 {t("Camera","कैमरा")}</button>
           <button type="button" onClick={()=>setQiOpen(!qiOpen)} className="text-sm font-bold text-orange-600 whitespace-nowrap px-2">{qiOpen?"✕ Close":"+ New Item"}</button>
         </div>
         {qiOpen && <div className="mt-2 p-2 rounded-lg bg-orange-50 border border-orange-100 grid md:grid-cols-4 gap-2 items-end">
@@ -1068,6 +1102,7 @@ function NewSale({initialDoc}){
           <div className="md:col-span-4"><button type="button" onClick={saveQuickItem} className="text-white text-sm font-bold py-2 px-4 rounded-lg" style={{background:"linear-gradient(135deg,#f97316,#ea580c)"}}>{t("Save & Add to bill","सेव व बिल में जोड़ें")}</button></div>
         </div>}
       </div>
+      {camOpen && <CameraScan onDetect={c=>{setCamOpen(false);doScan(c);}} onClose={()=>setCamOpen(false)}/>}
       <div className="card overflow-x-auto mb-4">
         <table className="w-full text-sm" style={{minWidth:880}}>
           <thead className="bg-slate-100 text-slate-600"><tr>

@@ -107,14 +107,24 @@ class CommitteeViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def open_bidding(self, request, pk=None):
-        """Ek month ki online boli kholo. body: {month_no}"""
+        """Ek month ki online boli kholo. body: {month_no, close_at(optional ISO datetime)}"""
         c = self.get_object()
         mn = int(request.data.get("month_no") or 0)
         if mn < 1:
             return Response({"detail": "month_no required"}, status=400)
         c.open_month = mn
         c.bidding_open = True
-        c.save(update_fields=["open_month", "bidding_open"])
+        close_at = request.data.get("close_at")
+        if close_at:
+            from django.utils.dateparse import parse_datetime
+            from django.utils import timezone
+            dt = parse_datetime(str(close_at))
+            if dt and timezone.is_naive(dt):
+                dt = timezone.make_aware(dt, timezone.get_current_timezone())
+            c.bid_close_at = dt
+        else:
+            c.bid_close_at = None
+        c.save(update_fields=["open_month", "bidding_open", "bid_close_at"])
         return Response(CommitteeSerializer(c).data)
 
     @action(detail=True, methods=["post"])

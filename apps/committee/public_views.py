@@ -40,6 +40,7 @@ def committee_public(request, public_uuid):
         "per_head_base": money(c.monthly_base),
         "coupon_total": money(c.coupon_total),
         "done": done, "live": live,
+        "bid_live": c.bidding_live(), "close_at": c.bid_close_at,
         "months_left": max(0, (c.members_count or 0) - len(done)),
     }
     return render(request, "committee_public.html", ctx)
@@ -53,6 +54,8 @@ def api_public_bid(request, public_uuid):
     c = _get_committee(public_uuid)
     if not c or not c.bidding_open or not c.open_month:
         return JsonResponse({"detail": "Boli abhi band hai"}, status=400)
+    if not c.bidding_live():
+        return JsonResponse({"detail": "Boli ka time khatam ho gaya"}, status=400)
     try:
         data = json.loads(request.body or "{}")
     except Exception:
@@ -123,6 +126,7 @@ def member_public(request, token):
             if b.member_id == m.id:
                 my_bid = money(b.bid_amount)
     ctx = {"c": c, "m": m, "stmt": stmt, "done": done, "live": live, "my_bid": my_bid,
+           "bid_live": c.bidding_live(), "close_at": c.bid_close_at,
            "per_head_base": money(c.monthly_base), "coupon_total": money(c.coupon_total)}
     return render(request, "committee_member_public.html", ctx)
 
@@ -138,6 +142,8 @@ def api_member_bid(request, token):
     c = m.committee
     if not c.bidding_open or not c.open_month:
         return JsonResponse({"detail": "Boli abhi band hai"}, status=400)
+    if not c.bidding_live():
+        return JsonResponse({"detail": "Boli ka time khatam ho gaya"}, status=400)
     try:
         data = json.loads(request.body or "{}")
     except Exception:

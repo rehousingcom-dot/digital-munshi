@@ -2180,12 +2180,13 @@ function CommitteeDetail({c,onBack}){
 }
 
 function ShareTab({c}){
-  const [st,setSt]=useState({bidding_open:c.bidding_open,open_month:c.open_month});
-  const [month,setMonth]=useState(c.open_month||1),[bids,setBids]=useState([]),[msg,setMsg]=useState("");
+  const [st,setSt]=useState({bidding_open:c.bidding_open,open_month:c.open_month,bid_close_at:c.bid_close_at});
+  const [month,setMonth]=useState(c.open_month||1),[closeAt,setCloseAt]=useState(""),[bids,setBids]=useState([]),[msg,setMsg]=useState("");
   const link=window.location.origin+"/c/"+c.public_uuid+"/";
   const loadBids=()=>{ if(st.open_month)api("/committees/"+c.id+"/bids/?month="+st.open_month).then(d=>setBids(Array.isArray(d)?d:[])).catch(()=>{}); };
   useEffect(()=>{ loadBids(); },[st.open_month]);
-  const openBid=async()=>{ const r=await api("/committees/"+c.id+"/open_bidding/",{method:"POST",body:JSON.stringify({month_no:month})}); setSt({bidding_open:true,open_month:month}); setMsg(t("Bidding opened for month","बोली खुली महीना")+" "+month); setTimeout(()=>setMsg(""),2500); };
+  const fmtDT=(s)=>{ if(!s)return ""; try{return new Date(s).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}catch(e){return s;} };
+  const openBid=async()=>{ const r=await api("/committees/"+c.id+"/open_bidding/",{method:"POST",body:JSON.stringify({month_no:month,close_at:closeAt||null})}); setSt({bidding_open:true,open_month:month,bid_close_at:r.bid_close_at}); setMsg(t("Bidding opened for month","बोली खुली महीना")+" "+month+(closeAt?(" · band: "+fmtDT(closeAt)):"")); setTimeout(()=>setMsg(""),3500); };
   const closeBid=async()=>{ if(!confirm(t("Close bidding? Highest bid wins.","बोली बंद करें? सबसे ऊंची बोली जीतेगी।")))return;
     const r=await api("/committees/"+c.id+"/close_bidding/",{method:"POST",body:JSON.stringify({})});
     setSt({bidding_open:false,open_month:st.open_month}); setMsg(r.winner?(t("Winner","विजेता")+": "+r.winner+" (₹"+Number(r.bid).toLocaleString('en-IN')+")"):t("No bids came","koi boli nahi aayi")); loadBids(); setTimeout(()=>setMsg(""),6000); };
@@ -2206,12 +2207,18 @@ function ShareTab({c}){
     <div className="card p-4">
       <div className="font-bold mb-2">🔨 {t("Online bidding","ऑनलाइन बोली")}</div>
       {st.bidding_open
-        ? <div><div className="text-sm mb-2">{t("Bidding OPEN for month","बोली खुली महीना")} <b>{st.open_month}</b></div>
-            <button onClick={closeBid} className="bg-red-600 text-white px-3 py-2 rounded text-sm w-full">{t("Close & pick winner (highest bid)","बंद करो व विजेता चुनो")}</button></div>
-        : <div className="flex gap-2 items-center">
-            <label className="text-sm text-slate-500">{t("Month","महीना")}</label>
-            <input type="number" className="border p-2 rounded w-20" value={month} onChange={e=>setMonth(+e.target.value)} />
-            <button onClick={openBid} className="bg-blue-900 text-white px-3 py-2 rounded text-sm">{t("Open bidding","बोली खोलो")}</button>
+        ? <div><div className="text-sm mb-1">{t("Bidding OPEN for month","बोली खुली महीना")} <b>{st.open_month}</b></div>
+            {st.bid_close_at && <div className="text-xs mb-2" style={{color:"#c2410c"}}>⏰ {t("Band hoga","बंद होगा")}: {fmtDT(st.bid_close_at)}</div>}
+            <button onClick={closeBid} className="bg-red-600 text-white px-3 py-2 rounded text-sm w-full">{t("Close now & pick winner (highest bid)","अभी बंद करो व विजेता चुनो")}</button>
+            <p className="text-xs text-slate-400 mt-1">{t("Deadline ke baad koi boli nahi lagegi. Winner tabhi banega jab aap 'Close' dabaoge.","Deadline ke baad boli band; winner aap close karne par.")}</p></div>
+        : <div className="space-y-2">
+            <div className="flex gap-2 items-center">
+              <label className="text-sm text-slate-500">{t("Month","महीना")}</label>
+              <input type="number" className="border p-2 rounded w-20" value={month} onChange={e=>setMonth(+e.target.value)} />
+              <button onClick={openBid} className="bg-blue-900 text-white px-3 py-2 rounded text-sm">{t("Open bidding","बोली खोलो")}</button>
+            </div>
+            <div><label className="text-xs text-slate-500">{t("Boli band hone ka time (optional)","बोली बंद होने का समय")}</label>
+              <input type="datetime-local" className="border p-2 rounded w-full text-sm" value={closeAt} onChange={e=>setCloseAt(e.target.value)} /></div>
           </div>}
       <div className="mt-3">
         <div className="flex items-center justify-between"><div className="text-sm font-semibold">{t("Live bids","लाइव बोली")} {st.open_month?("(month "+st.open_month+")"):""}</div><button onClick={loadBids} className="text-blue-700 text-xs">↻ {t("Refresh","रिफ्रेश")}</button></div>

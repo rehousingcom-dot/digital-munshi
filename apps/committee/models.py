@@ -57,6 +57,8 @@ class Committee(OrgOwned):
     bidding_open = models.BooleanField(default=False)
     open_month = models.PositiveSmallIntegerField(null=True, blank=True,
                                                   help_text="Kaunse month ki boli abhi khuli hai")
+    bid_close_at = models.DateTimeField(null=True, blank=True,
+                                        help_text="Is time ke baad boli nahi lag sakti (deadline)")
     allow_join = models.BooleanField(default=True, help_text="Public join link se log apply kar sakte hain")
 
     class Meta:
@@ -64,6 +66,15 @@ class Committee(OrgOwned):
 
     def __str__(self):
         return f"{self.name} ({self.total_value})"
+
+    def bidding_live(self):
+        """Boli abhi lag sakti hai? (khuli hai AUR deadline nahi nikli)."""
+        if not self.bidding_open or not self.open_month:
+            return False
+        if self.bid_close_at:
+            from django.utils import timezone
+            return timezone.now() <= self.bid_close_at
+        return True
 
     @property
     def coupon_total(self):

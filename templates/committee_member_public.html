@@ -20,9 +20,10 @@
 
   <!-- Meri boli -->
   <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
-    <div class="font-bold text-lg mb-1">🔨 Meri Boli {% if c.bidding_open %}<span class="text-xs align-middle text-white px-2 py-0.5 rounded-full" style="background:#16a34a">LIVE</span>{% endif %}</div>
-    {% if c.bidding_open and c.open_month %}
-      <p class="text-sm text-slate-500 mb-2">Month <b>{{ c.open_month }}</b> ki boli khuli hai. Sabse zyada boli wala uthayega.</p>
+    <div class="font-bold text-lg mb-1">🔨 Meri Boli {% if bid_live %}<span class="text-xs align-middle text-white px-2 py-0.5 rounded-full" style="background:#16a34a">LIVE</span>{% endif %}</div>
+    {% if bid_live %}
+      <p class="text-sm text-slate-500 mb-1">Month <b>{{ c.open_month }}</b> ki boli khuli hai. Sabse zyada boli wala uthayega.</p>
+      {% if close_at %}<p class="text-xs font-semibold mb-2" style="color:#c2410c">⏰ Boli band: {{ close_at|date:"d M Y, g:i A" }}</p>{% endif %}
       {% if my_bid %}<div class="text-sm mb-2 text-green-700 font-semibold">✓ Aapki boli: ₹{{ my_bid }} (badalne ke liye dobara daalo)</div>{% endif %}
       <label class="text-sm font-semibold">Aapki boli (₹ discount)</label>
       <input id="bid" type="number" class="w-full p-3 mt-1 mb-3 border border-slate-200 rounded-xl" placeholder="e.g. 90000">
@@ -33,6 +34,8 @@
         {% for b in live %}<div class="flex justify-between text-sm {% if forloop.first %}font-bold text-green-700{% endif %}"><span>{% if forloop.first %}🏆 {% endif %}{{ b.name }}{% if b.me %} (aap){% endif %}</span><span>{{ b.bid }}</span></div>{% empty %}<p class="text-sm text-slate-400">Abhi koi boli nahi.</p>{% endfor %}
         <p class="text-xs text-slate-400 mt-2">Page apne aap refresh hota hai.</p>
       </div>
+    {% elif c.bidding_open %}
+      <p class="text-sm font-semibold text-red-600">⏰ Boli ka time khatam ho gaya. Result jaldi aayega.</p>
     {% else %}
       <p class="text-sm text-slate-500">Boli abhi band hai. Organizer jab kholenge tab yahan aap seedhi apni boli daal sakte ho (naam chunne ki zaroorat nahi).</p>
     {% endif %}

@@ -19,9 +19,10 @@
 
   <!-- Online boli -->
   <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
-    <div class="font-bold text-lg mb-1">🔨 Online Boli {% if c.bidding_open %}<span class="text-xs align-middle text-white px-2 py-0.5 rounded-full" style="background:#16a34a">LIVE</span>{% endif %}</div>
-    {% if c.bidding_open and c.open_month %}
-      <p class="text-sm text-slate-500 mb-3">Month <b>{{ c.open_month }}</b> ki boli khuli hai. <b>Sabse zyada boli (discount)</b> wala uthayega.</p>
+    <div class="font-bold text-lg mb-1">🔨 Online Boli {% if bid_live %}<span class="text-xs align-middle text-white px-2 py-0.5 rounded-full" style="background:#16a34a">LIVE</span>{% endif %}</div>
+    {% if bid_live %}
+      <p class="text-sm text-slate-500 mb-1">Month <b>{{ c.open_month }}</b> ki boli khuli hai. <b>Sabse zyada boli (discount)</b> wala uthayega.</p>
+      {% if close_at %}<p class="text-xs font-semibold mb-3" style="color:#c2410c">⏰ Boli band hone ka time: {{ close_at|date:"d M Y, g:i A" }}</p>{% else %}<div class="mb-2"></div>{% endif %}
       <div id="bidForm">
         <label class="text-sm font-semibold">Aap kaun ho?</label>
         <select id="member" class="w-full p-3 mt-1 mb-3 border border-slate-200 rounded-xl">
@@ -49,6 +50,9 @@
           <p class="text-sm text-slate-400">Abhi tak koi boli nahi. Pehle aap daalo!</p>
         {% endif %}
       </div>
+    {% elif c.bidding_open %}
+      <p class="text-sm font-semibold text-red-600">⏰ Month {{ c.open_month }} ki boli ka time khatam ho gaya. Result jaldi aayega 👇</p>
+      {% if live %}<div class="mt-3 space-y-1">{% for b in live %}<div class="flex justify-between text-sm {% if forloop.first %}font-bold text-green-700{% endif %}"><span>{% if forloop.first %}🏆 {% endif %}{{ b.name }}</span><span>{{ b.bid }}</span></div>{% endfor %}</div>{% endif %}
     {% else %}
       <p class="text-sm text-slate-500">Boli abhi band hai. Organizer jab agli month ki boli kholenge, tab yahan boli daal sakte ho. Neeche pichhle result dekho 👇</p>
     {% endif %}

@@ -226,3 +226,22 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Digital Munshi <no-reply
 # (e.g. noreply@reloaddigital.in) or "onboarding@resend.dev" for testing to your own inbox.
 RESEND_API_KEY = env("RESEND_API_KEY", default="")
 RESEND_FROM = env("RESEND_FROM", default="Digital Munshi <onboarding@resend.dev>")
+
+# Backup email (backup_db command link yahan bhejta hai; khaali = DEFAULT_FROM_EMAIL)
+BACKUP_EMAIL = env("BACKUP_EMAIL", default="")
+
+# --- Sentry error monitoring (optional) — SENTRY_DSN env set karo to enable ---
+SENTRY_DSN = env("SENTRY_DSN", default="")
+if SENTRY_DSN and not DEBUG:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.django import DjangoIntegration
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            integrations=[DjangoIntegration()],
+            traces_sample_rate=0.1,
+            send_default_pii=False,
+            environment="production",
+        )
+    except Exception:
+        pass  # sentry optional — kabhi boot na roke

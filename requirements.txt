@@ -17,3 +17,4 @@ razorpay>=1.4                # payments (test + live). Bina keys ke dev-mode cha
 
 cloudinary>=1.40             # media SDK
 django-cloudinary-storage>=0.3  # Django media storage backend (persistent uploads)
+sentry-sdk>=2.0              # error monitoring (optional; SENTRY_DSN env se on)

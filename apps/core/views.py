@@ -222,43 +222,103 @@ def lead_create(request):
     return JsonResponse({"ok": True, "message": "Thank you! We will contact you soon."})
 
 
-def keyword_page(request, slug):
+_L_EN = {"cta1": "Get started free →", "cta2": "Book a demo", "why": "Why choose Digital Munshi?",
+         "faq": "Frequently Asked Questions (FAQ)", "explore": "Explore more", "bycity": "By city:",
+         "readmore": "Read more", "trydm": "Try Digital Munshi — free",
+         "trydesc": "Billing, GST, inventory, accounting — in one app. 7-day free trial.",
+         "startfree": "Start free →", "features": "Features", "read": "Read →",
+         "blogsub": "GST, billing and business tips — in simple language."}
+_L_HI = {"cta1": "Free me shuru karo →", "cta2": "Demo book karo", "why": "Digital Munshi kyun choose karein?",
+         "faq": "Aksar poochhe jaane wale sawaal (FAQ)", "explore": "Aur dekho", "bycity": "City me:",
+         "readmore": "Aur padho", "trydm": "Digital Munshi try karo — free",
+         "trydesc": "Billing, GST, inventory, accounting — ek app me. 7 din free trial.",
+         "startfree": "Free shuru karo →", "features": "Features", "read": "Padho →",
+         "blogsub": "GST, billing aur business tips — aasan bhasha me."}
+
+
+def _mods(lang):
+    if lang == "hi":
+        from . import marketing_hi as m
+        return m, _L_HI, "hi", "/hi"
+    from . import marketing as m
+    return m, _L_EN, "en", ""
+
+
+def _keyword_page(request, slug, lang):
     from django.shortcuts import render
     from django.http import HttpResponseNotFound
-    from .marketing import KEYWORD_PAGES, _WHY, CITIES
-    page = KEYWORD_PAGES.get(slug)
+    m, L, lc, pre = _mods(lang)
+    page = m.KEYWORD_PAGES.get(slug)
     if not page:
         return HttpResponseNotFound("Page not found")
-    other = [(s, kp["h1"]) for s, kp in KEYWORD_PAGES.items() if s != slug]
-    cities = list(CITIES.items())
+    other = [(s, kp["h1"]) for s, kp in m.KEYWORD_PAGES.items() if s != slug]
+    cities = list(m.CITIES.items())
+    alt = ("/software/%s/" % slug) if lang == "hi" else ("/hi/software/%s/" % slug)
     return render(request, "keyword_page.html",
-                  {"p": page, "slug": slug, "other": other, "why": _WHY, "cities": cities})
+                  {"p": page, "slug": slug, "other": other, "why": m._WHY,
+                   "cities": cities, "L": L, "lang": lc, "pre": pre, "alt": alt})
+
+
+def keyword_page(request, slug):
+    return _keyword_page(request, slug, "en")
+
+
+def keyword_page_hi(request, slug):
+    return _keyword_page(request, slug, "hi")
+
+
+def _city_page(request, slug, lang):
+    from django.shortcuts import render
+    from django.http import HttpResponseNotFound
+    m, L, lc, pre = _mods(lang)
+    data = m.city_page_data(slug)
+    if not data:
+        return HttpResponseNotFound("City page not found")
+    software = [(s, kp["h1"]) for s, kp in m.KEYWORD_PAGES.items()]
+    alt = ("/billing-software-in-%s/" % slug) if lang == "hi" else ("/hi/billing-software-in-%s/" % slug)
+    return render(request, "city_page.html",
+                  {"c": data, "software": software, "L": L, "lang": lc, "pre": pre, "alt": alt})
 
 
 def city_page(request, slug):
+    return _city_page(request, slug, "en")
+
+
+def city_page_hi(request, slug):
+    return _city_page(request, slug, "hi")
+
+
+def _blog_index(request, lang):
     from django.shortcuts import render
-    from django.http import HttpResponseNotFound
-    from .marketing import city_page_data, KEYWORD_PAGES
-    data = city_page_data(slug)
-    if not data:
-        return HttpResponseNotFound("City page not found")
-    software = [(s, kp["h1"]) for s, kp in KEYWORD_PAGES.items()]
-    return render(request, "city_page.html", {"c": data, "software": software})
+    m, L, lc, pre = _mods(lang)
+    posts = [(s, p["title"], p["desc"]) for s, p in m.BLOG_POSTS.items()]
+    alt = "/blog/" if lang == "hi" else "/hi/blog/"
+    return render(request, "blog_index.html", {"posts": posts, "L": L, "lang": lc, "pre": pre, "alt": alt})
 
 
 def blog_index(request):
+    return _blog_index(request, "en")
+
+
+def blog_index_hi(request):
+    return _blog_index(request, "hi")
+
+
+def _blog_post(request, slug, lang):
     from django.shortcuts import render
-    from .marketing import BLOG_POSTS
-    posts = [(s, p["title"], p["desc"]) for s, p in BLOG_POSTS.items()]
-    return render(request, "blog_index.html", {"posts": posts})
+    from django.http import HttpResponseNotFound
+    m, L, lc, pre = _mods(lang)
+    post = m.BLOG_POSTS.get(slug)
+    if not post:
+        return HttpResponseNotFound("Post not found")
+    other = [(s, p["title"]) for s, p in m.BLOG_POSTS.items() if s != slug]
+    return render(request, "blog_post.html",
+                  {"post": post, "slug": slug, "other": other, "L": L, "lang": lc, "pre": pre})
 
 
 def blog_post(request, slug):
-    from django.shortcuts import render
-    from django.http import HttpResponseNotFound
-    from .marketing import BLOG_POSTS
-    post = BLOG_POSTS.get(slug)
-    if not post:
-        return HttpResponseNotFound("Post not found")
-    other = [(s, p["title"]) for s, p in BLOG_POSTS.items() if s != slug]
-    return render(request, "blog_post.html", {"post": post, "slug": slug, "other": other})
+    return _blog_post(request, slug, "en")
+
+
+def blog_post_hi(request, slug):
+    return _blog_post(request, slug, "hi")

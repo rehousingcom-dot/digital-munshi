@@ -78,6 +78,11 @@ def sitemap_xml(request):
     urls += [base + "/software/" + s + "/" for s in KEYWORD_PAGES]
     urls += [base + "/blog/" + s + "/" for s in BLOG_POSTS]
     urls += [base + "/billing-software-in-" + s + "/" for s in CITIES]
+    from apps.core import marketing_hi as MH
+    urls += [base + "/hi/blog/"]
+    urls += [base + "/hi/software/" + s + "/" for s in MH.KEYWORD_PAGES]
+    urls += [base + "/hi/blog/" + s + "/" for s in MH.BLOG_POSTS]
+    urls += [base + "/hi/billing-software-in-" + s + "/" for s in MH.CITIES]
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     for u in urls:
         body += f"<url><loc>{u}</loc><changefreq>weekly</changefreq></url>"
@@ -199,6 +204,10 @@ urlpatterns = [
     path("blog/", core_views.blog_index, name="blog_index"),
     path("blog/<slug:slug>/", core_views.blog_post, name="blog_post"),
     path("billing-software-in-<slug:slug>/", core_views.city_page, name="city_page"),
+    path("hi/software/<slug:slug>/", core_views.keyword_page_hi, name="keyword_page_hi"),
+    path("hi/billing-software-in-<slug:slug>/", core_views.city_page_hi, name="city_page_hi"),
+    path("hi/blog/", core_views.blog_index_hi, name="blog_index_hi"),
+    path("hi/blog/<slug:slug>/", core_views.blog_post_hi, name="blog_post_hi"),
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),

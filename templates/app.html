@@ -1941,6 +1941,37 @@ function StaffView(){
 }
 
 // ---------- WhatsApp Connect ----------
+function MarketingBroadcast({cloudReady}){
+  const TEMPLATES=[
+    ["🎉 Offer","Namaste {name} ji! 🎉 Hamari dukaan par special offer chal raha hai. Aaj hi aaiye aur fayda uthaiye. — Dhanyavaad"],
+    ["🪔 Festival","🪔 {name} ji, aapko aur aapke parivaar ko festival ki dher saari shubhkamnayein! — Aapki dukaan"],
+    ["🆕 Naya stock","Namaste {name} ji! 🆕 Naya stock aa gaya hai. Ek baar zaroor dekhiye. — Dhanyavaad"],
+    ["💳 Reminder","Namaste {name} ji, aapka thoda udhaar baaki hai. Kripya jaldi clear karein. Dhanyavaad 🙏"],
+  ];
+  const [msg,setMsg]=useState(TEMPLATES[0][1]),[res,setRes]=useState(null),[busy,setBusy]=useState(false),[note,setNote]=useState("");
+  const run=async(auto)=>{ if(!msg.trim()){setNote("Message likho");return;} setBusy(true); setNote("");
+    try{ const r=await api("/marketing/broadcast/",{method:"POST",body:JSON.stringify({message:msg,auto:!!auto})}); setRes(r);
+      setNote(auto&&r.cloud?("✓ "+r.sent+" customers ko auto-send ho gaya"):(r.count+" customers ready — neeche se Send dabao")); }
+    catch(e){ setNote("Error: "+JSON.stringify(e)); } setBusy(false); };
+  return (<div className="card p-5">
+    <div className="flex items-center justify-between"><div className="font-bold text-slate-700">📣 {t("Marketing / Offers","मार्केटिंग / ऑफर")}</div>
+      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background:cloudReady?"#dcfce7":"#fef3c7",color:cloudReady?"#16a34a":"#b45309"}}>{cloudReady?"AUTO-SEND":"wa.me"}</span></div>
+    <p className="text-sm text-slate-500 mt-1">{t("Sab customers ko ek saath offer/festival message. {name} apne aap customer ka naam ban jaata hai.","Bulk offer/festival message; {name} = customer name.")}</p>
+    <div className="flex flex-wrap gap-2 mt-3">{TEMPLATES.map(([l,tpl])=><button key={l} onClick={()=>setMsg(tpl)} className="text-xs bg-slate-100 px-3 py-1.5 rounded-lg font-semibold">{l}</button>)}</div>
+    <textarea className="w-full border border-slate-200 rounded-xl p-3 mt-2 text-sm" rows="3" value={msg} onChange={e=>setMsg(e.target.value)} />
+    <div className="flex flex-wrap gap-2 mt-2">
+      <button onClick={()=>run(false)} disabled={busy} className="bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-semibold">{t("Preview recipients","रिसीवर देखें")}</button>
+      {cloudReady && <button onClick={()=>{if(confirm(t("Sab customers ko auto-send kare?","Auto-send to all?")))run(true);}} disabled={busy} className="text-white px-4 py-2 rounded-xl text-sm font-bold" style={{background:"#25D366"}}>{t("Send to all (auto)","सबको भेजें")}</button>}
+      {note && <span className="text-sm text-green-600 self-center">{note}</span>}
+    </div>
+    {res && res.recipients && res.recipients.length>0 && <div className="mt-3 max-h-72 overflow-y-auto border border-slate-100 rounded-xl">
+      <table className="w-full text-sm"><tbody>
+        {res.recipients.map(x=><tr key={x.id} className="border-b border-slate-50"><td className="p-2">{x.name}</td><td className="p-2 text-slate-400 text-xs">{x.phone}</td>
+          <td className="p-2 text-right">{x.sent?<span className="text-green-600 text-xs font-semibold">✓ sent</span>:(x.wa_url?<a href={x.wa_url} target="_blank" className="text-xs font-bold text-white px-3 py-1 rounded-lg" style={{background:"#25D366"}}>Send</a>:<span className="text-xs text-slate-400">no phone</span>)}</td></tr>)}
+      </tbody></table></div>}
+  </div>);
+}
+
 function WhatsAppView(){
   const [p,setP]=useState(null),[vouchers,setVouchers]=useState([]),[msg,setMsg]=useState("");
   useEffect(()=>{ api("/business-profile/").then(setP); apiList("/vouchers/?page_size=15").then(setVouchers); },[]);
@@ -1983,6 +2014,8 @@ function WhatsAppView(){
         <button onClick={saveCfg} className="bg-blue-900 text-white px-5 py-2 rounded-xl mt-3 font-semibold">Save</button>
         <p className="text-xs text-slate-400 mt-2">Token kaise milta hai: Meta Business → WhatsApp → API Setup. Token + Phone ID daalne par send auto ho jayega.</p>
       </div>
+
+      <MarketingBroadcast cloudReady={cloudReady} />
 
       <div className="card overflow-hidden">
         <div className="p-4 font-bold text-slate-700 border-b border-slate-100">Document bhejein</div>

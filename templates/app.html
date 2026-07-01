@@ -725,7 +725,7 @@ function ItemForm({item,onClose,onSaved}){
   const blank={name:"",item_type:"GOODS",hsn_code:"",category:"",primary_unit:"",secondary_unit:"",conversion_factor:1,
     mrp:0,tax_rate:"",reorder_level:0,size:"",colour:"",model:"",
     sale_price:0,purchase_price:0,sec_sale_price:0,
-    batch_no:"",batch_mrp:0,batch_disc_type:"PERCENT",batch_disc_value:0,batch_expiry:"",
+    batch_no:"",batch_mrp:0,batch_disc_type:"PERCENT",batch_disc_value:0,batch_expiry:"",batch_mfg:"",batch_size:"",batch_colour:"",batch_model:"",
     opening_godown:"",opening_qty:0,is_combo:false,components:[]};
   const [f,setF]=useState(item?{...blank,name:item.name,item_type:item.item_type,hsn_code:item.hsn_code||"",category:item.category||"",
     primary_unit:item.primary_unit||"",secondary_unit:item.secondary_unit||"",conversion_factor:item.conversion_factor||1,
@@ -733,6 +733,7 @@ function ItemForm({item,onClose,onSaved}){
     size:v0&&v0.size||"",colour:v0&&v0.colour||"",model:v0&&v0.model||""}:blank);
   const [allVariants,setAllVariants]=useState([]);
   const [tab,setTab]=useState("pricing"),[busy,setBusy]=useState(false),[err,setErr]=useState(""),[newUnit,setNewUnit]=useState("");
+  const [imgFile,setImgFile]=useState(null);
   const set=(k,val)=>setF(s=>({...s,[k]:val}));
   useEffect(()=>{ apiList("/units/").then(u=>{setUnits(u); if(!item&&u[0])setF(s=>({...s,primary_unit:u[0].id}));});
     apiList("/tax-rates/").then(setTaxes); apiList("/categories/").then(setCats);
@@ -751,6 +752,7 @@ function ItemForm({item,onClose,onSaved}){
       if(f.tax_rate) body.tax_rate=+f.tax_rate;
       const it=item?await api(`/items/${item.id}/`,{method:"PATCH",body:JSON.stringify(body)})
                     :await api("/items/",{method:"POST",body:JSON.stringify(body)});
+      if(imgFile){ const ifd=new FormData(); ifd.append("image",imgFile); await fetch(API+`/items/${it.id}/upload_image/`,{method:"POST",headers:{Authorization:"Bearer "+getToken()},body:ifd}).catch(()=>{}); }
       // fetch variant id
       const full=await api(`/items/${it.id}/`);
       const variant=full.variants&&full.variants[0];
@@ -762,7 +764,7 @@ function ItemForm({item,onClose,onSaved}){
         if(f.secondary_unit&&+f.sec_sale_price) await api("/unit-prices/",{method:"POST",body:JSON.stringify({variant:variant.id,unit:+f.secondary_unit,sale_price:String(f.sec_sale_price),purchase_price:"0"})}).catch(()=>{});
         // batch
         let batchId=null;
-        if(f.batch_no){ const b=await api("/batches/",{method:"POST",body:JSON.stringify({variant:variant.id,batch_no:f.batch_no,mrp:String(f.batch_mrp||0),discount_type:f.batch_disc_type,discount_value:String(f.batch_disc_value||0),expiry_date:f.batch_expiry||null})}).catch(()=>null); if(b)batchId=b.id; }
+        if(f.batch_no){ const b=await api("/batches/",{method:"POST",body:JSON.stringify({variant:variant.id,batch_no:f.batch_no,mrp:String(f.batch_mrp||0),discount_type:f.batch_disc_type,discount_value:String(f.batch_disc_value||0),expiry_date:f.batch_expiry||null,mfg_date:f.batch_mfg||null,size:f.batch_size||"",colour:f.batch_colour||"",model:f.batch_model||""})}).catch(()=>null); if(b)batchId=b.id; }
         // opening stock
         if(+f.opening_qty&&f.opening_godown) await api("/stock/",{method:"POST",body:JSON.stringify({variant:variant.id,godown:+f.opening_godown,batch:batchId,quantity:String(f.opening_qty)})}).catch(()=>{});
       }
@@ -784,6 +786,11 @@ function ItemForm({item,onClose,onSaved}){
             {I("Item Name *","name")}{I("HSN / SAC","hsn_code")}
             <div><label className="text-xs font-semibold text-slate-500">Category</label>
               <select className={cell} value={f.category} onChange={e=>set("category",e.target.value)}><option value="">— none —</option>{cats.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+          </div>
+          <div className="flex items-center gap-3">
+            {(imgFile||(item&&item.image)) && <img src={imgFile?URL.createObjectURL(imgFile):item.image} alt="" className="rounded-lg border border-slate-200 object-cover" style={{width:56,height:56}}/>}
+            <label className="text-xs font-semibold text-orange-600 cursor-pointer bg-orange-50 border border-orange-100 px-3 py-2 rounded-lg">📷 {imgFile?imgFile.name:(item&&item.image?"Change item photo":"Upload item photo")}
+              <input type="file" accept="image/*" className="hidden" onChange={e=>setImgFile(e.target.files[0]||null)} /></label>
           </div>
           <div className="border-t pt-3">
             <div className="text-xs font-bold text-slate-500 mb-2">UNITS (primary + secondary alag — slide 5)</div>
@@ -819,8 +826,12 @@ function ItemForm({item,onClose,onSaved}){
                   <select className={cell} value={f.batch_disc_type} onChange={e=>set("batch_disc_type",e.target.value)}><option value="PERCENT">Percent</option><option value="AMOUNT">Amount</option></select></div>
                 {I("Disc Value","batch_disc_value",{type:"number"})}
               </div>
+              <div className="grid md:grid-cols-4 gap-3">
+                {I("Mfg Date","batch_mfg",{type:"date"})}{I("Batch Expiry","batch_expiry",{type:"date"})}
+                {I("Batch Size","batch_size")}{I("Batch Colour","batch_colour")}
+              </div>
               <div className="grid md:grid-cols-3 gap-3">
-                {I("Batch Expiry","batch_expiry",{type:"date"})}
+                {I("Batch Model","batch_model")}
                 <div><label className="text-xs font-semibold text-slate-500">Opening Stock Godown</label>
                   <select className={cell} value={f.opening_godown} onChange={e=>set("opening_godown",e.target.value)}>{godowns.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></div>
                 {I("Opening Qty (primary unit)","opening_qty",{type:"number"})}

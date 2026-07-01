@@ -51,6 +51,7 @@ class Item(OrgOwned):
     )
 
     mrp = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    image = models.ImageField(upload_to="item_images/", null=True, blank=True, help_text="Item photo (upload)")
     is_active = models.BooleanField(default=True)
 
     # Combo / Bundle / Manufacturing BOM — yeh item dusre items se bana hai
@@ -142,6 +143,10 @@ class Batch(OrgOwned):
     discount_value = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     expiry_date = models.DateField(null=True, blank=True)
+    mfg_date = models.DateField(null=True, blank=True, help_text="Manufacturing date")
+    size = models.CharField(max_length=30, blank=True)
+    colour = models.CharField(max_length=30, blank=True)
+    model = models.CharField(max_length=30, blank=True)
     purchase_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     class Meta:

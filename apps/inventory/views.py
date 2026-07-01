@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from apps.tenants.tenancy import OrgScopedQuerysetMixin
 from apps.core.models import Unit, TaxRate
@@ -126,6 +127,17 @@ class CategoryViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
 class ItemViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
     queryset = Item.objects.all().prefetch_related("variants")
     serializer_class = ItemSerializer
+
+    @action(detail=True, methods=["post"], parser_classes=[MultiPartParser, FormParser])
+    def upload_image(self, request, pk=None):
+        """Item photo upload (multipart 'image' field)."""
+        item = self.get_object()
+        f = request.FILES.get("image")
+        if not f:
+            return Response({"detail": "image file required"}, status=400)
+        item.image = f
+        item.save(update_fields=["image"])
+        return Response({"image": item.image.url if item.image else None})
 
 
 class ItemVariantViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):

@@ -563,7 +563,7 @@ function Dashboard({onNav}){
       <div className="card overflow-hidden">
         <div className="p-4 font-bold text-slate-700 border-b border-slate-100">Recent Transactions</div>
         <table className="w-full text-sm">
-          <thead><tr><th className="text-left p-3">Date</th><th className="text-left p-3">No.</th><th className="text-left p-3">Type</th><th className="text-right p-3">Amount</th><th className="text-right p-3">Action</th></tr></thead>
+          <thead><tr><th className="text-left p-3">Date</th><th className="text-left p-3">No.</th><th className="text-left p-3">{t("Type","प्रकार")}</th><th className="text-right p-3">Amount</th><th className="text-right p-3">Action</th></tr></thead>
           <tbody>
             {recent.length===0 && <tr><td className="p-4 text-slate-400" colSpan="5">No transactions</td></tr>}
             {recent.map(v=><tr key={v.id} className="border-b">
@@ -615,27 +615,27 @@ function PartyView(){
   return (
     <div className="p-6 fade-in">
       <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
-        <h2 className="text-2xl font-extrabold text-slate-800">Parties <span className="text-sm font-normal text-slate-400">· {filt.length}</span></h2>
+        <h2 className="text-2xl font-extrabold text-slate-800">{t("Parties","पार्टियाँ")} <span className="text-sm font-normal text-slate-400">· {filt.length}</span></h2>
         <div className="flex gap-2 items-center">
           <div className="relative"><span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
-            <input className="p-2.5 pl-9 text-sm rounded-xl border border-slate-200" style={{minWidth:220}} placeholder="Search party…" value={q} onChange={e=>setQ(e.target.value)} /></div>
+            <input className="p-2.5 pl-9 text-sm rounded-xl border border-slate-200" style={{minWidth:220}} placeholder={t("Search party…","पार्टी खोजें…")} value={q} onChange={e=>setQ(e.target.value)} /></div>
           <button onClick={()=>{setEdit(null);setOpen(true);}} className="text-white px-4 py-2.5 rounded-xl text-sm font-bold" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>{t("+ Add Party","+ पार्टी जोड़ें")}</button>
         </div>
       </div>
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-slate-100 text-slate-600"><tr>
-            <th className="text-left p-2.5">Name</th><th className="text-left p-2.5">Type</th><th className="text-left p-2.5">GSTIN</th>
-            <th className="text-left p-2.5">Phone</th><th className="text-left p-2.5">City</th><th className="text-right p-2.5">Opening Bal</th><th className="text-left p-2.5">Docs</th><th></th></tr></thead>
+            <th className="text-left p-2.5">{t("Name","नाम")}</th><th className="text-left p-2.5">{t("Type","प्रकार")}</th><th className="text-left p-2.5">GSTIN</th>
+            <th className="text-left p-2.5">{t("Phone","फ़ोन")}</th><th className="text-left p-2.5">{t("City","शहर")}</th><th className="text-right p-2.5">{t("Opening Bal","ओपनिंग बैलेंस")}</th><th className="text-left p-2.5">{t("Docs","डॉक्स")}</th><th></th></tr></thead>
           <tbody>
-            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={8}>No parties — start with "+ Add Party"</td></tr>}
+            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={8}>{t('No parties — start with "+ Add Party"','कोई पार्टी नहीं — "+ पार्टी जोड़ें" से शुरू करें')}</td></tr>}
             {filt.map(r=><tr key={r.id} className="border-b hover:bg-slate-50">
               <td className="p-2.5 font-semibold text-slate-700">{r.name}{r.legal_name?<div className="text-xs text-slate-400">{r.legal_name}</div>:null}</td>
-              <td className="p-2.5"><span className="text-xs px-2 py-0.5 rounded-full" style={{background:r.party_type==="SUPPLIER"?"#fef3c7":"#dbeafe",color:r.party_type==="SUPPLIER"?"#92400e":"#1e40af"}}>{r.party_type==="SUPPLIER"?"Creditor":r.party_type==="BOTH"?"Both":"Debtor"}</span></td>
+              <td className="p-2.5"><span className="text-xs px-2 py-0.5 rounded-full" style={{background:r.party_type==="SUPPLIER"?"#fef3c7":"#dbeafe",color:r.party_type==="SUPPLIER"?"#92400e":"#1e40af"}}>{r.party_type==="SUPPLIER"?t("Creditor","लेनदार"):r.party_type==="BOTH"?t("Both","दोनों"):t("Debtor","देनदार")}</span></td>
               <td className="p-2.5 text-xs">{r.gstin||"—"}</td><td className="p-2.5">{r.phone||"—"}</td><td className="p-2.5">{r.city||"—"}</td>
               <td className="p-2.5 text-right">{bal(r)}</td>
               <td className="p-2.5 text-xs text-slate-500">{(r.documents||[]).length?`📎 ${(r.documents||[]).length}`:"—"}</td>
-              <td className="p-2.5 text-right whitespace-nowrap">{r.share_uuid && <a href={`/portal/${r.share_uuid}/`} target="_blank" className="text-xs font-semibold text-purple-700 mr-3" title="Customer portal link">Portal</a>}<button onClick={()=>{setEdit(r);setOpen(true);}} className="text-xs font-semibold text-blue-700 hover:underline">Edit</button></td>
+              <td className="p-2.5 text-right whitespace-nowrap">{r.share_uuid && <a href={`/portal/${r.share_uuid}/`} target="_blank" className="text-xs font-semibold text-purple-700 mr-3" title="Customer portal link">Portal</a>}<button onClick={()=>{setEdit(r);setOpen(true);}} className="text-xs font-semibold text-blue-700 hover:underline">{t("Edit","एडिट")}</button></td>
             </tr>)}
           </tbody>
         </table>
@@ -679,39 +679,39 @@ function PartyForm({party,onClose,onSaved}){
         <div className="p-6 space-y-4">
           {err && <div className="bg-red-50 text-red-700 text-sm p-2.5 rounded-lg">{err}</div>}
           <div className="grid md:grid-cols-3 gap-3">
-            <div>{I("Party Name *","name",{onBlur:checkDup})}
+            <div>{I(t("Party Name *","पार्टी नाम *"),"name",{onBlur:checkDup})}
               {dup && <div className="text-xs text-amber-700 mt-1">⚠ "{dup.name_matches[0].name}" already exists{dup.name_matches[0].city?` (${dup.name_matches[0].city})`:""} — naam badal sakte hain</div>}</div>
-            <div><label className="text-xs font-semibold text-slate-500">Party Type</label>
+            <div><label className="text-xs font-semibold text-slate-500">{t("Party Type","पार्टी प्रकार")}</label>
               <select className="border border-slate-200 w-full p-2 rounded-lg text-sm mt-1" value={f.party_type} onChange={e=>set("party_type",e.target.value)}>
-                <option value="CUSTOMER">Customer (Debtor — To Receive)</option><option value="SUPPLIER">Supplier (Creditor — To Pay)</option><option value="BOTH">Both</option></select></div>
-            {I("Phone","phone")}
+                <option value="CUSTOMER">{t("Customer (Debtor — To Receive)","ग्राहक (देनदार — लेना है)")}</option><option value="SUPPLIER">{t("Supplier (Creditor — To Pay)","सप्लायर (लेनदार — देना है)")}</option><option value="BOTH">{t("Both","दोनों")}</option></select></div>
+            {I(t("Phone","फ़ोन"),"phone")}
           </div>
           <div className="grid md:grid-cols-3 gap-3 items-end">
             <div className="md:col-span-2"><label className="text-xs font-semibold text-slate-500">GSTIN</label>
               <div className="flex gap-2 mt-1"><input className="border border-slate-200 w-full p-2 rounded-lg text-sm" value={f.gstin||""} onChange={e=>set("gstin",e.target.value.toUpperCase())} placeholder="06CBZPN8878H1ZH"/>
-                <button onClick={verify} className="px-3 py-2 rounded-lg text-sm font-semibold text-white whitespace-nowrap" style={{background:"#1e3a8a"}}>Verify</button></div>
+                <button onClick={verify} className="px-3 py-2 rounded-lg text-sm font-semibold text-white whitespace-nowrap" style={{background:"#1e3a8a"}}>{t("Verify","सत्यापित करें")}</button></div>
               {gst && (gst.loading?<div className="text-xs text-slate-400 mt-1">Verifying…</div>:
                 gst.valid?<div className="text-xs text-green-700 mt-1">✓ Valid · {gst.state} · PAN {gst.pan}{gst.source==="gst_api"?" · GST se auto-filled ✨":gst.source==="existing_record"?" · record mila":" · (set a GST API key for name/address)"}</div>:
                 <div className="text-xs text-red-600 mt-1">✗ {gst.detail||"Invalid GSTIN"}</div>)}</div>
-            {I("PAN","pan")}
+            {I(t("PAN","PAN"),"pan")}
           </div>
           <div className="grid md:grid-cols-3 gap-3">
-            {I("Legal Name (GST)","legal_name")}{I("Email","email")}{I("Pincode","pincode")}
+            {I(t("Legal Name (GST)","कानूनी नाम (GST)"),"legal_name")}{I(t("Email","ईमेल"),"email")}{I(t("Pincode","पिनकोड"),"pincode")}
           </div>
           <div className="grid md:grid-cols-3 gap-3">
-            <div className="md:col-span-1">{I("City","city")}</div>{I("State","state")}{I("State Code","state_code")}
+            <div className="md:col-span-1">{I(t("City","शहर"),"city")}</div>{I(t("State","राज्य"),"state")}{I(t("State Code","राज्य कोड"),"state_code")}
           </div>
-          <div><label className="text-xs font-semibold text-slate-500">Billing Address</label>
+          <div><label className="text-xs font-semibold text-slate-500">{t("Billing Address","बिलिंग पता")}</label>
             <textarea className="border border-slate-200 w-full p-2 rounded-lg text-sm mt-1" rows={2} value={f.address||""} onChange={e=>set("address",e.target.value)}/></div>
           <div className="border-t pt-4 grid md:grid-cols-4 gap-3 items-end">
-            <div><label className="text-xs font-semibold text-slate-500">Opening Balance</label>
+            <div><label className="text-xs font-semibold text-slate-500">{t("Opening Balance","ओपनिंग बैलेंस")}</label>
               <input type="number" className="border border-slate-200 w-full p-2 rounded-lg text-sm mt-1" value={f.opening_balance} onChange={e=>set("opening_balance",e.target.value)}/></div>
             <div><label className="text-xs font-semibold text-slate-500">Type</label>
               <select className="border border-slate-200 w-full p-2 rounded-lg text-sm mt-1" value={f.opening_balance_type} onChange={e=>set("opening_balance_type",e.target.value)}>
-                <option value="DR">To Receive (Dr)</option><option value="CR">To Pay (Cr)</option></select></div>
-            {I("Credit Limit","credit_limit",{type:"number"})}{I("Credit Days","credit_days",{type:"number"})}
+                <option value="DR">{t("To Receive (Dr)","लेना है (Dr)")}</option><option value="CR">{t("To Pay (Cr)","देना है (Cr)")}</option></select></div>
+            {I(t("Credit Limit","क्रेडिट लिमिट"),"credit_limit",{type:"number"})}{I(t("Credit Days","क्रेडिट दिन"),"credit_days",{type:"number"})}
           </div>
-          <div className="grid md:grid-cols-3 gap-3">{I("Party Group (Dealers / VIP / Route)","group")}</div>
+          <div className="grid md:grid-cols-3 gap-3">{I(t("Party Group (Dealers / VIP / Route)","पार्टी ग्रुप (डीलर / VIP / रूट)"),"group")}</div>
           <div className="border-t pt-4">
             <label className="text-xs font-semibold text-slate-500">✚ Custom Fields (extra info — e.g. Route, Vehicle No, Tag)</label>
             {Object.entries(f.custom_fields||{}).map(([k,v],i)=><div key={i} className="flex gap-2 mt-1">
@@ -726,13 +726,13 @@ function PartyForm({party,onClose,onSaved}){
             <label className="text-xs font-semibold text-slate-500">📎 Party Document (Aadhaar / PAN / GST cert / agreement)</label>
             {docs.length>0 && <div className="flex flex-wrap gap-2 my-2">{docs.map(d=><a key={d.id} href={d.file} target="_blank" className="text-xs bg-slate-100 px-2 py-1 rounded-lg text-blue-700">{d.title}</a>)}</div>}
             <div className="flex gap-2 mt-1">
-              <input className="border border-slate-200 p-2 rounded-lg text-sm flex-1" placeholder="Document title" value={docTitle} onChange={e=>setDocTitle(e.target.value)}/>
+              <input className="border border-slate-200 p-2 rounded-lg text-sm flex-1" placeholder={t("Document title","डॉक्यूमेंट शीर्षक")} value={docTitle} onChange={e=>setDocTitle(e.target.value)}/>
               <input type="file" className="text-sm" onChange={e=>setDocFile(e.target.files[0])}/></div>
             <div className="text-xs text-slate-400 mt-1">Save karte waqt document bhi upload ho jayega.</div>
           </div>
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">Cancel</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">{t("Cancel","रद्द करें")}</button>
           <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)",opacity:busy?.6:1}}>{busy?t("Saving…","सेव हो रहा…"):party?t("Update","अपडेट"):t("Save Party","पार्टी सेव करें")}</button>
         </div>
       </div>
@@ -748,27 +748,27 @@ function ItemView(){
   return (
     <div className="p-6 fade-in">
       <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
-        <h2 className="text-2xl font-extrabold text-slate-800">Items <span className="text-sm font-normal text-slate-400">· {filt.length}</span></h2>
+        <h2 className="text-2xl font-extrabold text-slate-800">{t("Items","आइटम")} <span className="text-sm font-normal text-slate-400">· {filt.length}</span></h2>
         <div className="flex gap-2 items-center">
           <div className="relative"><span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
-            <input className="p-2.5 pl-9 text-sm rounded-xl border border-slate-200" style={{minWidth:220}} placeholder="Search item…" value={q} onChange={e=>setQ(e.target.value)} /></div>
+            <input className="p-2.5 pl-9 text-sm rounded-xl border border-slate-200" style={{minWidth:220}} placeholder={t("Search item…","आइटम खोजें…")} value={q} onChange={e=>setQ(e.target.value)} /></div>
           <button onClick={()=>{setEdit(null);setOpen(true);}} className="text-white px-4 py-2.5 rounded-xl text-sm font-bold" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>{t("+ Add Item","+ आइटम जोड़ें")}</button>
         </div>
       </div>
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-slate-100 text-slate-600"><tr>
-            <th className="text-left p-2.5">Name</th><th className="text-left p-2.5">Type</th><th className="text-left p-2.5">Item Code</th>
-            <th className="text-left p-2.5">HSN</th><th className="text-right p-2.5">MRP</th><th className="text-center p-2.5">Variants</th><th></th></tr></thead>
+            <th className="text-left p-2.5">{t("Name","नाम")}</th><th className="text-left p-2.5">{t("Type","प्रकार")}</th><th className="text-left p-2.5">{t("Item Code","आइटम कोड")}</th>
+            <th className="text-left p-2.5">{t("HSN","HSN")}</th><th className="text-right p-2.5">{t("MRP","MRP")}</th><th className="text-center p-2.5">{t("Variants","वेरिएंट")}</th><th></th></tr></thead>
           <tbody>
-            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={7}>No items — start with "+ Add Item"</td></tr>}
+            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={7}>{t('No items — start with "+ Add Item"','कोई आइटम नहीं — "+ आइटम जोड़ें" से शुरू करें')}</td></tr>}
             {filt.map(r=><tr key={r.id} className="border-b hover:bg-slate-50">
               <td className="p-2.5 font-semibold text-slate-700">{r.name}</td>
-              <td className="p-2.5"><span className="text-xs px-2 py-0.5 rounded-full" style={{background:r.item_type==="SERVICE"?"#ede9fe":"#dcfce7",color:r.item_type==="SERVICE"?"#6d28d9":"#166534"}}>{r.item_type==="SERVICE"?"Service":"Product"}</span></td>
+              <td className="p-2.5"><span className="text-xs px-2 py-0.5 rounded-full" style={{background:r.item_type==="SERVICE"?"#ede9fe":"#dcfce7",color:r.item_type==="SERVICE"?"#6d28d9":"#166534"}}>{r.item_type==="SERVICE"?t("Service","सेवा"):t("Product","उत्पाद")}</span></td>
               <td className="p-2.5 text-xs">{(r.variants&&r.variants[0]&&r.variants[0].item_code)||"—"}</td>
               <td className="p-2.5 text-xs">{r.hsn_code||"—"}</td><td className="p-2.5 text-right">{money(r.mrp)}</td>
               <td className="p-2.5 text-center">{(r.variants||[]).length}</td>
-              <td className="p-2.5 text-right"><button onClick={()=>{setEdit(r);setOpen(true);}} className="text-xs font-semibold text-blue-700 hover:underline">Edit</button></td>
+              <td className="p-2.5 text-right"><button onClick={()=>{setEdit(r);setOpen(true);}} className="text-xs font-semibold text-blue-700 hover:underline">{t("Edit","एडिट")}</button></td>
             </tr>)}
           </tbody>
         </table>
@@ -915,7 +915,7 @@ function ItemForm({item,onClose,onSaved}){
           </div>
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">Cancel</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">{t("Cancel","रद्द करें")}</button>
           <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)",opacity:busy?.6:1}}>{busy?t("Saving…","सेव हो रहा…"):item?t("Update","अपडेट"):t("Save Item","आइटम सेव करें")}</button>
         </div>
       </div>
@@ -1288,7 +1288,7 @@ function CashBankView(){
         <button onClick={()=>setModal({type:tab})} className="ml-auto text-white px-4 py-1.5 rounded-full text-sm font-bold" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>+ Add</button>
       </div>
       {tab==="accounts" && <div className="card overflow-hidden"><table className="w-full text-sm">
-        <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Name</th><th className="text-left p-2.5">Type</th><th className="text-left p-2.5">A/c No</th><th className="text-left p-2.5">Bank/UPI</th><th className="text-right p-2.5">Balance</th><th className="text-right p-2.5">Action</th></tr></thead>
+        <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">{t("Name","नाम")}</th><th className="text-left p-2.5">{t("Type","प्रकार")}</th><th className="text-left p-2.5">A/c No</th><th className="text-left p-2.5">Bank/UPI</th><th className="text-right p-2.5">Balance</th><th className="text-right p-2.5">Action</th></tr></thead>
         <tbody>{accounts.length===0&&<tr><td className="p-3 text-slate-400" colSpan={6}>No accounts</td></tr>}
           {accounts.map(a=><tr key={a.id} className="border-b hover:bg-slate-50"><td className="p-2.5 font-semibold">{a.name}</td>
             <td className="p-2.5"><span className="text-xs px-2 py-0.5 rounded-full" style={{background:a.account_type==="CASH"?"#dcfce7":"#dbeafe",color:a.account_type==="CASH"?"#166534":"#1e40af"}}>{a.account_type}</span></td>
@@ -1297,7 +1297,7 @@ function CashBankView(){
             <td className="p-2.5 text-right"><button onClick={()=>setModal({type:"txn",account:a})} className="text-xs font-semibold text-blue-700">+ Money In/Out</button></td></tr>)}
         </tbody></table></div>}
       {tab==="cheques" && <div className="card overflow-hidden"><table className="w-full text-sm">
-        <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Cheque No</th><th className="text-left p-2.5">Type</th><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">Due</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Action</th></tr></thead>
+        <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Cheque No</th><th className="text-left p-2.5">{t("Type","प्रकार")}</th><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">Due</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Action</th></tr></thead>
         <tbody>{cheques.length===0&&<tr><td className="p-3 text-slate-400" colSpan={7}>No cheques</td></tr>}
           {cheques.map(c=><tr key={c.id} className="border-b hover:bg-slate-50"><td className="p-2.5 font-semibold">{c.cheque_no}</td>
             <td className="p-2.5 text-xs">{c.cheque_type==="RECEIVABLE"?"In":"Out"}</td><td className="p-2.5">{c.party_name||pName(c.party)}</td>
@@ -1360,7 +1360,7 @@ function CashBankModal({modal,parties,expCats,onClose,onSaved}){
               <div><label className="text-xs font-semibold text-slate-500">IFSC</label><input className={cell} value={f.ifsc||""} onChange={e=>set("ifsc",e.target.value)}/></div></div>
             <div className="grid grid-cols-2 gap-3"><div><label className="text-xs font-semibold text-slate-500">Bank Name</label><input className={cell} value={f.bank_name||""} onChange={e=>set("bank_name",e.target.value)}/></div>
               <div><label className="text-xs font-semibold text-slate-500">UPI ID</label><input className={cell} value={f.upi_id||""} onChange={e=>set("upi_id",e.target.value)}/></div></div>
-            <div><label className="text-xs font-semibold text-slate-500">Opening Balance</label><input type="number" className={cell} value={f.opening_balance||""} onChange={e=>set("opening_balance",e.target.value)}/></div></>}
+            <div><label className="text-xs font-semibold text-slate-500">{t("Opening Balance","ओपनिंग बैलेंस")}</label><input type="number" className={cell} value={f.opening_balance||""} onChange={e=>set("opening_balance",e.target.value)}/></div></>}
           {modal.type==="txn" && <>
             <div className="text-sm text-slate-500">{modal.account.name}</div>
             <div className="grid grid-cols-2 gap-3"><div><label className="text-xs font-semibold text-slate-500">Direction</label><select className={cell} value={f.direction||"IN"} onChange={e=>set("direction",e.target.value)}><option value="IN">Money In (+)</option><option value="OUT">Money Out (−)</option></select></div>
@@ -1393,7 +1393,7 @@ function CashBankModal({modal,parties,expCats,onClose,onSaved}){
               <div><label className="text-xs font-semibold text-slate-500">Notes</label><input className={cell} value={f.notes||""} onChange={e=>set("notes",e.target.value)}/></div></div></>}
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">Cancel</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">{t("Cancel","रद्द करें")}</button>
           <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)",opacity:busy?.6:1}}>{busy?"Saving…":"Save"}</button>
         </div>
       </div>
@@ -1434,7 +1434,7 @@ function VouchersView({initialQuery,onNav}){
       </div>
       {type==="RECURRING"
         ? <div className="card overflow-x-auto"><table className="w-full text-sm" style={{minWidth:760}}>
-            <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Name</th><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">Frequency</th><th className="text-left p-2.5">Next Run</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Generated</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Actions</th></tr></thead>
+            <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">{t("Name","नाम")}</th><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">Frequency</th><th className="text-left p-2.5">Next Run</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Generated</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Actions</th></tr></thead>
             <tbody>{recs.length===0 && <tr><td className="p-3 text-slate-400" colSpan={8}>No auto invoices — create one from any Invoice via "↻ Auto" (monthly AMC, rent, contracts)</td></tr>}
               {recs.map(r=><tr key={r.id} className="border-b hover:bg-slate-50"><td className="p-2.5 font-semibold">{r.name}</td><td className="p-2.5">{r.party_name}</td>
                 <td className="p-2.5 text-xs">{r.frequency}</td><td className="p-2.5 text-xs">{r.next_run}</td><td className="p-2.5 text-right font-semibold">{money(r.amount)}</td>
@@ -1446,7 +1446,7 @@ function VouchersView({initialQuery,onNav}){
         : <div className="card overflow-x-auto">
         <table className="w-full text-sm" style={{minWidth:760}}>
           <thead className="bg-slate-100 text-slate-600"><tr>
-            <th className="text-left p-2.5">Number</th><th className="text-left p-2.5">Type</th><th className="text-left p-2.5">Date</th>
+            <th className="text-left p-2.5">Number</th><th className="text-left p-2.5">{t("Type","प्रकार")}</th><th className="text-left p-2.5">Date</th>
             <th className="text-left p-2.5">Party</th><th className="text-right p-2.5">Total</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Actions</th></tr></thead>
           <tbody>
             {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={7}>No transactions</td></tr>}
@@ -1497,7 +1497,7 @@ function RecurringModal({voucher,onClose,onSaved}){
           <div className="text-xs text-slate-400">Har cycle pe yeh invoice clone hoke auto-ban jayega. "Generate Now" se manually bhi bana sakte ho.</div>
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">Cancel</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">{t("Cancel","रद्द करें")}</button>
           <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>{busy?"…":"Create"}</button>
         </div>
       </div>
@@ -1603,7 +1603,7 @@ function AdminPanel(){
       </div>
       <div className="card p-4">
         <div className="font-semibold mb-2 text-slate-600">Recent Businesses</div>
-        <table className="w-full text-sm"><thead className="text-slate-500"><tr><th className="text-left p-1">Name</th><th className="text-left p-1">Joined</th><th className="text-left p-1">Status</th></tr></thead>
+        <table className="w-full text-sm"><thead className="text-slate-500"><tr><th className="text-left p-1">{t("Name","नाम")}</th><th className="text-left p-1">Joined</th><th className="text-left p-1">Status</th></tr></thead>
         <tbody>{m.recent_businesses.map((b,i)=><tr key={i} className="border-b"><td className="p-1">{b.name}</td><td className="p-1">{b.joined}</td><td className="p-1">{b.status}</td></tr>)}</tbody></table>
       </div>
     </div>);
@@ -1659,7 +1659,7 @@ function ReportsView(){
     if(tab==="reminders") return <div className="space-y-3">
       <StatCard label="Total To Receive" value={money(D.total_receivable)} accent="#dc2626"/>
       <div className="card overflow-hidden"><table className="w-full text-sm">
-        <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">Phone</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Days Overdue</th><th className="text-right p-2.5">Reminder</th></tr></thead>
+        <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">{t("Phone","फ़ोन")}</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Days Overdue</th><th className="text-right p-2.5">Reminder</th></tr></thead>
         <tbody>{(D.parties||[]).length===0&&<tr><td className="p-3 text-slate-400" colSpan={5}>All clear — nothing outstanding 🎉</td></tr>}
           {(D.parties||[]).map(x=>{const digits=(x.phone||"").replace(/\D/g,"");const ph=digits.length===10?"91"+digits:digits;
             const msg=encodeURIComponent(`Namaste ${x.name},\nAapka ₹${x.amount} ka payment baaki hai${x.days_overdue>0?` (${x.days_overdue} din se due)`:""}. Kripya jaldi clear karein. Dhanyavaad.`);
@@ -1767,7 +1767,7 @@ function StaffView(){
         <button onClick={add} disabled={busy||limitReached} className="text-white p-2 rounded-lg font-bold" style={{background:limitReached?"#cbd5e1":"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>{busy?"…":"+ Add Staff"}</button>
       </div>
       <div className="card overflow-hidden">
-        <table className="w-full text-sm"><thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Username</th><th className="text-left p-2.5">Phone</th><th className="text-left p-2.5">Role</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Action</th></tr></thead>
+        <table className="w-full text-sm"><thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Username</th><th className="text-left p-2.5">{t("Phone","फ़ोन")}</th><th className="text-left p-2.5">Role</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Action</th></tr></thead>
         <tbody>{rows.length===0&&<tr><td className="p-3 text-slate-400" colSpan={5}>Only you (owner). Add staff.</td></tr>}
           {rows.map(r=>{const c=roleColor[r.role]||roleColor.VIEWER;return <tr key={r.id} className="border-b hover:bg-slate-50">
             <td className="p-2.5 font-semibold text-slate-700">{r.username}</td><td className="p-2.5 text-xs">{r.phone||"—"}</td>
@@ -1827,7 +1827,7 @@ function WhatsAppView(){
       <div className="card overflow-hidden">
         <div className="p-4 font-bold text-slate-700 border-b border-slate-100">Document bhejein</div>
         <table className="w-full text-sm">
-          <thead><tr><th className="text-left p-3">No.</th><th className="text-left p-3">Type</th><th className="text-left p-3">Date</th><th className="text-right p-3">Amount</th><th className="text-right p-3"></th></tr></thead>
+          <thead><tr><th className="text-left p-3">No.</th><th className="text-left p-3">{t("Type","प्रकार")}</th><th className="text-left p-3">Date</th><th className="text-right p-3">Amount</th><th className="text-right p-3"></th></tr></thead>
           <tbody>{vouchers.map(v=><tr key={v.id} className="border-b">
             <td className="p-3 font-medium">{v.number}</td><td className="p-3">{v.voucher_type}</td><td className="p-3">{v.date}</td>
             <td className="p-3 text-right font-semibold">{money(v.grand_total)}</td>
@@ -1884,7 +1884,7 @@ function Employees({emps,reload}){
       <button onClick={save} className="bg-blue-900 text-white p-2 rounded md:col-span-2">Add Employee</button>
     </div>
     <div className="card overflow-hidden"><table className="w-full text-sm">
-      <thead className="bg-slate-100"><tr><th className="text-left p-2">Code</th><th className="text-left p-2">Name</th><th className="text-left p-2">Designation</th><th className="text-right p-2">Basic</th><th className="text-right p-2">Gross</th></tr></thead>
+      <thead className="bg-slate-100"><tr><th className="text-left p-2">Code</th><th className="text-left p-2">{t("Name","नाम")}</th><th className="text-left p-2">Designation</th><th className="text-right p-2">Basic</th><th className="text-right p-2">Gross</th></tr></thead>
       <tbody>{emps.map(e=><tr key={e.id} className="border-b"><td className="p-2">{e.code}</td><td className="p-2">{e.name}</td><td className="p-2">{e.designation}</td><td className="p-2 text-right">{money(e.basic_salary)}</td><td className="p-2 text-right">{money(e.gross_salary)}</td></tr>)}</tbody>
     </table></div>
   </div>);
@@ -1926,7 +1926,7 @@ function LeaveTab({emps}){
       <button onClick={add} className="bg-blue-900 text-white p-2 rounded">Add Leave</button>
     </div>
     <div className="card overflow-hidden"><table className="w-full text-sm">
-      <thead className="bg-slate-100"><tr><th className="text-left p-2">Employee</th><th className="p-2">Type</th><th className="p-2">From</th><th className="p-2">To</th><th className="p-2">Days</th><th className="p-2">Status</th><th></th></tr></thead>
+      <thead className="bg-slate-100"><tr><th className="text-left p-2">Employee</th><th className="p-2">{t("Type","प्रकार")}</th><th className="p-2">From</th><th className="p-2">To</th><th className="p-2">Days</th><th className="p-2">Status</th><th></th></tr></thead>
       <tbody>{rows.map(r=><tr key={r.id} className="border-b"><td className="p-2">{r.employee_name}</td><td className="p-2">{r.leave_type}</td><td className="p-2">{r.from_date}</td><td className="p-2">{r.to_date}</td><td className="p-2">{r.days}</td><td className="p-2">{r.status}</td>
         <td className="p-2">{r.status==="PENDING"&&<span><button onClick={()=>setStatus(r.id,"APPROVED")} className="text-green-600 mr-2">Approve</button><button onClick={()=>setStatus(r.id,"REJECTED")} className="text-red-500">Reject</button></span>}</td></tr>)}</tbody>
     </table></div>
@@ -2162,7 +2162,7 @@ function AccountingView(){
           <button key={k} onClick={()=>setTab(k)} className="px-3.5 py-1.5 rounded-full text-sm font-semibold" style={{background:tab===k?"#ea6a1e":"#fff",color:tab===k?"#fff":"#64748b",border:"1px solid "+(tab===k?"#ea6a1e":"#e2e8f0")}}>{l}</button>)}
       </div>
       {tab==="coa" && <div className="card overflow-hidden"><table className="w-full text-sm">
-        <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Code</th><th className="text-left p-2.5">Account</th><th className="text-left p-2.5">Type</th><th className="text-right p-2.5">Balance</th></tr></thead>
+        <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Code</th><th className="text-left p-2.5">Account</th><th className="text-left p-2.5">{t("Type","प्रकार")}</th><th className="text-right p-2.5">Balance</th></tr></thead>
         <tbody>{accs.length===0&&<tr><td className="p-3 text-slate-400" colSpan={4}>Chart of accounts load ho raha hai…</td></tr>}
           {accs.map(a=><tr key={a.id} className="border-b hover:bg-slate-50"><td className="p-2.5 text-xs font-mono">{a.code}</td><td className="p-2.5 font-semibold">{a.name}</td>
             <td className="p-2.5"><span className="text-xs px-2 py-0.5 rounded-full" style={{background:(typeColor[a.account_type]||"#64748b")+"18",color:typeColor[a.account_type]||"#64748b"}}>{a.account_type}</span></td>
@@ -2199,9 +2199,9 @@ function AccountModal({acc,onClose,onSaved}){
         <div className="grid grid-cols-2 gap-3"><div><label className="text-xs font-semibold text-slate-500">Code</label><input className={cell} value={f.code} onChange={e=>setF({...f,code:e.target.value})}/></div>
           <div><label className="text-xs font-semibold text-slate-500">Type</label><select className={cell} value={f.account_type} onChange={e=>setF({...f,account_type:e.target.value})}>{["ASSET","LIABILITY","EQUITY","INCOME","EXPENSE"].map(t=><option key={t}>{t}</option>)}</select></div></div>
         <div><label className="text-xs font-semibold text-slate-500">Name</label><input className={cell} value={f.name} onChange={e=>setF({...f,name:e.target.value})}/></div>
-        <div><label className="text-xs font-semibold text-slate-500">Opening Balance</label><input type="number" className={cell} value={f.opening_balance} onChange={e=>setF({...f,opening_balance:e.target.value})}/></div>
+        <div><label className="text-xs font-semibold text-slate-500">{t("Opening Balance","ओपनिंग बैलेंस")}</label><input type="number" className={cell} value={f.opening_balance} onChange={e=>setF({...f,opening_balance:e.target.value})}/></div>
       </div>
-      <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t"><button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">Cancel</button>
+      <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t"><button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">{t("Cancel","रद्द करें")}</button>
         <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>{busy?"…":"Save"}</button></div>
     </div></div>);
 }
@@ -2234,7 +2234,7 @@ function JournalModal({je,accounts,onClose,onSaved}){
         </table>
         <button onClick={()=>setF(s=>({...s,lines:[...s.lines,{account:"",debit:"",credit:""}]}))} className="text-orange-700 text-sm font-semibold">+ Add line</button>
       </div>
-      <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t"><button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">Cancel</button>
+      <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t"><button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">{t("Cancel","रद्द करें")}</button>
         <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>{busy?"…":"Post Journal"}</button></div>
     </div></div>);
 }

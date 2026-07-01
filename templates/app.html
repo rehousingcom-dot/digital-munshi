@@ -867,7 +867,7 @@ function NewSale({initialDoc}){
   const applyPriceList=id=>{ setPlId(id); const pl=priceLists.find(x=>x.id==id); if(!pl)return;
     setLines(ls=>ls.map(l=>{ if(!l.variant)return l; const it=(pl.items||[]).find(x=>x.variant==l.variant); return it?{...l,rate:+it.price}:l; })); };
   const DOCS=[["SALE","Tax Invoice"],["PURCHASE","Purchase"],["ESTIMATE","Estimate / Quotation"],["PROFORMA","Proforma Invoice"],["SALE_ORDER","Sale Order"],["DELIVERY_CHALLAN","Delivery Challan"],["SALE_RETURN","Sale Return / Credit Note"]];
-  function blank(){ return {variant:"",unit:"",qty:1,rate:0,incl:false,mrp:0,disc1_pct:0,disc2_pct:0,disc3_pct:0,discount_amount:0,tax_percent:0,cess_percent:0,free_qty:0,batch:""}; }
+  function blank(){ return {variant:"",unit:"",qty:1,rate:0,incl:false,mrp:0,disc1_pct:0,disc2_pct:0,disc3_pct:0,discount_amount:0,tax_percent:0,cess_percent:0,free_qty:0,batch:"",description:""}; }
   useEffect(()=>{ apiList("/parties/?page_size=500").then(setParties); apiList("/godowns/").then(g=>{setGodowns(g);if(g[0])setGodown(g[0].id);});
     apiList("/units/").then(setUnits); apiList("/items/?page_size=500").then(setItems);
     apiList("/price-lists/").then(setPriceLists).catch(()=>{});
@@ -884,7 +884,8 @@ function NewSale({initialDoc}){
     return +v.item.mrp||0; };
   const taxFor=v=>{ const t=v&&v.item&&v.item.tax_percent; return (t===0||t)?+t:0; };
   const setLine=(i,k,val)=>{ setLines(ls=>{ const n=ls.map((l,j)=>j===i?{...l,[k]:val}:l);
-    if(k==="variant"){ const v=vById(val); if(v){ const u=v.item.primary_unit; n[i].unit=u; n[i].rate=priceFor(v,u); n[i].mrp=+v.item.mrp||0; n[i].tax_percent=taxFor(v); n[i].batch=""; } }
+    if(k==="variant"){ const v=vById(val); if(v){ const u=v.item.primary_unit; n[i].unit=u; n[i].rate=priceFor(v,u); n[i].mrp=+v.item.mrp||0; n[i].tax_percent=taxFor(v); n[i].batch=""; }
+      if(val && i===n.length-1) n.push(blank()); }
     if(k==="unit"){ const v=vById(n[i].variant); if(v) n[i].rate=priceFor(v,val); }
     if(k==="batch"){ const v=vById(n[i].variant); const b=(v&&v.batches||[]).find(x=>x.id==val); if(b){ if(+b.mrp)n[i].mrp=+b.mrp;
       if(+b.discount_value){ if(b.discount_type==="PERCENT")n[i].disc1_pct=+b.discount_value; else n[i].discount_amount=+b.discount_value; } } }
@@ -906,7 +907,7 @@ function NewSale({initialDoc}){
     const used=lines.filter(l=>l.variant);
     if(used.length===0){ setErr("Kam se kam ek item add karein"); return; }
     const payload={voucher_type:docType,date,party:+party,godown:+godown,company_state_code:profile.state_code||"",currency,exchange_rate:String(fx||1),
-      lines:used.map(l=>({variant:+l.variant,unit:+l.unit,batch:l.batch?+l.batch:null,qty:String(l.qty),rate:String(l.rate),
+      lines:used.map(l=>({variant:+l.variant,unit:+l.unit,batch:l.batch?+l.batch:null,description:l.description||"",qty:String(l.qty),rate:String(l.rate),
         price_inclusive_tax:!!l.incl,tax_percent:String(l.tax_percent),cess_percent:String(l.cess_percent||0),free_qty:String(l.free_qty||0),
         disc1_pct:String(l.disc1_pct||0),disc2_pct:String(l.disc2_pct||0),disc3_pct:String(l.disc3_pct||0),discount_amount:String(l.discount_amount||0)}))};
     try{ const v=await api("/vouchers/",{method:"POST",body:JSON.stringify(payload)});
@@ -965,7 +966,8 @@ function NewSale({initialDoc}){
           <tbody>{lines.map((l,i)=>{const c=calc(l);const v=vById(l.variant);const us=itemUnits(v);return(
             <React.Fragment key={i}>
             <tr className="border-b">
-              <td className="p-1"><select className={cell} value={l.variant} onChange={e=>setLine(i,"variant",e.target.value)}><option value="">— item —</option>{variants.map(x=><option key={x.id} value={x.id}>{x.label}</option>)}</select></td>
+              <td className="p-1"><select className={cell} value={l.variant} onChange={e=>setLine(i,"variant",e.target.value)}><option value="">— item —</option>{variants.map(x=><option key={x.id} value={x.id}>{x.label}</option>)}</select>
+                {l.variant && <input className={cell+" mt-1 text-xs"} placeholder="Description / note (optional)" value={l.description} onChange={e=>setLine(i,"description",e.target.value)} />}</td>
               <td className="p-1"><select className={cell} value={l.unit} onChange={e=>setLine(i,"unit",e.target.value)}>{(us.length?us:units.map(u=>u.id)).map(uid=><option key={uid} value={uid}>{unitsById[uid]?unitsById[uid].short_code:uid}</option>)}</select></td>
               <td className="p-1"><input type="number" className={cell} value={l.qty} onChange={e=>setLine(i,"qty",e.target.value)} /></td>
               <td className="p-1"><div className="flex items-center gap-1"><input type="number" className={cell} value={l.rate} onChange={e=>setLine(i,"rate",e.target.value)} />

@@ -216,6 +216,7 @@ class VoucherLine(OrgOwned):
     variant = models.ForeignKey(ItemVariant, on_delete=models.PROTECT)
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT, help_text="Kisi bhi unit se billing")
     batch = models.ForeignKey(Batch, on_delete=models.SET_NULL, null=True, blank=True)
+    description = models.CharField(max_length=255, blank=True, help_text="Line description / note (invoice par print)")
 
     qty = models.DecimalField(max_digits=14, decimal_places=4, default=0)
     rate = models.DecimalField(max_digits=14, decimal_places=2, default=0, help_text="Price per selected unit")

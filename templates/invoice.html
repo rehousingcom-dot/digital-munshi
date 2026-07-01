@@ -72,7 +72,8 @@
       <tr>
         <td class="c">{{ forloop.counter }}</td>
         <td>{{ l.variant.item.name }}{% if l.variant.size or l.variant.colour or l.variant.model %}
-            <br><span style="color:#888;font-size:9px;">{{ l.variant.size }} {{ l.variant.colour }} {{ l.variant.model }}</span>{% endif %}</td>
+            <br><span style="color:#888;font-size:9px;">{{ l.variant.size }} {{ l.variant.colour }} {{ l.variant.model }}</span>{% endif %}{% if l.description %}
+            <br><span style="color:#555;font-size:9px;">{{ l.description }}</span>{% endif %}</td>
         <td class="c">{{ l.variant.item.hsn_code }}</td>
         <td class="r">{{ l.qty }}</td>
         <td class="c">{{ l.unit.short_code }}</td>

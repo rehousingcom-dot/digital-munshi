@@ -10,7 +10,10 @@ _Priority order: bugs first, then missing features in waves._
       no refresh; any 401 forced logout. Fix: `SIMPLE_JWT` access=7d/refresh=30d + rotating,
       frontend ab refresh-token store karke 401 pe auto-renew karta hai (retry once, tabhi logout).
       _(commit: JWT session fix)_
-- [ ] 🐞 **New Sale — GST auto-picks 18% (wrong)** — item ka actual GST rate pick hona chahiye.
+- [x] ✅ **New Sale — GST auto-picks 18% (wrong)** — FIXED. Cause: frontend `taxFor()` stub
+      hamesha 18 return karta tha; item ka tax_rate percent expose hi nahi tha. Fix: ItemSerializer
+      me `tax_percent` add (tax_rate.percent se), New Sale + POS ab item ka **real GST** pick karte
+      hain (item me rate set na ho to 0 — user item form me GST% set kare). _(commit 1d258eb)_
 
 ## Slide 2 — Login / Signup
 - [x] ✅ Auto-logout fix (upar).

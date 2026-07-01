@@ -1,7 +1,28 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
+
+# ---- PWA service worker (served at root so its scope covers the whole app) ----
+_SW_JS = """
+const CACHE = "dm-shell-v1";
+const SHELL = ["/", "/static/pwa/icon-192.png"];
+self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).catch(()=>{})); self.skipWaiting(); });
+self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k))))); self.clients.claim(); });
+self.addEventListener("fetch", e => {
+  const req = e.request;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/admin/") || url.pathname.startsWith("/invoice/")) return;
+  e.respondWith(
+    fetch(req).then(res => { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)).catch(()=>{}); return res; })
+      .catch(() => caches.match(req).then(r => r || caches.match("/")))
+  );
+});
+"""
+
+def service_worker(request):
+    return HttpResponse(_SW_JS, content_type="application/javascript")
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -73,6 +94,7 @@ router.register("journals", acc_views.JournalEntryViewSet)
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="app.html"), name="app"),
+    path("sw.js", service_worker, name="service_worker"),
     path("admin/", admin.site.urls),
     path("api/health/", health, name="health"),
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),

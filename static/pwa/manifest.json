@@ -1,0 +1,15 @@
+{
+  "name": "Digital Munshi ERP",
+  "short_name": "Digital Munshi",
+  "description": "GST billing, inventory, payments, accounting & payroll — all in one.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#ea6a1e",
+  "icons": [
+    {"src": "/static/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/static/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

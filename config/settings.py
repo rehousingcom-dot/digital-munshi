@@ -115,6 +115,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+_static_src = BASE_DIR / "static"
+STATICFILES_DIRS = [_static_src] if _static_src.exists() else []
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 # WhiteNoise compressed static storage — sirf jab whitenoise installed ho

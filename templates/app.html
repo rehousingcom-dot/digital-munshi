@@ -619,6 +619,10 @@ function PartyView(){
   const filt=rows.filter(r=>!q||JSON.stringify(r).toLowerCase().includes(q.toLowerCase()));
   const bal=r=>{const v=Number(r.opening_balance||0); if(!v)return <span className="text-slate-400">0.00</span>;
     return <span style={{color:r.opening_balance_type==="DR"?"#059669":"#dc2626",fontWeight:600}}>{money(v)} {r.opening_balance_type}</span>;};
+  const waStatement=(r)=>{ let ph=(r.phone||"").replace(/\D/g,""); if(ph.length===10)ph="91"+ph;
+    const link=window.location.origin+"/party/"+r.id+"/statement/?share="+r.share_uuid;
+    const msg="Namaste "+r.name+", aapka account statement:%0A"+encodeURIComponent(link)+"%0A%0APDF: "+encodeURIComponent(link+"&format=pdf");
+    return "https://wa.me/"+ph+"?text="+msg; };
   return (
     <div className="p-6 fade-in">
       <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
@@ -642,7 +646,7 @@ function PartyView(){
               <td className="p-2.5 text-xs">{r.gstin||"—"}</td><td className="p-2.5">{r.phone||"—"}</td><td className="p-2.5">{r.city||"—"}</td>
               <td className="p-2.5 text-right">{bal(r)}</td>
               <td className="p-2.5 text-xs text-slate-500">{(r.documents||[]).length?`📎 ${(r.documents||[]).length}`:"—"}</td>
-              <td className="p-2.5 text-right whitespace-nowrap">{r.share_uuid && <a href={`/portal/${r.share_uuid}/`} target="_blank" className="text-xs font-semibold text-purple-700 mr-3" title="Customer portal link">Portal</a>}<button onClick={()=>{setEdit(r);setOpen(true);}} className="text-xs font-semibold text-blue-700 hover:underline">{t("Edit","एडिट")}</button></td>
+              <td className="p-2.5 text-right whitespace-nowrap">{r.share_uuid && <a href={`/party/${r.id}/statement/?share=${r.share_uuid}`} target="_blank" className="text-xs font-semibold text-orange-700 mr-3" title="Ledger statement">📄 {t("Statement","स्टेटमेंट")}</a>}{r.share_uuid && r.phone && <a href={waStatement(r)} target="_blank" className="text-xs font-semibold text-emerald-600 mr-3" title="Send on WhatsApp">WhatsApp</a>}{r.share_uuid && <a href={`/portal/${r.share_uuid}/`} target="_blank" className="text-xs font-semibold text-purple-700 mr-3" title="Customer portal link">Portal</a>}<button onClick={()=>{setEdit(r);setOpen(true);}} className="text-xs font-semibold text-blue-700 hover:underline">{t("Edit","एडिट")}</button></td>
             </tr>)}
           </tbody>
         </table>

@@ -182,3 +182,72 @@ def _gst_api_lookup(gstin):
 class PartyDocumentViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
     queryset = PartyDocument.objects.all()
     serializer_class = PartyDocumentSerializer
+
+
+def _party_ledger(party):
+    """Party ka ledger rows + closing balance (party_statement report jaisa)."""
+    from decimal import Decimal
+    from apps.billing.models import Voucher
+    from apps.payments.models import Payment
+    opening = Decimal(str(party.opening_balance or 0))
+    opening_signed = opening if party.opening_balance_type == "DR" else -opening
+    entries = []
+    for v in Voucher.all_objects.filter(organization=party.organization, party=party, is_posted=True):
+        eff = 1 if v.voucher_type in ("SALE", "DEBIT_NOTE") else (
+            -1 if v.voucher_type in ("SALE_RETURN", "CREDIT_NOTE", "PURCHASE") else 0)
+        if eff:
+            entries.append((v.date, v.get_voucher_type_display(), v.number, eff * float(v.grand_total)))
+    for p in Payment.all_objects.filter(organization=party.organization, party=party):
+        eff = -1 if p.payment_type == "RECEIPT" else 1
+        entries.append((p.date, p.get_payment_type_display(), p.number, eff * float(p.amount)))
+    entries.sort(key=lambda e: str(e[0]))
+    bal = float(opening_signed)
+    rows = [{"date": "Opening", "type": "Opening Balance", "number": "", "debit": "", "credit": "", "balance": round(bal, 2)}]
+    for d, t, n, amt in entries:
+        bal += amt
+        rows.append({"date": str(d), "type": t, "number": n,
+                     "debit": round(amt, 2) if amt > 0 else "",
+                     "credit": round(-amt, 2) if amt < 0 else "",
+                     "balance": round(bal, 2)})
+    return rows, round(bal, 2)
+
+
+def party_statement_doc(request, pk):
+    """Party ledger — print-ready HTML ya PDF. Public via ?share=<uuid> (WhatsApp ke liye)."""
+    import uuid as _uuid
+    from io import BytesIO
+    from django.template.loader import render_to_string
+    from django.http import HttpResponseForbidden
+    from apps.core.models import Company
+
+    share = request.GET.get("share")
+    party = None
+    if share:
+        try:
+            _uuid.UUID(str(share))
+            party = Party.all_objects.filter(pk=pk, share_uuid=share).first()
+        except (ValueError, TypeError):
+            party = None
+    if not party:
+        return HttpResponseForbidden("Galat ya missing share link.")
+
+    rows, closing = _party_ledger(party)
+    company = (Company.all_objects.filter(organization=party.organization, is_active=True).first()
+               or Company.all_objects.filter(organization=party.organization).first())
+    ctx = {"party": party, "rows": rows, "closing": closing,
+           "closing_type": "To Receive (Dr)" if closing >= 0 else "To Pay (Cr)",
+           "company": company}
+
+    if request.GET.get("format") == "pdf":
+        try:
+            from xhtml2pdf import pisa
+        except ImportError:
+            return HttpResponse("PDF engine not available", status=500)
+        html = render_to_string("statement.html", ctx)
+        buf = BytesIO()
+        pisa.CreatePDF(src=html, dest=buf)
+        buf.seek(0)
+        resp = HttpResponse(buf.read(), content_type="application/pdf")
+        resp["Content-Disposition"] = f'attachment; filename="statement-{party.name}.pdf"'
+        return resp
+    return render(request, "statement.html", ctx)

@@ -167,6 +167,7 @@ urlpatterns = [
     path("api/expense-summary/", cashbank_views.expense_summary, name="expense_summary"),
     path("api/trial-balance/", acc_views.trial_balance, name="trial_balance"),
     path("portal/<uuid:share>/", party_extra.customer_portal, name="customer_portal"),
+    path("party/<int:pk>/statement/", party_extra.party_statement_doc, name="party_statement_doc"),
     path("welcome/", core_views.landing, name="landing"),
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_xml, name="sitemap"),

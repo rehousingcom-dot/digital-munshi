@@ -3085,7 +3085,7 @@ function App(){
   const go=(k,mode)=>{ setTab(k); if(mode)setSaleMode(mode); setOpen(false); };
   return (
     <div className="md:flex md:h-screen md:overflow-hidden">
-      {cmdOpen && <CommandPalette nav={navShown} onGo={go} onClose={()=>setCmdOpen(false)} />}
+      {cmdOpen && <CommandPalette nav={nav} onGo={go} onClose={()=>setCmdOpen(false)} />}
       {/* Mobile top bar */}
       <div className="md:hidden bg-blue-900 text-white flex items-center justify-between p-3">
         <button onClick={()=>setOpen(!open)} className="text-xl">☰</button>
@@ -3101,7 +3101,7 @@ function App(){
         </div>
         <div className="mt-4 mb-1 hidden md:block"><FirmSwitcher /></div>
         <div className="mt-2 mb-1 px-2 text-[10px] uppercase tracking-wider text-indigo-300 hidden md:block">Menu</div>
-        {navShown.map(([k,l])=><button key={k} onClick={()=>go(k)} className={"flex items-center gap-3 text-left mb-1 "+(tab===k?"bg-blue-700":"")+(k==="plan"?" mt-2":"")}><Icon n={k} size={17}/><span>{l}</span></button>)}
+        {nav.map(([k,l])=>{const locked=!allow(k);return <button key={k} onClick={()=>go(k)} title={locked?t("Upgrade se unlock","Upgrade to unlock"):l} className={"flex items-center gap-3 text-left mb-1 "+(tab===k?"bg-blue-700":"")+(k==="plan"?" mt-2":"")+(locked?" opacity-50":"")}><Icon n={k} size={17}/><span className="flex-1">{l}</span>{locked&&<span className="text-xs">🔒</span>}</button>;})}
         <button onClick={()=>{clearAuth();setAuthed(false);setSub(null);}} className="md:mt-auto flex items-center gap-3 text-left text-indigo-300"><Icon n="logout" size={17}/><span>Logout</span></button>
       </aside>
       <main className="flex-1 md:h-screen overflow-y-auto">

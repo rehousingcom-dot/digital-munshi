@@ -1404,7 +1404,7 @@ function CashBankModal({modal,parties,expCats,onClose,onSaved}){
 function VouchersView({initialQuery,onNav}){
   const TABS=[["","All"],["SALE","Invoices"],["ESTIMATE","Estimates"],["PROFORMA","Proforma"],["SALE_ORDER","Sale Orders"],["DELIVERY_CHALLAN","Delivery Challan"],["SALE_RETURN","Credit Notes"],["PURCHASE","Purchases"],["RECURRING","↻ Auto Invoice"]];
   const [type,setType]=useState(""),[rows,setRows]=useState([]),[parties,setParties]=useState([]),[q,setQ]=useState(initialQuery||""),[msg,setMsg]=useState("");
-  const [recs,setRecs]=useState([]),[recFor,setRecFor]=useState(null);
+  const [recs,setRecs]=useState([]),[recFor,setRecFor]=useState(null),[retFor,setRetFor]=useState(null);
   const load=()=>apiList("/vouchers/?page_size=500"+(type?"&type="+type:"")).then(setRows);
   const loadRecs=()=>apiList("/recurring-invoices/").then(setRecs);
   useEffect(()=>{ if(type!=="RECURRING")load(); else loadRecs(); },[type]);
@@ -1412,8 +1412,8 @@ function VouchersView({initialQuery,onNav}){
   const genNow=async r=>{ try{ const x=await api(`/recurring-invoices/${r.id}/generate_now/`,{method:"POST"}); setMsg(`✓ ${x.number} generate hua — agla ${x.next_run}`); loadRecs(); setTimeout(()=>setMsg(""),3500);}catch(e){setMsg("Generate failed");} };
   const toggleRec=async r=>{ try{ await api(`/recurring-invoices/${r.id}/`,{method:"PATCH",body:JSON.stringify({is_active:!r.is_active})}); loadRecs();}catch(e){} };
   const pName=id=>{const p=parties.find(x=>x.id==id);return p?p.name:"—";};
-  const convert=async(r,to)=>{ try{ const x=await api(`/vouchers/${r.id}/convert/`,{method:"POST",body:JSON.stringify({to})});
-    setMsg(`✓ ${r.number} → ${x.number} (${to==="SALE"?"Invoice":"Order"}) ban gaya`); load(); setTimeout(()=>setMsg(""),3500);
+  const convert=async(r,to,returns)=>{ try{ const x=await api(`/vouchers/${r.id}/convert/`,{method:"POST",body:JSON.stringify({to,returns:returns||{}})});
+    setMsg(`✓ ${r.number} → ${x.number} (${to==="SALE"?t("Invoice","इनवॉइस"):t("Order","ऑर्डर")}) ${t("ban gaya","बन गया")}`); setRetFor(null); load(); setTimeout(()=>setMsg(""),3500);
   }catch(e){ setMsg((e&&e.detail)||"Convert failed"); setTimeout(()=>setMsg(""),4000); } };
   const canConvert=t=>["ESTIMATE","PROFORMA","SALE_ORDER","DELIVERY_CHALLAN"].includes(t);
   const filt=rows.filter(r=>!q||JSON.stringify(r).toLowerCase().includes(q.toLowerCase())||pName(r.party).toLowerCase().includes(q.toLowerCase()));
@@ -1458,7 +1458,7 @@ function VouchersView({initialQuery,onNav}){
               <td className="p-2.5 text-center">{r.is_posted?<span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Posted</span>:<span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Open</span>}</td>
               <td className="p-2.5 text-right whitespace-nowrap">
                 {r.converted_to && <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 mr-3" title="Invoice ban chuka">✓ Invoiced</span>}
-                {canConvert(r.voucher_type) && !r.converted_to && <button onClick={()=>convert(r,"SALE")} className="text-xs font-bold text-orange-700 mr-3 hover:underline">→ Invoice</button>}
+                {canConvert(r.voucher_type) && !r.converted_to && <button onClick={()=>r.voucher_type==="DELIVERY_CHALLAN"?setRetFor(r):convert(r,"SALE")} className="text-xs font-bold text-orange-700 mr-3 hover:underline">→ {t("Invoice","इनवॉइस")}</button>}
                 {r.voucher_type==="ESTIMATE" && !r.converted_to && <button onClick={()=>convert(r,"SALE_ORDER")} className="text-xs font-bold text-indigo-600 mr-3 hover:underline">→ Order</button>}
                 {r.voucher_type==="SALE" && <button onClick={()=>setRecFor(r)} className="text-xs font-semibold text-purple-700 mr-3" title="Create Auto Invoice">↻ Auto</button>}
                 <button onClick={async()=>{try{const x=await api(`/vouchers/${r.id}/email/`,{method:"POST",body:JSON.stringify({})});setMsg(x.sent?`✓ Email bheja ${x.to}`:`Email: ${x.to||"party has no email"}`);setTimeout(()=>setMsg(""),3000);}catch(e){setMsg("Email failed — add the party's email");setTimeout(()=>setMsg(""),3000);}}} className="text-blue-600 text-xs font-semibold mr-3">Email</button>
@@ -1471,6 +1471,7 @@ function VouchersView({initialQuery,onNav}){
         </table>
       </div>}
       {recFor && <RecurringModal voucher={recFor} onClose={()=>setRecFor(null)} onSaved={()=>{setRecFor(null);loadRecs();setMsg("✓ Auto invoice set");setTimeout(()=>setMsg(""),3000);}}/>}
+      {retFor && <ReturnChallanModal voucher={retFor} onClose={()=>setRetFor(null)} onConfirm={(returns)=>convert(retFor,"SALE",returns)}/>}
     </div>);
 }
 
@@ -1499,6 +1500,38 @@ function RecurringModal({voucher,onClose,onSaved}){
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t">
           <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">{t("Cancel","रद्द करें")}</button>
           <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>{busy?"…":"Create"}</button>
+        </div>
+      </div>
+    </div>);
+}
+
+function ReturnChallanModal({voucher,onClose,onConfirm}){
+  const [lines,setLines]=useState(null),[ret,setRet]=useState({}),[busy,setBusy]=useState(false);
+  useEffect(()=>{ api(`/vouchers/${voucher.id}/`).then(v=>setLines(v.lines||[])).catch(()=>setLines([])); },[]);
+  const cell="border border-slate-200 p-1.5 rounded-lg w-24 text-sm text-right";
+  const go=()=>{ setBusy(true); const clean={}; Object.entries(ret).forEach(([k,v])=>{ if(+v>0) clean[k]=+v; }); onConfirm(clean); };
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 overflow-y-auto" style={{background:"rgba(15,23,42,.45)"}} onClick={onClose}>
+      <div className="card w-full max-w-lg overflow-hidden" onClick={e=>e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>
+          <h3 className="text-white font-bold">{t("Delivery Challan → Invoice","डिलीवरी चालान → इनवॉइस")}</h3>
+          <button onClick={onClose} className="text-white text-xl">×</button></div>
+        <div className="p-6 space-y-3">
+          <div className="text-sm text-slate-500">{t("Jo maal wapas aaya uski qty likho — sirf net delivered qty invoice hogi.","How much came back? Enter returned qty — only net delivered qty will be invoiced.")}</div>
+          {lines===null ? <div className="text-slate-400 text-sm">Loading…</div> :
+           lines.length===0 ? <div className="text-slate-400 text-sm">{t("Koi line nahi","No lines")}</div> :
+           <table className="w-full text-sm">
+            <thead className="text-slate-500"><tr><th className="text-left py-1">{t("Item","आइटम")}</th><th className="text-right py-1">{t("Delivered","डिलीवर")}</th><th className="text-right py-1">{t("Returned","वापस")}</th><th className="text-right py-1">{t("Net","नेट")}</th></tr></thead>
+            <tbody>{lines.map(l=>{const d=+l.qty||0;const r=+ret[l.id]||0;const net=Math.max(0,d-r);return(
+              <tr key={l.id} className="border-t"><td className="py-1.5">{l.variant_name||("#"+l.variant)}{l.description?<div className="text-xs text-slate-400">{l.description}</div>:null}</td>
+                <td className="py-1.5 text-right text-slate-600">{d}</td>
+                <td className="py-1.5 text-right"><input type="number" min="0" max={d} className={cell} value={ret[l.id]||""} placeholder="0" onChange={e=>setRet({...ret,[l.id]:e.target.value})}/></td>
+                <td className="py-1.5 text-right font-semibold" style={{color:net<=0?"#dc2626":"#059669"}}>{net}</td></tr>);})}</tbody>
+           </table>}
+        </div>
+        <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">{t("Cancel","रद्द करें")}</button>
+          <button onClick={go} disabled={busy||lines===null} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)",opacity:busy?.6:1}}>{busy?"…":t("Create Invoice","इनवॉइस बनाएं")}</button>
         </div>
       </div>
     </div>);

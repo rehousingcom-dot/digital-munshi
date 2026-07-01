@@ -197,20 +197,35 @@ class Voucher(OrgOwned):
         self.is_posted = True
         self.save(update_fields=["is_posted"])
 
-    def convert_to(self, new_type):
+    def convert_to(self, new_type, returns=None):
         """Estimate/Order/Challan ko Sale Invoice/Order mein convert karta hai (lines copy).
-        Ek source ko invoice sirf EK BAAR banaya ja sakta hai (converted_to guard)."""
+        Ek source ko invoice sirf EK BAAR banaya ja sakta hai (converted_to guard).
+        `returns`: {source_line_id: returned_qty} — Delivery Challan se invoice banate
+        waqt jo maal wapas aaya use minus karke sirf net delivered qty invoice hoti hai."""
         if new_type == "SALE" and self.converted_to_id:
             raise ValueError(f"{self.number} ka invoice pehle hi ban chuka hai ({self.converted_to.number}).")
+        returns = returns or {}
+
+        def _ret(lid):
+            v = returns.get(str(lid), returns.get(lid, 0))
+            try:
+                return Decimal(str(v or 0))
+            except Exception:
+                return Decimal("0")
+
         new_v = Voucher.objects.create(
             voucher_type=new_type, date=self.date, party=self.party,
             godown=self.godown, company_state_code=self.company_state_code,
             notes=f"Converted from {self.number}",
         )
         for ln in self.lines.all():
+            net = Decimal(str(ln.qty or 0)) - _ret(ln.id)
+            if net <= 0:
+                continue
             ln.pk = None
             ln.id = None
             ln.voucher = new_v
+            ln.qty = net
             ln.save()
         new_v.recalculate()
         if new_type == "SALE":

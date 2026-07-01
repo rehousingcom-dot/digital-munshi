@@ -15,6 +15,18 @@ class RecurringInvoiceSerializer(serializers.ModelSerializer):
 
 
 class VoucherLineSerializer(serializers.ModelSerializer):
+    variant_name = serializers.SerializerMethodField()
+
+    def get_variant_name(self, obj):
+        try:
+            v = obj.variant
+            it = v.item
+            extra = " ".join(x for x in [getattr(v, "size", ""), getattr(v, "colour", ""),
+                                         getattr(v, "model", "")] if x)
+            return it.name + (f" ({extra})" if extra else "")
+        except Exception:
+            return ""
+
     class Meta:
         model = VoucherLine
         fields = "__all__"

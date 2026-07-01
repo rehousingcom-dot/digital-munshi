@@ -1,8 +1,8 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chit Fund / Committee (BC) Calculator — Interest & Payout | Digital Munshi</title>
-<meta name="description" content="Free chit fund / committee (BC/kitty) calculator. Enter members, amount and monthly bid to find your payout, monthly contribution and the effective interest rate.">
-<meta name="keywords" content="chit fund calculator, committee calculator, BC calculator, kitty party calculator, chit fund interest rate">
+<title>Chit Fund / Committee (BC) Calculator — Payout, Contribution & Interest | Digital Munshi</title>
+<meta name="description" content="Free chit fund / committee (BC/kitty) calculator. Enter members, amount and each month's bid to get the net payout, per-member contribution and effective interest. Month-wise schedule.">
+<meta name="keywords" content="chit fund calculator, committee calculator, BC calculator, kitty party calculator, chit fund interest rate, committee net payable">
 <link rel="canonical" href="https://erp.reloaddigital.in/tools/chit-fund-calculator/"><meta name="robots" content="index, follow">
 <script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
 <body class="text-slate-800 bg-white">
@@ -10,77 +10,90 @@
   <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
   <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
 
-<section class="max-w-xl mx-auto px-5 py-10">
+<section class="max-w-3xl mx-auto px-5 py-10">
   <h1 class="text-3xl font-extrabold">Chit Fund / Committee (BC) Calculator</h1>
-  <p class="text-slate-500 mt-2 mb-6">Find your monthly contribution, payout and the real interest rate of a committee (BC / kitty). Free.</p>
-  <div class="bg-white border border-slate-100 rounded-2xl p-6 space-y-3">
-    <div><label class="text-sm font-semibold text-slate-600">Total committee amount (₹)</label><input id="v" type="number" value="100000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
-    <div class="grid grid-cols-2 gap-3">
-      <div><label class="text-sm font-semibold text-slate-600">Members</label><input id="n" type="number" value="10" oninput="syncMonths()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
-      <div><label class="text-sm font-semibold text-slate-600">Duration (months)</label><input id="m" type="number" value="10" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
-    </div>
-    <div><label class="text-sm font-semibold text-slate-600">Monthly bid / discount (₹)</label><input id="d" type="number" value="8000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"><div class="text-xs text-slate-400 mt-1">Jitna "loss" me boli lagti hai (e.g. 8000)</div></div>
-    <div class="grid grid-cols-2 gap-3">
-      <div><label class="text-sm font-semibold text-slate-600">You take in month</label><input id="k" type="number" value="1" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
-      <div><label class="text-sm font-semibold text-slate-600">Organizer commission (%)</label><input id="c" type="number" value="0" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
-    </div>
-    <div class="rounded-xl bg-slate-50 p-4 text-sm space-y-1 mt-2">
-      <div class="flex justify-between"><span>Base monthly contribution</span><b id="rBase">₹0</b></div>
-      <div class="flex justify-between"><span>Monthly dividend (bid shared)</span><b id="rDiv" class="text-green-700">₹0</b></div>
-      <div class="flex justify-between"><span>Your net monthly payment</span><b id="rNet">₹0</b></div>
-      <div class="flex justify-between"><span>You receive (payout)</span><b id="rPay">₹0</b></div>
-      <div class="flex justify-between"><span>Total you pay</span><b id="rTot">₹0</b></div>
-      <div class="flex justify-between pt-2 border-t mt-1"><span>Net gain / (cost)</span><b id="rGain">₹0</b></div>
-      <div class="flex justify-between text-lg font-extrabold pt-2 border-t mt-1" style="color:#c2410c"><span>Effective interest (annual)</span><b id="rIrr">0%</b></div>
-    </div>
-    <div id="note" class="text-xs text-slate-500"></div>
+  <p class="text-slate-500 mt-2 mb-6">Enter the total amount, members and each month's bid (boli). Get the net payout, per-member contribution and effective interest — like a real committee schedule.</p>
+
+  <div class="grid grid-cols-2 gap-3 mb-4">
+    <div><label class="text-sm font-semibold text-slate-600">Total committee amount (₹)</label><input id="v" type="number" value="600000" oninput="build()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div><label class="text-sm font-semibold text-slate-600">Members / months</label><input id="n" type="number" value="12" oninput="build()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
   </div>
-  <div class="mt-5 p-4 rounded-2xl text-sm" style="background:linear-gradient(135deg,#fff7ed,#fff)">Run a committee/BC and track members &amp; payments? <a href="/" class="font-bold text-orange-700">Try Digital Munshi free →</a></div>
+  <div class="flex items-center gap-2 mb-3 text-sm">
+    <button onclick="fill2pct()" class="bg-slate-100 px-3 py-1.5 rounded-lg font-semibold">Auto-fill (2%/month)</button>
+    <button onclick="clearBids()" class="bg-slate-100 px-3 py-1.5 rounded-lg font-semibold">Clear bids</button>
+    <span class="text-slate-400 text-xs">Bids ₹1000 ke multiple me badti hain</span>
+  </div>
+
+  <div class="overflow-x-auto rounded-2xl border border-slate-100">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50"><tr>
+        <th class="p-2 text-left">Month</th><th class="p-2 text-right">Bid / boli (₹)</th>
+        <th class="p-2 text-right">Net payable (winner gets)</th><th class="p-2 text-right">Per-member this month</th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+      <tfoot><tr class="bg-slate-50 font-bold"><td class="p-2" colspan="3">Each member pays in total</td><td class="p-2 text-right" id="memTotal">₹0</td></tr></tfoot>
+    </table>
+  </div>
+
+  <div class="mt-5 rounded-2xl bg-slate-50 p-4 text-sm">
+    <div class="font-bold text-slate-700 mb-2">Your position</div>
+    <label class="text-sm">You take the money in month <select id="k" onchange="calc()" class="border border-slate-200 rounded-lg p-1.5 mx-1"></select></label>
+    <div class="mt-3 space-y-1">
+      <div class="flex justify-between"><span>You receive (net payable)</span><b id="rPay">₹0</b></div>
+      <div class="flex justify-between"><span>You pay in total (over term)</span><b id="rTot">₹0</b></div>
+      <div class="flex justify-between pt-1 border-t"><span>Net gain / (cost)</span><b id="rGain">₹0</b></div>
+      <div class="flex justify-between text-lg font-extrabold pt-2 border-t mt-1" style="color:#c2410c"><span>Approx effective interest (annual)</span><b id="rIrr">0%</b></div>
+    </div>
+    <div id="note" class="text-xs text-slate-500 mt-2"></div>
+  </div>
+  <div class="mt-5 p-4 rounded-2xl text-sm" style="background:linear-gradient(135deg,#fff7ed,#fff)">Run committees/BC and track members, bids &amp; payments in one app? <a href="/" class="font-bold text-orange-700">Try Digital Munshi free →</a></div>
 </section>
 
-<section class="max-w-xl mx-auto px-5 pb-6 text-sm text-slate-600">
-  <h2 class="text-xl font-extrabold mb-2 text-slate-800">How a committee (BC) works</h2>
-  <p>A committee (also called BC, chit fund or kitty) is a group savings scheme. For example, 10 people put in money for 10 months to build a pool. Every month there is a bid (boli) — whoever needs the money bids a discount (a "loss" they accept). The highest bidder takes the pool minus their bid, and that bid amount is shared among all members as a dividend, lowering everyone's payment that month.</p>
-  <h2 class="text-xl font-extrabold mb-2 mt-4 text-slate-800">What is the interest rate?</h2>
-  <p>Whoever takes the money early is effectively borrowing: the discount (bid) they gave up is the cost of getting the money early. This calculator estimates that as an approximate annual interest rate = discount ÷ amount received × (12 ÷ months) × 100. Whoever takes the pool last earns the shared dividends instead. Figures are indicative; actual returns depend on each month's bid.</p>
+<section class="max-w-3xl mx-auto px-5 pb-6 text-sm text-slate-600">
+  <h2 class="text-xl font-extrabold mb-2 text-slate-800">How a committee (BC / chit) works</h2>
+  <p>A committee is a group savings scheme — for example 12 members put in money for 12 months to build a pool (say ₹6,00,000). Each month there is a bid (boli); the winner takes the pool minus their bid (the "net payable"). Because of the discount, all members pay a little less that month. Whoever takes early accepts a bigger discount (they effectively borrow and pay interest); whoever takes last pays the least and earns the most.</p>
+  <h2 class="text-xl font-extrabold mb-2 mt-4 text-slate-800">Net payable and interest</h2>
+  <p>Net payable = total amount − bid. Each member's contribution that month = net payable ÷ members. Your gain or cost = what you receive minus what you pay in total. The effective interest shown is an approximate annualised figure for your chosen month.</p>
 </section>
 <section class="bg-slate-50 py-10"><div class="px-5">{% include "_leadform.html" %}</div></section>
 <footer class="border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
 {% include "_floatwa.html" %}
 <script>
 function fmt(n){return "₹"+Math.round(n).toLocaleString("en-IN");}
-function syncMonths(){var n=parseInt(document.getElementById("n").value)||0;var m=document.getElementById("m");if(!m.value||m.dataset.auto!=="0")m.value=n;calc();}
-document.getElementById("m").addEventListener("input",function(){this.dataset.auto="0";});
+var BIDS=[];
+function build(){
+ var n=parseInt(document.getElementById("n").value)||1; if(n<1)n=1; if(n>60)n=60;
+ while(BIDS.length<n)BIDS.push(0); BIDS.length=n;
+ var tb="";for(var i=0;i<n;i++){tb+='<tr class="border-t"><td class="p-2">'+(i+1)+'</td><td class="p-2 text-right"><input type="number" value="'+BIDS[i]+'" oninput="setBid('+i+',this.value)" class="w-28 p-1.5 border border-slate-200 rounded-lg text-right text-sm"></td><td class="p-2 text-right" id="np'+i+'">₹0</td><td class="p-2 text-right" id="pm'+i+'">₹0</td></tr>';}
+ document.getElementById("tb").innerHTML=tb;
+ var ks="";for(var j=0;j<n;j++)ks+='<option value="'+(j+1)+'">'+(j+1)+'</option>';document.getElementById("k").innerHTML=ks;
+ calc();
+}
+function setBid(i,v){BIDS[i]=parseFloat(v)||0;calc();}
+function fill2pct(){var n=BIDS.length,V=parseFloat(document.getElementById("v").value)||0;
+ // month factor from n-1 down to 0; net = V/(1+0.02*f); bid = V-net; round to nearest 1000
+ for(var i=0;i<n;i++){var f=(n-1-i);var net=V/(1+0.02*f);var bid=Math.round((V-net)/1000)*1000;BIDS[i]=bid;}
+ build();}
+function clearBids(){for(var i=0;i<BIDS.length;i++)BIDS[i]=0;build();}
 function calc(){
- var V=parseFloat(document.getElementById("v").value)||0;
- var n=parseInt(document.getElementById("n").value)||1;
- var months=parseInt(document.getElementById("m").value)||n;
- var D=parseFloat(document.getElementById("d").value)||0;
- var k=parseInt(document.getElementById("k").value)||1; if(k<1)k=1; if(k>months)k=months;
- var cpct=parseFloat(document.getElementById("c").value)||0;
- var comm=V*cpct/100;
- var base=V/n;                // base monthly contribution
- var div=D/n;                 // bid shared among members (that month's dividend)
- var net=base-div;            // your net monthly payment (if avg bid applies)
- var payout=V-D-comm;         // what the winner receives
- var totalPay=net*months;
- var gain=payout-totalPay;
- // Approx annual interest = cost of taking money early (discount over the holding period)
- var holdMonths=(months-k+1);  // roughly how long you hold the early money
- if(holdMonths<1)holdMonths=1;
- var annual = payout>0 ? (D/payout)*(12/months)*100 : 0;
- document.getElementById("rBase").textContent=fmt(base);
- document.getElementById("rDiv").textContent=fmt(div);
- document.getElementById("rNet").textContent=fmt(net);
+ var V=parseFloat(document.getElementById("v").value)||0;var n=BIDS.length||1;
+ var memTotal=0;var nets=[];
+ for(var i=0;i<n;i++){var net=V-BIDS[i];nets.push(net);var pm=net/n;memTotal+=pm;
+  var e1=document.getElementById("np"+i),e2=document.getElementById("pm"+i);if(e1)e1.textContent=fmt(net);if(e2)e2.textContent=fmt(pm);}
+ document.getElementById("memTotal").textContent=fmt(memTotal);
+ var k=parseInt(document.getElementById("k").value)||1;var payout=nets[k-1]||0;
+ var gain=payout-memTotal;
  document.getElementById("rPay").textContent=fmt(payout);
- document.getElementById("rTot").textContent=fmt(totalPay);
+ document.getElementById("rTot").textContent=fmt(memTotal);
  document.getElementById("rGain").textContent=(gain<0?"-":"")+fmt(Math.abs(gain));
  document.getElementById("rGain").style.color=gain<0?"#dc2626":"#059669";
- document.getElementById("rIrr").textContent=(isFinite(annual)?annual.toFixed(1):"0")+"%";
- var half=Math.ceil(months/2);
- document.getElementById("note").textContent = (k<=half)
-   ? ("Taking early — you pay about "+annual.toFixed(1)+"% per year as the cost of getting money sooner.")
-   : ("Taking late — you skip the cost and earn the shared dividends instead.");
+ // approx annual interest from your gain/cost over the term
+ var annual = memTotal>0 ? (gain/memTotal)*(12/n)*100 : 0;
+ document.getElementById("rIrr").textContent=(annual>=0?"+":"")+annual.toFixed(1)+"%";
+ document.getElementById("rIrr").style.color=annual<0?"#dc2626":"#059669";
+ document.getElementById("note").textContent = gain<0
+   ? ("You take early — it costs about "+Math.abs(annual).toFixed(1)+"% per year (you receive less than you pay).")
+   : ("You take late — you earn about "+annual.toFixed(1)+"% per year (you receive more than you pay).");
 }
-calc();
+build();
 </script></body></html>

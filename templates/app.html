@@ -380,6 +380,30 @@ function Subscribe({sub,onActivated}){
     </div>);
 }
 
+// ---------- Onboarding checklist (new business) ----------
+function Onboarding({onNav}){
+  const [c,setC]=useState(null);
+  const cnt=async(p)=>{ try{ const d=await api(p+(p.includes("?")?"&":"?")+"page_size=1"); return (d&&d.count!=null)?d.count:(Array.isArray(d)?d.length:0);}catch(e){return 0;} };
+  useEffect(()=>{ (async()=>{ setC({items:await cnt("/items/"),parties:await cnt("/parties/"),vouchers:await cnt("/vouchers/")}); })(); },[]);
+  if(!c) return null;
+  const steps=[
+    {k:"items",done:c.items>0,label:t("Add your first item","पहला आइटम जोड़ें"),nav:"items"},
+    {k:"parties",done:c.parties>0,label:t("Add a customer","एक ग्राहक जोड़ें"),nav:"parties"},
+    {k:"inv",done:c.vouchers>0,label:t("Create your first invoice","पहला इनवॉइस बनाएं"),nav:"sale"},
+    {k:"profile",done:false,label:t("Set business profile & logo","बिज़नेस प्रोफाइल व लोगो"),nav:"settings"},
+  ];
+  const doneN=steps.filter(s=>s.done).length;
+  if(doneN>=3) return null;
+  return (<div className="card p-5" style={{borderLeft:"4px solid #ea6a1e"}}>
+    <div className="flex items-center justify-between mb-3"><div className="font-extrabold text-slate-800">🚀 {t("Get started — set up your business","शुरू करें — बिज़नेस सेट करें")}</div>
+      <div className="text-xs font-semibold text-slate-400">{doneN}/{steps.length}</div></div>
+    <div className="grid sm:grid-cols-2 gap-2">
+      {steps.map(s=><button key={s.k} onClick={()=>onNav&&onNav(s.nav)} className="flex items-center gap-2.5 text-left p-2.5 rounded-xl border" style={{borderColor:s.done?"#a7f3d0":"#e2e8f0",background:s.done?"#f0fdf4":"#fff"}}>
+        <span className="rounded-full flex items-center justify-center text-xs shrink-0" style={{width:20,height:20,background:s.done?"#059669":"#f1f5f9",color:s.done?"#fff":"#94a3b8"}}>{s.done?"✓":"→"}</span>
+        <span className={"text-sm "+(s.done?"text-slate-400 line-through":"text-slate-700 font-semibold")}>{s.label}</span></button>)}
+    </div>
+  </div>);
+}
 // ---------- Dashboard ----------
 function Dashboard({onNav}){
   const [d,setD]=useState(null),[low,setLow]=useState(null),[recent,setRecent]=useState([]);
@@ -483,6 +507,7 @@ function Dashboard({onNav}){
           </div>
         </div>
       </div>
+      <Onboarding onNav={onNav}/>
       {low && low.count>0 && <div className="rounded-2xl p-3 text-sm flex items-center gap-2" style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#b91c1c"}}><Icon n="alert" size={16}/> <b>{low.count}</b> {t("items low on stock","आइटम कम स्टॉक पर")}: {low.items.slice(0,5).map(x=>x.item+" ("+x.current_stock+")").join(", ")}</div>}
       <div className="text-sm font-semibold text-slate-500">{t("Overview","ओवरव्यू")}</div>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

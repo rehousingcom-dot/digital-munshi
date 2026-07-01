@@ -1783,18 +1783,7 @@ function ReportsView(){
     if(tab==="stock") return <div className="space-y-3">
       <StatCard label="Total Stock Value" value={money(D.total_value)} accent="#ea6a1e"/>
       <RTable head={["Item","Code","Godown","Qty","Purchase ₹","Sale ₹","Value"]} rows={(D.items||[]).map(x=>[x.item,x.item_code,x.godown,x.qty+" "+x.unit,money(x.purchase_price),money(x.sale_price),money(x.value)])}/></div>;
-    if(tab==="reminders") return <div className="space-y-3">
-      <StatCard label="Total To Receive" value={money(D.total_receivable)} accent="#dc2626"/>
-      <div className="card overflow-hidden"><table className="w-full text-sm">
-        <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">{t("Phone","फ़ोन")}</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Days Overdue</th><th className="text-right p-2.5">Reminder</th></tr></thead>
-        <tbody>{(D.parties||[]).length===0&&<tr><td className="p-3 text-slate-400" colSpan={5}>All clear — nothing outstanding 🎉</td></tr>}
-          {(D.parties||[]).map(x=>{const digits=(x.phone||"").replace(/\D/g,"");const ph=digits.length===10?"91"+digits:digits;
-            const msg=encodeURIComponent(`Namaste ${x.name},\nAapka ₹${x.amount} ka payment baaki hai${x.days_overdue>0?` (${x.days_overdue} din se due)`:""}. Kripya jaldi clear karein. Dhanyavaad.`);
-            return <tr key={x.party_id} className="border-b hover:bg-slate-50"><td className="p-2.5 font-semibold">{x.name}</td><td className="p-2.5 text-xs">{x.phone||"—"}</td>
-              <td className="p-2.5 text-right font-bold" style={{color:"#dc2626"}}>{money(x.amount)}</td>
-              <td className="p-2.5 text-center">{x.days_overdue>0?<span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">{x.days_overdue}d</span>:<span className="text-xs text-slate-400">—</span>}</td>
-              <td className="p-2.5 text-right">{ph?<a href={`https://wa.me/${ph}?text=${msg}`} target="_blank" className="text-xs font-bold text-white px-3 py-1.5 rounded-lg" style={{background:"#25D366"}}>WhatsApp Reminder</a>:<span className="text-xs text-slate-400">No phone</span>}</td></tr>;})}
-        </tbody></table></div></div>;
+    if(tab==="reminders") return <UdhaarReminders D={D}/>;
     if(tab==="stmt") return <div className="space-y-3">
       <div className="flex gap-4"><StatCard label="Closing Balance" value={money(D.closing_balance)} accent="#ea6a1e"/><StatCard label="Status" value={D.closing_type}/></div>
       <RTable head={["Date","Particulars","No","Debit","Credit","Balance"]} rows={D.entries.map(e=>[e.date,e.type,e.number,e.debit?money(e.debit):"",e.credit?money(e.credit):"",money(e.balance)])}/></div>;
@@ -2347,6 +2336,35 @@ function LedgerTab({c}){
 
 function Stat({label,v}){
   return <div className="card p-3"><div className="text-xs text-slate-500">{label}</div><div className="text-lg font-extrabold text-slate-800">{v}</div></div>;
+}
+
+// ---------- Udhaar reminders (UPI pay-link + Bharosa score) ----------
+function UdhaarReminders({D}){
+  const parties=D.parties||[];
+  return (<div className="space-y-3">
+    <StatCard label={t("Total To Receive","कुल प्राप्य")} value={money(D.total_receivable)} accent="#dc2626"/>
+    <div className="text-xs text-slate-500">{t("Bharosa score = party time pe chukता hai ya nahi. UPI pay-link ke liye Cash & Bank me apna UPI ID daalo.","Bharosa score = payment behaviour. UPI link ke liye UPI ID daalo.")}</div>
+    <div className="card overflow-hidden"><table className="w-full text-sm">
+      <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">{t("Party","पार्टी")}</th><th className="text-left p-2.5">{t("Phone","फ़ोन")}</th><th className="text-right p-2.5">{t("Amount","राशि")}</th><th className="text-center p-2.5">{t("Overdue","बकाया")}</th><th className="text-center p-2.5">{t("Bharosa","भरोसा")}</th><th className="text-right p-2.5">{t("Reminder","रिमाइंडर")}</th></tr></thead>
+      <tbody>{parties.length===0&&<tr><td className="p-3 text-slate-400" colSpan={6}>All clear — nothing outstanding 🎉</td></tr>}
+        {parties.map(x=><UdhaarRow key={x.party_id} x={x}/>)}
+      </tbody></table></div></div>);
+}
+
+function UdhaarRow({x}){
+  const [b,setB]=useState(null),[busy,setBusy]=useState(false);
+  useEffect(()=>{ api("/udhaar/bharosa/?party="+x.party_id).then(setB).catch(()=>{}); },[]);
+  const remind=async()=>{ setBusy(true); try{ const r=await api("/udhaar/reminder/?party="+x.party_id); window.open(r.wa_url,"_blank"); }catch(e){} setBusy(false); };
+  const toneC={green:["#dcfce7","#166534"],blue:["#dbeafe","#1e40af"],amber:["#fef9c3","#854d0e"],red:["#fee2e2","#b91c1c"]};
+  const tc=b?(toneC[b.tone]||toneC.blue):["#f1f5f9","#94a3b8"];
+  return (<tr className="border-b hover:bg-slate-50">
+    <td className="p-2.5 font-semibold">{x.name}</td>
+    <td className="p-2.5 text-xs">{x.phone||"—"}</td>
+    <td className="p-2.5 text-right font-bold" style={{color:"#dc2626"}}>{money(x.amount)}</td>
+    <td className="p-2.5 text-center">{x.days_overdue>0?<span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">{x.days_overdue}d</span>:<span className="text-xs text-slate-400">—</span>}</td>
+    <td className="p-2.5 text-center">{b?<span title={"Score "+b.score+"/100"} className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{background:tc[0],color:tc[1]}}>{b.score} · {b.label}</span>:<span className="text-xs text-slate-300">…</span>}</td>
+    <td className="p-2.5 text-right">{x.phone?<button onClick={remind} disabled={busy} className="text-xs font-bold text-white px-3 py-1.5 rounded-lg" style={{background:"#25D366"}}>{busy?"…":"WhatsApp + UPI"}</button>:<span className="text-xs text-slate-400">No phone</span>}</td>
+  </tr>);
 }
 
 // ---------- AI Munshi (chat + voice) ----------

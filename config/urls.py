@@ -238,6 +238,8 @@ urlpatterns = [
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),
     path("api/catalog/toggle/", tenant_views.catalog_toggle, name="catalog_toggle"),
     path("api/munshi/ask/", __import__("apps.core.munshi", fromlist=["munshi_ask"]).munshi_ask, name="munshi_ask"),
+    path("api/udhaar/reminder/", __import__("apps.core.udhaar", fromlist=["udhaar_reminder"]).udhaar_reminder, name="udhaar_reminder"),
+    path("api/udhaar/bharosa/", __import__("apps.core.udhaar", fromlist=["bharosa"]).bharosa, name="udhaar_bharosa"),
     # Committee public (online boli + join) + member statement
     path("c/<uuid:public_uuid>/", committee_public.committee_public, name="committee_public"),
     path("c/<uuid:public_uuid>/bid/", committee_public.api_public_bid, name="committee_public_bid"),

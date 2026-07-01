@@ -35,14 +35,14 @@ _Priority order: bugs first, then missing features in waves._
 ## Slide 4 — Transactions
 - [x] ✅ Sale Order/Estimate/Challan → invoice **sirf ek baar** (converted-once guard; "✓ Invoiced" badge). _(75add7b)_
 - [x] ✅ Estimate → **2 options**: "→ Invoice" aur "→ Order" buttons. _(75add7b)_
-- [~] 🟡 Delivery Challan → invoice **returned qty** prompt — abhi seedha convert hota hai; returned-qty
-      prompt v2 me (partial-invoice qty tracking ke saath).
+- [x] ✅ Delivery Challan → invoice **returned qty** prompt — per-line "Returned" qty modal; sirf net
+      delivered qty invoice hoti hai (backend convert_to returns=). _(5b1db8e)_
 - [x] ✅ **Recurring → "Auto Invoice"** rename (tab, buttons, modal). _(75add7b)_
 
 ## Slide 5 — Batch details
 - [x] 🟢 size/colour/model (ItemVariant) + expiry (Batch) — HAI.
 - [x] ✅ **Batch me mfg_date + size + colour + model** fields add (model + ItemForm inputs). _(7d0c0ae)_
-- [~] 🟡 **Multiple batch ek saath add** (grid window) — abhi ek batch per item form; multi-batch grid v2 me.
+- [x] ✅ **Multiple batch ek saath add** — Item form → Stock tab me "More Batches" grid (batch_no+MRP+expiry, add many). _(144b661)_
 
 ## Slide 6 — Reports
 - [x] ✅ Report **branded header** (business name, report title, date-range, Generated timestamp, **Print/PDF**)
@@ -52,7 +52,7 @@ _Priority order: bugs first, then missing features in waves._
 - [x] 🟢 Barcode designer — HAI (symbology, custom W×H mm, copies).
 - [x] ✅ **Columns/row (fix print)**, **unique barcode per unit** (…-0001), name/price design toggles,
       printer choice (browser print dialog). Custom size pehle se tha. _(7ab92ec)_
-- [~] 🟡 **Batch-wise barcode** (batch se) — v2 (batch selector barcode designer me).
+- [x] ✅ **Batch-wise barcode** — Barcode Designer me batch selector; value = code-<batch_no>, MRP batch se. _(144b661)_
 
 ## Slide 8 — Cash & Bank
 - [x] 🟢 Bank detail edit — HAI.
@@ -69,3 +69,10 @@ _Priority order: bugs first, then missing features in waves._
 5. **Batch + Barcode:** mfg date + multi-batch window, barcode enhancements.
 6. **Reports:** header + filters.
 7. **Signup OTP** (needs SMS gateway keys).
+
+## Post-deck follow-ups (July 2026)
+- [x] ✅ **Email OTP via Resend** (Railway SMTP blocked) — domain reloaddigital.in verified. _(1497bf5)_
+- [x] ✅ **Data backup / export** — Utilities → Transactions CSV (all + Sales/Purchase filters). _(6fe477a)_
+- [x] ✅ **Hindi/English toggle** expanded — New Sale, Party, Items, Reports/Cash&Bank/Utilities/Accounting/HR
+      titles + tab bars + core form fields wrapped in `t()`. _(bc70ec0, aa97ab5, 4864299, 3e03187)_
+- [x] ✅ **Challan→invoice returned-qty**, **multi-batch grid**, **batch-wise barcode**. _(5b1db8e, 144b661)_

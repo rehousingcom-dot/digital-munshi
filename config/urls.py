@@ -46,6 +46,24 @@ def cron_run(request):
     return JsonResponse({"status": "started", "tasks": tasks})
 
 
+def sms_test(request):
+    """SMS gateway test — /api/sms/test/?token=<CRON_TOKEN>&to=<number>&text=<optional>
+    Gateway ka raw response return karta hai (debug ke liye)."""
+    import os
+    if request.GET.get("token", "") != os.environ.get("CRON_TOKEN", "") or not os.environ.get("CRON_TOKEN"):
+        return JsonResponse({"error": "forbidden"}, status=403)
+    to = request.GET.get("to", "")
+    if not to:
+        return JsonResponse({"error": "give ?to=<number>"}, status=400)
+    from apps.core import sms as _sms
+    if not _sms.is_enabled():
+        return JsonResponse({"error": "SMS_API_URL not set"}, status=400)
+    text = request.GET.get("text") or "Digital Munshi SMS test. -RELOAD"
+    tid = request.GET.get("tid", "")
+    ok, info = _sms.send_sms(to, text, template_id=tid)
+    return JsonResponse({"ok": ok, "gateway_response": info})
+
+
 def robots_txt(request):
     return HttpResponse("User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\n"
                         "Sitemap: https://erp.reloaddigital.in/sitemap.xml\n",
@@ -132,6 +150,7 @@ urlpatterns = [
     path("", TemplateView.as_view(template_name="app.html"), name="app"),
     path("sw.js", service_worker, name="service_worker"),
     path("api/cron/run/", cron_run, name="cron_run"),
+    path("api/sms/test/", sms_test, name="sms_test"),
     path("admin/", admin.site.urls),
     path("api/health/", health, name="health"),
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),

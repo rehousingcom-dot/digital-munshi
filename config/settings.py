@@ -245,3 +245,10 @@ if SENTRY_DSN and not DEBUG:
         )
     except Exception:
         pass  # sentry optional — kabhi boot na roke
+
+# --- SMS gateway (DLT) — provider-agnostic. Set SMS_API_URL to enable. ---
+# Example (GET): https://gateway.com/api?key=XXX&sender=RELOAD&to={to}&message={text}&tempid={tid}
+SMS_API_URL = env("SMS_API_URL", default="")
+SMS_METHOD = env("SMS_METHOD", default="GET")
+SMS_OTP_TEXT = env("SMS_OTP_TEXT", default="Your Digital Munshi OTP is {otp}. Valid 10 min. Do not share.")
+SMS_OTP_TID = env("SMS_OTP_TID", default="")

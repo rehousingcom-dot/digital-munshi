@@ -180,7 +180,19 @@ def send_otp(request):
         return Response({"detail": "Enter a valid email address"}, status=400)
     otp, sent, err = _send_email_otp(email)
     resp = {"sent": sent}
-    if not sent:
+    # Bonus: phone diya ho aur SMS gateway configured ho to OTP SMS bhi bhejo
+    phone = str(request.data.get("phone") or "").strip()
+    if phone:
+        try:
+            from apps.core import sms as _sms
+            if _sms.is_enabled():
+                ok, info = _sms.send_otp_sms(phone, otp)
+                resp["sms_sent"] = ok
+                if not ok:
+                    resp["sms_error"] = info
+        except Exception as e:
+            resp["sms_error"] = str(e)
+    if not sent and not resp.get("sms_sent"):
         resp["dev_otp"] = otp
         resp["message"] = "Email not sent — OTP shown on screen (dev mode)."
         resp["email_error"] = err

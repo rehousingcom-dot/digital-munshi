@@ -573,3 +573,62 @@ def balance_sheet(request):
                         "capital": float(capital), "total": float(assets)},
         "note": "Simplified accrual snapshot — capital balancing figure hai.",
     })
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def dead_stock(request):
+    """Dead / Slow / Fast movers — pichhle N din (default 90) ki bikri velocity ke
+    aadhar pe. Har item: current stock, period me becha qty, days-of-cover, tag.
+    DEAD = stock pada hai par is period me 0 bika. FAST = jaldi khatam hoga (restock).
+    """
+    try:
+        days = max(1, int(request.query_params.get("days", 90)))
+    except ValueError:
+        days = 90
+    since = timezone.localdate() - timedelta(days=days)
+
+    sold, lastsold = {}, {}
+    for l in (VoucherLine.objects.select_related("voucher")
+              .filter(voucher__voucher_type="SALE", voucher__date__gte=since)):
+        vid = l.variant_id
+        sold[vid] = sold.get(vid, Decimal("0")) + Decimal(str(l.qty or 0))
+        d = l.voucher.date
+        if vid not in lastsold or d > lastsold[vid]:
+            lastsold[vid] = d
+
+    stock = {}
+    for s in Stock.objects.filter(quantity__gt=0):
+        stock[s.variant_id] = stock.get(s.variant_id, Decimal("0")) + Decimal(str(s.quantity))
+
+    rows = []
+    for v in ItemVariant.objects.select_related("item", "item__primary_unit"):
+        qty = stock.get(v.id, Decimal("0"))
+        soldq = sold.get(v.id, Decimal("0"))
+        if qty <= 0 and soldq <= 0:
+            continue
+        per_day = float(soldq) / days
+        cover = round(float(qty) / per_day, 1) if per_day > 0 else None
+        if soldq <= 0 and qty > 0:
+            tag = "DEAD"
+        elif cover is not None and cover <= 20:
+            tag = "FAST"
+        else:
+            tag = "SLOW"
+        rows.append({
+            "item": v.item.name,
+            "item_code": v.item_code,
+            "unit": v.item.primary_unit.short_code if v.item.primary_unit else "",
+            "stock": float(qty),
+            "sold": float(soldq),
+            "per_day": round(per_day, 2),
+            "days_cover": cover if cover is not None else "",
+            "last_sold": lastsold[v.id].isoformat() if v.id in lastsold else "—",
+            "tag": tag,
+        })
+    order = {"DEAD": 0, "SLOW": 1, "FAST": 2}
+    rows.sort(key=lambda r: (order.get(r["tag"], 3), -r["stock"]))
+    counts = {"DEAD": 0, "SLOW": 0, "FAST": 0}
+    for r in rows:
+        counts[r["tag"]] = counts.get(r["tag"], 0) + 1
+    return Response({"days": days, "count": len(rows), "counts": counts, "items": rows})

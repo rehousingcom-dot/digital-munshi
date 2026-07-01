@@ -16,4 +16,5 @@ urlpatterns = [
     path("hsn-summary/", views.hsn_summary, name="hsn_summary"),
     path("balance-sheet/", views.balance_sheet, name="balance_sheet"),
     path("payment-reminders/", views.payment_reminders, name="payment_reminders"),
+    path("dead-stock/", views.dead_stock, name="dead_stock"),
 ]

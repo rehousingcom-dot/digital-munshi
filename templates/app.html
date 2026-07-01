@@ -1679,12 +1679,12 @@ function ReportsView(){
   const DATE_REPORTS=["pnl","daybook","gstr1","gstr3b","hsn","purchase","aging"];
   useEffect(()=>{ apiList("/parties/?page_size=500").then(setParties); api("/business-profile/").then(p=>setBiz(p.business_name||p.name||"")).catch(()=>{}); },[]);
   const load=async(t,extra="")=>{ setTab(t); setData(null);
-    const map={pnl:"/reports/pnl/",aging:"/reports/receivables-aging/",daybook:"/reports/day-book/",gstr1:"/reports/gstr1/",gstr3b:"/reports/gstr3b/",hsn:"/reports/hsn-summary/",bsheet:"/reports/balance-sheet/",stock:"/reports/stock-valuation/",reminders:"/reports/payment-reminders/",lowstock:"/reports/low-stock/",stmt:"/reports/party-statement/?party="+extra,purchase:"/reports/purchase-register/"};
+    const map={pnl:"/reports/pnl/",aging:"/reports/receivables-aging/",daybook:"/reports/day-book/",gstr1:"/reports/gstr1/",gstr3b:"/reports/gstr3b/",hsn:"/reports/hsn-summary/",bsheet:"/reports/balance-sheet/",stock:"/reports/stock-valuation/",reminders:"/reports/payment-reminders/",lowstock:"/reports/low-stock/",dead:"/reports/dead-stock/",stmt:"/reports/party-statement/?party="+extra,purchase:"/reports/purchase-register/"};
     let url=map[t];
     if((start||end)&&DATE_REPORTS.includes(t)) url+=(url.includes("?")?"&":"?")+"start="+(start||"")+"&end="+(end||"");
     try{ setData(await api(url)); }catch(e){ setData({error:String(e)}); } };
   useEffect(()=>{ load("pnl"); },[]);
-  const tabs=[["pnl",t("P&L","लाभ-हानि")],["bsheet",t("Balance Sheet","बैलेंस शीट")],["stock",t("Live Stock","लाइव स्टॉक")],["reminders",t("Payment Reminders","भुगतान रिमाइंडर")],["aging",t("Receivables Aging","प्राप्य एजिंग")],["daybook",t("Day Book","डे बुक")],["gstr1",t("GSTR-1","GSTR-1")],["gstr3b",t("GSTR-3B","GSTR-3B")],["hsn",t("HSN Summary","HSN सारांश")],["lowstock",t("Low Stock","लो स्टॉक")],["purchase",t("Purchase Register","खरीद रजिस्टर")],["stmt",t("Party Statement","पार्टी स्टेटमेंट")]];
+  const tabs=[["pnl",t("P&L","लाभ-हानि")],["bsheet",t("Balance Sheet","बैलेंस शीट")],["stock",t("Live Stock","लाइव स्टॉक")],["reminders",t("Payment Reminders","भुगतान रिमाइंडर")],["aging",t("Receivables Aging","प्राप्य एजिंग")],["daybook",t("Day Book","डे बुक")],["gstr1",t("GSTR-1","GSTR-1")],["gstr3b",t("GSTR-3B","GSTR-3B")],["hsn",t("HSN Summary","HSN सारांश")],["lowstock",t("Low Stock","लो स्टॉक")],["dead",t("Dead / Fast Movers","रुका / तेज़ बिकने वाला")],["purchase",t("Purchase Register","खरीद रजिस्टर")],["stmt",t("Party Statement","पार्टी स्टेटमेंट")]];
   const D=data;
   const body=()=>{
     if(!D) return <div className="card p-6 text-slate-400">Loading…</div>;
@@ -1705,6 +1705,10 @@ function ReportsView(){
     if(tab==="daybook") return <RTable head={["Date","Type","Number","Party","Amount"]} rows={D.entries.map(e=>[e.date,e.type,e.number,e.party,money(e.amount)])}/>;
     if(tab==="purchase") return <RTable head={["Date","Invoice","Supplier","GSTIN","Taxable","Tax","Total"]} rows={D.purchases.map(p=>[p.date,p.number,p.supplier,p.gstin||"-",money(p.taxable),money(p.tax),money(p.total)])}/>;
     if(tab==="lowstock") return <RTable head={["Item","Current Stock","Reorder Level","Shortfall"]} rows={D.items.map(x=>[x.item,x.current_stock,x.reorder_level,x.shortfall])}/>;
+    if(tab==="dead"){ const badge=g=>{const c=g==="DEAD"?["#fee2e2","#b91c1c"]:g==="FAST"?["#dcfce7","#166534"]:["#fef9c3","#854d0e"];return <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{background:c[0],color:c[1]}}>{g}</span>;};
+      return <div className="space-y-3">
+        <div className="flex gap-3 text-sm">{Object.entries(D.counts||{}).map(([k,v])=><span key={k} className="px-3 py-1 rounded-lg bg-slate-100 font-semibold text-slate-600">{k}: {v}</span>)}<span className="text-slate-400 self-center">· {t("last","पिछले")} {D.days} {t("days","दिन")}</span></div>
+        <RTable head={[t("Item","आइटम"),t("Stock","स्टॉक"),t("Sold","बिका"),t("Per day","रोज़"),t("Days cover","कितने दिन"),t("Last sold","आखिरी बिक्री"),"Tag"]} rows={(D.items||[]).map(x=>[x.item+(x.unit?" ("+x.unit+")":""),x.stock,x.sold,x.per_day,x.days_cover,x.last_sold,badge(x.tag)])}/></div>; }
     if(tab==="stock") return <div className="space-y-3">
       <StatCard label="Total Stock Value" value={money(D.total_value)} accent="#ea6a1e"/>
       <RTable head={["Item","Code","Godown","Qty","Purchase ₹","Sale ₹","Value"]} rows={(D.items||[]).map(x=>[x.item,x.item_code,x.godown,x.qty+" "+x.unit,money(x.purchase_price),money(x.sale_price),money(x.value)])}/></div>;

@@ -46,6 +46,7 @@ class Party(OrgOwned):
     # Credit control
     credit_limit = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0"))
     credit_days = models.PositiveIntegerField(default=0)
+    loyalty_points = models.IntegerField(default=0, help_text="Har Rs 100 bikri pe 1 point (auto)")
 
     # Custom fields (Swipe-style) — extra business-specific data (JSON key/value)
     custom_fields = models.JSONField(default=dict, blank=True)

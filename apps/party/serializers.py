@@ -11,6 +11,7 @@ class PartyDocumentSerializer(serializers.ModelSerializer):
 class PartySerializer(serializers.ModelSerializer):
     documents = PartyDocumentSerializer(many=True, read_only=True)
     state_code = serializers.CharField(read_only=True)
+    loyalty_points = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Party

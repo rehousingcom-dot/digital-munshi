@@ -59,6 +59,21 @@ class VoucherViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
                 status=400)
         return super().update(request, *args, **kwargs)
 
+    def perform_create(self, serializer):
+        obj = serializer.save()
+        self._audit("CREATE", obj)
+        # Loyalty: SALE pe party ko points (Rs 100 = 1 point)
+        try:
+            if obj.voucher_type == "SALE" and obj.party_id:
+                from django.db.models import F
+                from apps.party.models import Party
+                pts = int(float(obj.grand_total or 0) // 100)
+                if pts:
+                    Party.all_objects.filter(pk=obj.party_id).update(
+                        loyalty_points=F("loyalty_points") + pts)
+        except Exception:
+            pass
+
     @action(detail=True, methods=["post"])
     def post_to_stock(self, request, pk=None):
         """Voucher ko stock mein post karta hai (quantity update)."""

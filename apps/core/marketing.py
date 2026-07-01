@@ -221,6 +221,33 @@ KEYWORD_PAGES = {
             {"q": "Can I track outstanding and credit limits?", "a": "Yes — receivables aging, credit limits, reminders and statements are built in."},
         ],
     },
+    "committee-management-software": {
+        "title": "Committee / BC / Chit Fund Management Software (Free Trial) | Digital Munshi",
+        "desc": "Manage your committee (BC / kitty / chit fund) online — members, monthly bids (boli), per-head contribution, payment tracking with late fee, coupons and effective interest ledger. Free trial.",
+        "h1": "Committee / BC / Chit Fund Management Software",
+        "intro": "Run your committee (BC / kitty / chit) without registers. Add members, record each month's bid (boli), and Digital Munshi auto-calculates the net payable, per-head contribution (coupons included), tracks who paid, adds late fee automatically, and shows each member's effective interest.",
+        "points": ["Members list + monthly bid (boli) record", "Auto net payable + per-head contribution (coupon included)", "Payment tracking — paid / partial / pending", "Automatic late fee (₹/day after due date)", "Per-member interest / profit ledger", "Free chit fund calculator included"],
+        "keyword": "committee management software",
+        "body": """
+<h2>What is committee / BC / chit fund software?</h2>
+<p>A committee (also called BC, kitty or chit fund) is a group savings scheme where members contribute every month and one member takes the pooled amount each month after a bid (boli). Digital Munshi turns the whole register into an app — no more manual diaries and calculation mistakes.</p>
+<h2>Record the monthly bid (boli) in seconds</h2>
+<p>Enter the winner and the bid amount for the month. The app instantly calculates the net payable (total value − bid), adds the organizer coupons to the collection, and computes each member's per-head contribution — exactly like your paper sheet, but automatic.</p>
+<h2>Track payments and late fee</h2>
+<p>Every member's due for the month is created automatically. Mark payments as received; if a member pays after the due date, the late fee (for example ₹500 per day) is added on its own. See paid, partial and pending at a glance.</p>
+<h2>Know the real interest</h2>
+<p>The interest ledger shows, for each member, how much they received, how much they contribute, their gain or cost, and the approximate annual interest rate. Whoever takes early pays interest; whoever takes last earns — all calculated for you.</p>
+<h2>Free committee & chit fund calculator</h2>
+<p>Not ready to sign up? Use our free <a href="/tools/chit-fund-calculator/">chit fund / committee calculator</a> to work out net payable, per-head contribution and interest for any committee.</p>
+""",
+        "faqs": [
+            {"q": "Can I manage a BC or kitty committee in this software?", "a": "Yes. Add your members, record each month's bid (boli), and the app auto-calculates net payable, per-head contribution, payments and interest."},
+            {"q": "Does it calculate the per-head contribution with coupons?", "a": "Yes — per-head = (total value − bid + coupons) ÷ members, exactly matching a real committee sheet."},
+            {"q": "Does it add late fee automatically?", "a": "Yes. Set your per-day late fee and due date; if a member pays late, the fee is added automatically."},
+            {"q": "How is the interest calculated?", "a": "For each member the app shows received amount, total contribution, gain or cost, and an approximate annualised interest rate based on when they took the money."},
+            {"q": "Is there a free committee calculator?", "a": "Yes — a free chit fund / committee calculator is available at /tools/chit-fund-calculator/ with no signup."},
+        ],
+    },
 }
 
 # ---- City / local landing pages (/billing-software-in-<slug>/) ----

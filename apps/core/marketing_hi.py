@@ -120,6 +120,33 @@ KEYWORD_PAGES = {
             {"q": "Cloud hai ya desktop?", "a": "Cloud-based — mobile aur laptop dono par, data auto-backup ke saath."},
         ],
     },
+    "committee-management-software": {
+        "title": "Committee / BC / Chit Fund Software — Hinglish | Digital Munshi",
+        "desc": "Apni committee (BC / kitty / chit) online chalao — members, har month ki boli, per-head contribution, payment tracking with late fee, coupon aur interest ledger. Free trial.",
+        "h1": "Committee / BC / Chit Fund Management Software",
+        "intro": "Register ke bina apni committee (BC / kitty / chit) chalao. Members add karo, har month ki boli daalo — Digital Munshi khud net payable, per-head contribution (coupon sameet), kaun ne paya kaun nahi, late fee, aur har member ka interest nikal deta hai.",
+        "points": ["Members list + har month ki boli record", "Auto net payable + per-head (coupon sameet)", "Payment tracking — paid / partial / pending", "Late fee auto (due date ke baad ₹/din)", "Har member ka interest / profit ledger", "Free chit fund calculator saath me"],
+        "keyword": "committee software",
+        "body": """
+<h2>Committee / BC / chit fund software kya hai?</h2>
+<p>Committee (BC, kitty ya chit fund) ek group savings scheme hai — members har month paise jama karte hain aur har month ek member boli lagakar rakam le jaata hai. Digital Munshi poore register ko app bana deta hai — na diary, na hisaab ki galti.</p>
+<h2>Har month ki boli seconds me record</h2>
+<p>Winner aur boli amount daalo. App turant net payable (total − boli) nikalta hai, coupon collection me jodta hai, aur har member ka per-head contribution nikal deta hai — bilkul aapke paper sheet jaisa, par automatic.</p>
+<h2>Payment aur late fee tracking</h2>
+<p>Har member ka us month ka due apne aap ban jaata hai. Payment received mark karo; agar koi due date ke baad bhare to late fee (jaise ₹500/din) khud jud jaati hai. Paid, partial, pending ek nazar me.</p>
+<h2>Asli interest jaano</h2>
+<p>Interest ledger har member ka dikhata hai — kitna mila, kitna bharna, gain ya cost, aur approx saalana interest. Jaldi lene wala interest deta, baad wala kamata — sab calculate ho jaata hai.</p>
+<h2>Free committee & chit fund calculator</h2>
+<p>Signup se pehle try karna hai? Free <a href="/tools/chit-fund-calculator/">chit fund / committee calculator</a> use karo — net payable, per-head aur interest kisi bhi committee ke liye.</p>
+""",
+        "faqs": [
+            {"q": "Kya isme BC ya kitty committee manage kar sakte hain?", "a": "Haan. Members add karo, har month ki boli daalo — app khud net payable, per-head, payment aur interest nikalta hai."},
+            {"q": "Per-head coupon sameet nikalta hai?", "a": "Haan — per-head = (total value − boli + coupon) ÷ members, asli committee sheet se exact match."},
+            {"q": "Late fee auto jodta hai?", "a": "Haan. Apni per-day late fee aur due date set karo; koi late bhare to fee khud jud jaati hai."},
+            {"q": "Interest kaise nikalta hai?", "a": "Har member ka mila hua paisa, total contribution, gain/cost aur approx saalana interest dikhata hai."},
+            {"q": "Free committee calculator hai?", "a": "Haan — /tools/chit-fund-calculator/ par free hai, bina signup ke."},
+        ],
+    },
 }
 
 # ---- City / local landing pages (/billing-software-in-<slug>/) ----

@@ -86,3 +86,13 @@ _Priority order: bugs first, then missing features in waves._
 - **Go-LIVE step (website approval ke baad):** Railway me `RAZORPAY_KEY_ID`+`RAZORPAY_KEY_SECRET`
       ko test se **LIVE** keys (`rzp_live_...`) se replace + Deploy. Koi code change nahi.
 - `razorpay>=1.4` requirements me enabled. `seed_plans` se Basic/Pro/Premium plans seed hote hain.
+
+## Pending integrations (baad me — keys/accounts ka wait)
+- [ ] **GSTIN verify API** (Appyflow/MasterGST key) — party name/address auto-fill.
+- [ ] **WhatsApp Cloud API** (Meta token) — invoice + payment reminder auto-send.
+- [ ] **Razorpay LIVE keys** — website approval ke baad test→live swap (code ready).
+- [x] ✅ **Cloudinary media storage** — WORKING (photos/logo permanent). Cloud: tguyzcx2.
+
+## Security TODO (rotate — chat me expose hue)
+- [ ] GitHub PAT revoke, Gmail app-password, Resend key, Razorpay test key, **Cloudinary secret** rotate.
+- [ ] `SECRET_KEY` ko strong unique value se replace (abhi placeholder).

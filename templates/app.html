@@ -2538,7 +2538,12 @@ function MunshiChat(){
   const [msgs,setMsgs]=useState([{me:false,text:t("Namaste! Main aapka Munshi. Poochho: \"aaj ki bikri?\", \"kaun udhaar me hai?\", ya \"parcha: 2 kilo cheeni\".","Namaste! Main aapka Munshi.")}]);
   const [inp,setInp]=useState(""),[busy,setBusy]=useState(false),[rec,setRec]=useState(false);
   const boxRef=useRef(null);
+  const [alertShown,setAlertShown]=useState(false),[alertCount,setAlertCount]=useState(0);
+  useEffect(()=>{ api("/alerts/").then(d=>setAlertCount((d&&d.count)||0)).catch(()=>{}); },[]);
   useEffect(()=>{ if(boxRef.current)boxRef.current.scrollTop=boxRef.current.scrollHeight; },[msgs,open]);
+  useEffect(()=>{ if(open&&!alertShown){ setAlertShown(true);
+    api("/alerts/").then(d=>{ if(d&&d.alerts&&d.alerts.length){ const txt="🔔 "+t("Dhyan do","Alerts")+":\n"+d.alerts.map(a=>a.icon+" "+a.text).join("\n"); setMsgs(m=>[...m,{me:false,text:txt}]); } }).catch(()=>{});
+  } },[open]);
   const send=async(q)=>{ const text=(q||inp).trim(); if(!text)return; setInp("");
     setMsgs(m=>[...m,{me:true,text}]); setBusy(true);
     try{ const r=await api("/munshi/ask/",{method:"POST",body:JSON.stringify({q:text})}); setMsgs(m=>[...m,{me:false,text:r.answer||"..."}]); }
@@ -2560,7 +2565,7 @@ function MunshiChat(){
       setMsgs(m=>[...m,{me:false,text:r.answer||"..."}]);
     }catch(err){ setMsgs(m=>[...m,{me:false,text:t("Photo padhne me dikkat. Chrome me try karo.","OCR failed. Try Chrome.")}]); }
     setBusy(false); e.target.value=""; };
-  if(!open) return <button onClick={()=>setOpen(true)} title="Munshi" className="fixed z-40 rounded-full shadow-lg flex items-center justify-center text-white" style={{bottom:20,right:20,width:56,height:56,background:"linear-gradient(135deg,#ea6a1e,#c2410c)",fontSize:26}}>🧑‍💼</button>;
+  if(!open) return <button onClick={()=>setOpen(true)} title="Munshi" className="fixed z-40 rounded-full shadow-lg flex items-center justify-center text-white" style={{bottom:20,right:20,width:56,height:56,background:"linear-gradient(135deg,#ea6a1e,#c2410c)",fontSize:26}}>🧑‍💼{alertCount>0 && <span className="absolute flex items-center justify-center text-white font-bold rounded-full" style={{top:-2,right:-2,minWidth:20,height:20,fontSize:11,background:"#dc2626",padding:"0 5px"}}>{alertCount}</span>}</button>;
   return (<div className="fixed z-40 flex flex-col bg-white rounded-2xl shadow-2xl border border-slate-200" style={{bottom:20,right:20,width:340,maxWidth:"92vw",height:480,maxHeight:"78vh"}}>
     <div className="flex items-center justify-between px-4 py-3 rounded-t-2xl text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>
       <div className="flex items-center gap-2 font-bold">🧑‍💼 {t("Munshi","मुंशी")} <span className="text-[10px] bg-white/25 px-1.5 py-0.5 rounded">AI</span></div>

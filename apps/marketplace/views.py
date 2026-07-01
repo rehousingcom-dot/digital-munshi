@@ -1,3 +1,4 @@
+from decimal import Decimal, InvalidOperation
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -20,10 +21,16 @@ def profile(request):
         organization=org, defaults={"display_name": org.name})
     if request.method == "PUT":
         d = request.data
-        for f in ["is_listed", "display_name", "category", "city", "state", "about",
-                  "whatsapp", "min_order"]:
+        if "is_listed" in d:
+            prof.is_listed = bool(d.get("is_listed"))
+        for f in ["display_name", "category", "city", "state", "about", "whatsapp"]:
             if f in d:
-                setattr(prof, f, d[f])
+                setattr(prof, f, (d.get(f) or ""))
+        if "min_order" in d:
+            try:
+                prof.min_order = Decimal(str(d.get("min_order") or 0))
+            except (InvalidOperation, ValueError, TypeError):
+                prof.min_order = Decimal("0")
         if not prof.display_name:
             prof.display_name = org.name
         prof.save()

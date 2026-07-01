@@ -8,7 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 
 from apps.tenants.tenancy import get_current_org
-from .models import Committee, CommitteeMember, CommitteeBid, CommitteeJoinRequest, money
+from .models import (Committee, CommitteeMember, CommitteeBid, CommitteeJoinRequest,
+                     CommitteeRound, money)
 
 
 def _get_committee(public_uuid):
@@ -97,6 +98,57 @@ def api_public_join(request, public_uuid):
     except Exception:
         pass
     return JsonResponse({"ok": True})
+
+
+# ---- Personal member page (secure token link) ----
+def member_public(request, token):
+    """Member ka apna secure page — apni boli daalo + apna statement dekho."""
+    m = CommitteeMember.all_objects.filter(token=token).select_related("committee").first()
+    if not m:
+        raise Http404("Not found")
+    c = m.committee
+    from .views import member_statement_data
+    stmt = member_statement_data(m)
+    done = []
+    for r in c.rounds.filter(winner__isnull=False).order_by("month_no"):
+        done.append({"month_no": r.month_no, "winner": r.winner.name if r.winner else "—",
+                     "bid": money(r.bid_amount), "net_payable": money(r.net_payable),
+                     "per_head": money(r.per_head)})
+    live = []
+    my_bid = None
+    if c.bidding_open and c.open_month:
+        for b in c.bids.filter(month_no=c.open_month).select_related("member").order_by("-bid_amount"):
+            live.append({"name": b.member.name, "bid": money(b.bid_amount),
+                         "me": b.member_id == m.id})
+            if b.member_id == m.id:
+                my_bid = money(b.bid_amount)
+    ctx = {"c": c, "m": m, "stmt": stmt, "done": done, "live": live, "my_bid": my_bid,
+           "per_head_base": money(c.monthly_base), "coupon_total": money(c.coupon_total)}
+    return render(request, "committee_member_public.html", ctx)
+
+
+@csrf_exempt
+def api_member_bid(request, token):
+    """Member apni boli daale (identity token se fixed). body: {bid_amount}"""
+    if request.method != "POST":
+        return JsonResponse({"detail": "POST only"}, status=405)
+    m = CommitteeMember.all_objects.filter(token=token).select_related("committee").first()
+    if not m:
+        return JsonResponse({"detail": "Not found"}, status=404)
+    c = m.committee
+    if not c.bidding_open or not c.open_month:
+        return JsonResponse({"detail": "Boli abhi band hai"}, status=400)
+    try:
+        data = json.loads(request.body or "{}")
+    except Exception:
+        data = request.POST
+    amt = data.get("bid_amount")
+    if not amt:
+        return JsonResponse({"detail": "Boli amount daalo"}, status=400)
+    CommitteeBid.all_objects.update_or_create(
+        committee=c, month_no=c.open_month, member=m,
+        defaults={"bid_amount": money(amt), "organization": c.organization})
+    return JsonResponse({"ok": True, "bid": str(money(amt)), "month": c.open_month})
 
 
 # ---- Member statement (token-protected, like payslip) ----

@@ -22,6 +22,7 @@ class CommitteeSerializer(serializers.ModelSerializer):
 
 class CommitteeMemberSerializer(serializers.ModelSerializer):
     party_name = serializers.CharField(source="party.name", read_only=True)
+    token = serializers.CharField(read_only=True)
 
     class Meta:
         model = CommitteeMember

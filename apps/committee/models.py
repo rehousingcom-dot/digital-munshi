@@ -86,6 +86,8 @@ class CommitteeMember(OrgOwned):
     committee = models.ForeignKey(Committee, on_delete=models.CASCADE, related_name="members")
     name = models.CharField(max_length=120)
     phone = models.CharField(max_length=15, blank=True)
+    # Personal secure link ke liye token — sirf yahi member apni boli/statement dekh sake
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     # Optional link to an existing party/customer
     party = models.ForeignKey("party.Party", on_delete=models.SET_NULL, null=True, blank=True)
 

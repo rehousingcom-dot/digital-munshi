@@ -250,6 +250,8 @@ urlpatterns = [
     path("c/<uuid:public_uuid>/join/", committee_public.api_public_join, name="committee_public_join"),
     path("committee/member/<int:pk>/statement/", committee_public.member_statement_html, name="committee_stmt"),
     path("committee/member/<int:pk>/statement.pdf", committee_public.member_statement_pdf, name="committee_stmt_pdf"),
+    path("cm/<uuid:token>/", committee_public.member_public, name="committee_member_public"),
+    path("cm/<uuid:token>/bid/", committee_public.api_member_bid, name="committee_member_bid"),
     # Supplier network / marketplace
     path("suppliers/", market_public.suppliers_directory, name="suppliers_directory"),
     path("suppliers/<int:org_id>/enquiry/", market_public.api_public_enquiry, name="supplier_enquiry"),

@@ -166,7 +166,7 @@ const apiList = async (path) => asList(await api(path));
 
 async function shareWhatsApp(id){
   try{ const r=await api(`/vouchers/${id}/share_link/`); window.open(r.whatsapp_url,"_blank"); }
-  catch(e){ alert("Share link banane mein dikkat aayi"); }
+  catch(e){ alert("Could not create share link"); }
 }
 
 // ---------- inline SVG icons (lucide-style) ----------
@@ -208,24 +208,24 @@ function Login({onLogin}){
   const [showPass,setShowPass]=useState(false);
   const [otpSent,setOtpSent]=useState(false),[devOtp,setDevOtp]=useState("");
   const sendOtp=async()=>{ setErr("");
-    if((f.phone||"").replace(/\D/g,"").length<10){ setErr("Valid 10-digit mobile number daalein"); return; }
+    if((f.phone||"").replace(/\D/g,"").length<10){ setErr("Enter a valid 10-digit mobile number"); return; }
     try{ const r=await fetch(API+"/send-otp/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone:f.phone})}); const d=await r.json();
-      if(r.ok){ setOtpSent(true); setDevOtp(d.dev_otp||""); } else setErr(d.detail||"OTP bhejne me dikkat"); }
-    catch(e){ setErr("OTP bhejne me dikkat"); } };
+      if(r.ok){ setOtpSent(true); setDevOtp(d.dev_otp||""); } else setErr(d.detail||"Could not send OTP"); }
+    catch(e){ setErr("Could not send OTP"); } };
   const BTYPES=[["RETAIL","Retail Shop / Kirana"],["WHOLESALE","Wholesale / Distributor"],["RESTAURANT","Restaurant / Cafe"],["PHARMACY","Pharmacy / Medical"],["SERVICES","Services / Professional"],["MANUFACTURER","Manufacturer"],["GENERAL","General / Other"]];
   const set=k=>e=>setF({...f,[k]:e.target.value});
   const submit=async e=>{ e.preventDefault(); setErr(""); setBusy(true);
     try{
       if(mode==="login"){
         const d=await fetch(API+"/auth/token/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:f.username,password:f.password})}).then(r=>r.json());
-        if(d.access){ saveTokens(d); onLogin(); } else setErr("Galat username/password");
+        if(d.access){ saveTokens(d); onLogin(); } else setErr("Wrong username/password");
       }else{
         const r=await fetch(API+"/signup/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(f)});
         const d=await r.json();
         if(r.ok && d.tokens){ saveTokens(d.tokens); onLogin(); } else setErr(d.detail||"Signup failed");
       }
-    }catch(e){ setErr("Kuch galat hua"); } setBusy(false); };
-  const FEATURES=["GST-ready invoice — print, PDF & WhatsApp","Live stock + low-stock alerts","Payments, udhaar & auto reminders","Staff payroll, attendance & payslip","Accounting, reports & GSTR","POS, barcode & thermal print"];
+    }catch(e){ setErr("Something went wrong"); } setBusy(false); };
+  const FEATURES=["GST-ready invoice — print, PDF & WhatsApp","Live stock + low-stock alerts","Payments, credit & auto reminders","Staff payroll, attendance & payslip","Accounting, reports & GSTR","POS, barcode & thermal print"];
   return (
     <div className="min-h-screen w-full" style={{background:"radial-gradient(1100px 560px at 82% -8%, rgba(251,146,60,0.28), transparent 60%), linear-gradient(135deg,#2b1407 0%,#7c2d12 46%,#ea580c 100%)"}}>
       <div className="min-h-screen flex flex-col lg:flex-row">
@@ -271,8 +271,8 @@ function Login({onLogin}){
         <div className="lg:w-[44%] flex items-center justify-center px-5 pb-10 lg:p-10">
           <div className="w-full bg-white rounded-3xl shadow-2xl p-7 sm:p-9 fade-in" style={{maxWidth:430}}>
             <div className="lg:hidden flex items-center gap-2 justify-center text-orange-600 font-extrabold mb-4"><span className="text-2xl">📒</span> Digital Munshi</div>
-            <h2 className="text-2xl font-extrabold text-slate-900">{mode==="login"?"Welcome back 👋":"Free trial shuru karein 🚀"}</h2>
-            <p className="text-sm text-slate-500 mt-1">{mode==="login"?"Apne account mein login karein":"Naya business banao — 7 din bilkul free"}</p>
+            <h2 className="text-2xl font-extrabold text-slate-900">{mode==="login"?"Welcome back 👋":"Start your free trial 🚀"}</h2>
+            <p className="text-sm text-slate-500 mt-1">{mode==="login"?"Login to your account":"Create a new business — 7 days free"}</p>
             {mode==="signup"
               ? <div className="flex flex-wrap gap-2 mb-5 mt-3">{["No credit card","7-day free trial","Cancel anytime"].map(t=><span key={t} className="text-xs bg-orange-50 text-orange-700 font-semibold px-2.5 py-1 rounded-full">✓ {t}</span>)}</div>
               : <div className="mb-5"></div>}
@@ -280,7 +280,7 @@ function Login({onLogin}){
             {err && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl mb-3 border border-red-100">{err}</div>}
 
             <form onSubmit={submit}>
-              {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Business / Shop ka naam" value={f.org_name} onChange={set("org_name")} />}
+              {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Business / Shop name" value={f.org_name} onChange={set("org_name")} />}
               {mode==="signup" && <select className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-100" value={f.business_type} onChange={set("business_type")}>
                 {BTYPES.map(([c,l])=><option key={c} value={c}>{l}</option>)}</select>}
               <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Username" value={f.username} onChange={set("username")} />
@@ -297,13 +297,13 @@ function Login({onLogin}){
                 <input className="w-full p-3 pr-16 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" type={showPass?"text":"password"} placeholder="Password" value={f.password} onChange={set("password")} />
                 <button type="button" onClick={()=>setShowPass(!showPass)} className="absolute right-3 top-1/2 text-xs font-bold text-orange-600" style={{transform:"translateY(-50%)"}}>{showPass?"Hide":"Show"}</button>
               </div>
-              <button disabled={busy} className="w-full p-3 rounded-xl font-bold text-white shadow-lg disabled:opacity-60" style={{background:"linear-gradient(135deg,#f97316,#ea580c)"}}>{busy?"Ek minute…":(mode==="login"?"Login":"Free Trial Shuru Karein →")}</button>
+              <button disabled={busy} className="w-full p-3 rounded-xl font-bold text-white shadow-lg disabled:opacity-60" style={{background:"linear-gradient(135deg,#f97316,#ea580c)"}}>{busy?"One moment…":(mode==="login"?"Login":"Start Free Trial →")}</button>
             </form>
 
             <p className="text-sm text-center mt-5 text-slate-500">
               {mode==="login"
-                ? <span>Naya business? <a className="text-orange-600 font-bold cursor-pointer hover:underline" onClick={()=>{setMode("signup");setErr("");}}>Sign up free</a></span>
-                : <span>Pehle se account hai? <a className="text-orange-600 font-bold cursor-pointer hover:underline" onClick={()=>{setMode("login");setErr("");}}>Login</a></span>}
+                ? <span>New business? <a className="text-orange-600 font-bold cursor-pointer hover:underline" onClick={()=>{setMode("signup");setErr("");}}>Sign up free</a></span>
+                : <span>Already have an account? <a className="text-orange-600 font-bold cursor-pointer hover:underline" onClick={()=>{setMode("login");setErr("");}}>Login</a></span>}
             </p>
             <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-center gap-4 text-xs text-slate-400">
               <span>🔒 Secure</span><span>🇮🇳 Made in India</span><span>☁️ Cloud backup</span>
@@ -483,9 +483,9 @@ function Dashboard({onNav}){
       {/* Analytics tiles (deck slide 3) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {tile("Top Sellers","Hot selling items",(d.hot_selling||[]).slice(0,6).map(c=>[c.item,c.qty]),"#ea6a1e")}
-        {tile("Top Customers","Sabse zyada kharidne wale",(d.top_customers||[]).map(c=>[c.name,money(c.total)]),"#f59e0b")}
+        {tile("Top Customers","Top buyers",(d.top_customers||[]).map(c=>[c.name,money(c.total)]),"#f59e0b")}
         {tile("Low / Slow Selling","Kam bikne wale items",(d.slow_selling||[]).slice(0,6).map(c=>[c.item,c.qty]),"#0891b2")}
-        {tile("Dead Stock","Bilkul nahi bik raha",(d.dead_stock||[]).slice(0,6).map(c=>[c.item,c.stock_qty]),"#dc2626")}
+        {tile("Dead Stock","Not selling at all",(d.dead_stock||[]).slice(0,6).map(c=>[c.item,c.stock_qty]),"#dc2626")}
       </div>
       {/* Cash Flow Risk + WhatsApp + Most Used Reports */}
       <div className="grid md:grid-cols-3 gap-4">
@@ -617,13 +617,13 @@ function PartyForm({party,onClose,onSaved}){
         address:r.address||s.address,city:r.city||s.city,pincode:r.pincode||s.pincode,
         name:s.name||r.trade_name||r.legal_name||""})); }
     }catch(e){ setGst({valid:false,detail:"Verify nahi ho paaya"}); } };
-  const save=async()=>{ if(!f.name){setErr("Party name zaroori hai");return;} setBusy(true);setErr("");
+  const save=async()=>{ if(!f.name){setErr("Party name is required");return;} setBusy(true);setErr("");
     try{ const method=party?"PATCH":"POST"; const path=party?`/parties/${party.id}/`:"/parties/";
       const saved=await api(path,{method,body:JSON.stringify(f)});
       if(docFile){ const fd=new FormData(); fd.append("party",saved.id); fd.append("title",docTitle||docFile.name); fd.append("file",docFile);
         await fetch(API+"/party-documents/",{method:"POST",headers:{Authorization:"Bearer "+getToken()},body:fd}); }
       onSaved();
-    }catch(e){ setErr(typeof e==="object"?Object.entries(e).map(([k,v])=>`${k}: ${v}`).join(", "):"Save nahi hua"); setBusy(false); } };
+    }catch(e){ setErr(typeof e==="object"?Object.entries(e).map(([k,v])=>`${k}: ${v}`).join(", "):"Could not save"); setBusy(false); } };
   const I=(label,k,props={})=>(<div><label className="text-xs font-semibold text-slate-500">{label}</label>
     <input className="border border-slate-200 w-full p-2 rounded-lg text-sm mt-1" value={f[k]||""} onChange={e=>set(k,e.target.value)} {...props}/></div>);
   return (
@@ -675,7 +675,7 @@ function PartyForm({party,onClose,onSaved}){
               <input className="border border-slate-200 p-1.5 rounded-lg text-sm flex-1" value={v} onChange={e=>{const cf={...(f.custom_fields||{})};cf[k]=e.target.value;set("custom_fields",cf);}}/>
               <button onClick={()=>{const cf={...(f.custom_fields||{})};delete cf[k];set("custom_fields",cf);}} className="text-red-500 px-2">×</button></div>)}
             <div className="flex gap-2 mt-1">
-              <input id="cfk" className="border border-slate-200 p-1.5 rounded-lg text-sm flex-1" placeholder="Field naam"/>
+              <input id="cfk" className="border border-slate-200 p-1.5 rounded-lg text-sm flex-1" placeholder="Field name"/>
               <button onClick={()=>{const el=document.getElementById("cfk");const k=el.value.trim();if(k){const cf={...(f.custom_fields||{})};cf[k]="";set("custom_fields",cf);el.value="";}}} className="text-xs bg-slate-200 px-3 rounded-lg font-semibold">+ Field</button></div>
           </div>
           <div className="border-t pt-4">
@@ -755,8 +755,8 @@ function ItemForm({item,onClose,onSaved}){
     apiList("/items/?page_size=500").then(its=>{const vs=[];its.forEach(it=>(it.variants||[]).forEach(v=>vs.push({id:v.id,label:it.name+(v.size||v.colour||v.model?` (${[v.size,v.colour,v.model].filter(Boolean).join(" ")})`:"")})));setAllVariants(vs);}); },[]);
   const addUnit=async()=>{ const n=newUnit.trim(); if(!n)return;
     try{ const u=await api("/units/",{method:"POST",body:JSON.stringify({name:n,short_code:n.slice(0,6).toUpperCase()})});
-      setUnits(us=>[...us,u]); set("primary_unit",u.id); setNewUnit(""); }catch(e){ setErr("Unit add fail (shayad duplicate)"); } };
-  const save=async()=>{ if(!f.name){setErr("Item name zaroori hai");return;} if(!f.primary_unit){setErr("Primary unit select karein");return;}
+      setUnits(us=>[...us,u]); set("primary_unit",u.id); setNewUnit(""); }catch(e){ setErr("Could not add unit (maybe duplicate)"); } };
+  const save=async()=>{ if(!f.name){setErr("Item name is required");return;} if(!f.primary_unit){setErr("Select a primary unit");return;}
     setBusy(true); setErr("");
     try{
       const body={name:f.name,item_type:f.item_type,hsn_code:f.hsn_code,mrp:String(f.mrp||0),reorder_level:String(f.reorder_level||0),
@@ -816,7 +816,7 @@ function ItemForm({item,onClose,onSaved}){
               <div><label className="text-xs font-semibold text-slate-500">1 Secondary = ? Primary</label>
                 <input type="number" className={cell} value={f.conversion_factor} onChange={e=>set("conversion_factor",e.target.value)}/></div>
             </div>
-            <div className="flex gap-2 mt-2"><input className="border border-slate-200 p-1.5 rounded-lg text-xs flex-1" placeholder="Naya unit naam (e.g. Box)" value={newUnit} onChange={e=>setNewUnit(e.target.value)}/>
+            <div className="flex gap-2 mt-2"><input className="border border-slate-200 p-1.5 rounded-lg text-xs flex-1" placeholder="New unit name (e.g. Box)" value={newUnit} onChange={e=>setNewUnit(e.target.value)}/>
               <button onClick={addUnit} className="text-xs bg-slate-200 px-3 rounded-lg font-semibold">+ Unit</button></div>
           </div>
           <div className="border-t pt-3">
@@ -890,20 +890,20 @@ function NewSale({initialDoc}){
   const [currency,setCurrency]=useState("INR"),[fx,setFx]=useState(1);
   const [lines,setLines]=useState([blank()]); const [done,setDone]=useState(null),[err,setErr]=useState("");
   const [qpOpen,setQpOpen]=useState(false),[qpName,setQpName]=useState(""),[qpPhone,setQpPhone]=useState("");
-  const saveQuickParty=async()=>{ if(!qpName.trim()){setErr("Party ka naam daalein");return;}
+  const saveQuickParty=async()=>{ if(!qpName.trim()){setErr("Enter party name");return;}
     try{ const pt=docType==="PURCHASE"?"SUPPLIER":"CUSTOMER";
       const p=await api("/parties/",{method:"POST",body:JSON.stringify({name:qpName.trim(),phone:qpPhone.trim(),party_type:pt})});
       setParties(x=>[...x,p]); setParty(String(p.id)); setQpOpen(false); setQpName(""); setQpPhone(""); setErr("");
-    }catch(e){ setErr("Party add nahi hua"); } };
+    }catch(e){ setErr("Could not add party"); } };
   const [qiOpen,setQiOpen]=useState(false),[qiName,setQiName]=useState(""),[qiRate,setQiRate]=useState(""),[qiTax,setQiTax]=useState("");
-  const saveQuickItem=async()=>{ if(!qiName.trim()){setErr("Item ka naam daalein");return;}
+  const saveQuickItem=async()=>{ if(!qiName.trim()){setErr("Enter item name");return;}
     try{ const pu=(units[0]&&units[0].id)||null;
       const it=await api("/items/",{method:"POST",body:JSON.stringify({name:qiName.trim(),mrp:String(qiRate||0),primary_unit:pu})});
       setItems(x=>[...x,it]);
       const vid=it.variants&&it.variants[0]&&it.variants[0].id;
       if(vid){ setLines(ls=>{ const n=ls.filter(l=>l.variant); const b=blank(); b.variant=String(vid); b.unit=it.primary_unit||pu; b.rate=+qiRate||0; b.tax_percent=+(qiTax||0); n.push(b); n.push(blank()); return n; }); }
       setQiOpen(false); setQiName(""); setQiRate(""); setQiTax(""); setErr("");
-    }catch(e){ setErr("Item add nahi hua — poora item Items page se banayein"); } };
+    }catch(e){ setErr("Could not add item — create full item from Items page"); } };
   const applyPriceList=id=>{ setPlId(id); const pl=priceLists.find(x=>x.id==id); if(!pl)return;
     setLines(ls=>ls.map(l=>{ if(!l.variant)return l; const it=(pl.items||[]).find(x=>x.variant==l.variant); return it?{...l,rate:+it.price}:l; })); };
   const DOCS=[["SALE","Tax Invoice"],["PURCHASE","Purchase"],["ESTIMATE","Estimate / Quotation"],["PROFORMA","Proforma Invoice"],["SALE_ORDER","Sale Order"],["DELIVERY_CHALLAN","Delivery Challan"],["SALE_RETURN","Sale Return / Credit Note"]];
@@ -943,9 +943,9 @@ function NewSale({initialDoc}){
   const grand=Math.round(T.taxable+T.tax+T.cess); const roundOff=grand-(T.taxable+T.tax+T.cess);
   const balance=grand-(+received||0);
   const submit=async()=>{ setErr("");
-    if(!party||!godown){ setErr("Party aur godown select karein"); return; }
+    if(!party||!godown){ setErr("Select party and godown"); return; }
     const used=lines.filter(l=>l.variant);
-    if(used.length===0){ setErr("Kam se kam ek item add karein"); return; }
+    if(used.length===0){ setErr("Add at least one item"); return; }
     const payload={voucher_type:docType,date,party:+party,godown:+godown,company_state_code:profile.state_code||"",currency,exchange_rate:String(fx||1),
       lines:used.map(l=>({variant:+l.variant,unit:+l.unit,batch:l.batch?+l.batch:null,description:l.description||"",qty:String(l.qty),rate:String(l.rate),
         price_inclusive_tax:!!l.incl,tax_percent:String(l.tax_percent),cess_percent:String(l.cess_percent||0),free_qty:String(l.free_qty||0),
@@ -1000,7 +1000,7 @@ function NewSale({initialDoc}){
       <div className="card p-3 mb-3">
         <div className="flex gap-2 items-center">
           <span className="text-sm text-slate-500">📷 Barcode / Item code:</span>
-          <input className="border border-slate-200 p-2 rounded-lg flex-1 text-sm" placeholder="Scan ya type karke Enter" value={barcode}
+          <input className="border border-slate-200 p-2 rounded-lg flex-1 text-sm" placeholder="Scan or type, then Enter" value={barcode}
             onChange={e=>setBarcode(e.target.value)} onKeyDown={async e=>{if(e.key==="Enter"){e.preventDefault();const code=barcode.trim();if(!code)return;
               try{const r=await api("/scan/?code="+encodeURIComponent(code)); if(r.found){setLines(ls=>{const n=ls.filter(l=>l.variant);const b=blank();b.variant=String(r.variant_id);b.unit=String(r.unit);b.rate=r.sale_price;b.tax_percent=r.tax_percent;n.push(b);return n;});setBarcode("");} else setErr("Barcode '"+code+"' nahi mila");}catch(x){setErr("Scan fail");}}}} />
           <button type="button" onClick={()=>setQiOpen(!qiOpen)} className="text-sm font-bold text-orange-600 whitespace-nowrap px-2">{qiOpen?"✕ Close":"+ New Item"}</button>
@@ -1158,7 +1158,7 @@ function PriceListManager(){
     <div className="grid md:grid-cols-2 gap-5">
       <div className="card p-5">
         <div className="font-bold text-slate-700 mb-3">Price Lists (Retail / Wholesale / Distributor)</div>
-        <div className="flex gap-2 mb-3"><input className={cell+" flex-1"} placeholder="Nayi list (e.g. Wholesale)" value={newName} onChange={e=>setNewName(e.target.value)}/>
+        <div className="flex gap-2 mb-3"><input className={cell+" flex-1"} placeholder="New list (e.g. Wholesale)" value={newName} onChange={e=>setNewName(e.target.value)}/>
           <button onClick={create} className="text-white px-4 rounded-lg text-sm font-bold" style={{background:"#ea6a1e"}}>+ Create</button></div>
         {lists.length===0 && <div className="text-sm text-slate-400">Koi price list nahi.</div>}
         {lists.map(l=><button key={l.id} onClick={()=>setSel(l)} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-semibold mb-1" style={{background:sel&&sel.id===l.id?"#fff7ed":"#f8fafc",color:sel&&sel.id===l.id?"#c2410c":"#475569"}}>{l.name} <span className="text-xs text-slate-400">· {(l.items||[]).length} items</span></button>)}
@@ -1360,12 +1360,12 @@ function VouchersView({initialQuery,onNav}){
   const loadRecs=()=>apiList("/recurring-invoices/").then(setRecs);
   useEffect(()=>{ if(type!=="RECURRING")load(); else loadRecs(); },[type]);
   useEffect(()=>{ apiList("/parties/?page_size=500").then(setParties); loadRecs(); },[]);
-  const genNow=async r=>{ try{ const x=await api(`/recurring-invoices/${r.id}/generate_now/`,{method:"POST"}); setMsg(`✓ ${x.number} generate hua — agla ${x.next_run}`); loadRecs(); setTimeout(()=>setMsg(""),3500);}catch(e){setMsg("Generate fail");} };
+  const genNow=async r=>{ try{ const x=await api(`/recurring-invoices/${r.id}/generate_now/`,{method:"POST"}); setMsg(`✓ ${x.number} generate hua — agla ${x.next_run}`); loadRecs(); setTimeout(()=>setMsg(""),3500);}catch(e){setMsg("Generate failed");} };
   const toggleRec=async r=>{ try{ await api(`/recurring-invoices/${r.id}/`,{method:"PATCH",body:JSON.stringify({is_active:!r.is_active})}); loadRecs();}catch(e){} };
   const pName=id=>{const p=parties.find(x=>x.id==id);return p?p.name:"—";};
   const convert=async(r,to)=>{ try{ const x=await api(`/vouchers/${r.id}/convert/`,{method:"POST",body:JSON.stringify({to})});
     setMsg(`✓ ${r.number} → ${x.number} (${to==="SALE"?"Invoice":"Order"}) ban gaya`); load(); setTimeout(()=>setMsg(""),3500);
-  }catch(e){ setMsg((e&&e.detail)||"Convert fail"); setTimeout(()=>setMsg(""),4000); } };
+  }catch(e){ setMsg((e&&e.detail)||"Convert failed"); setTimeout(()=>setMsg(""),4000); } };
   const canConvert=t=>["ESTIMATE","PROFORMA","SALE_ORDER","DELIVERY_CHALLAN"].includes(t);
   const filt=rows.filter(r=>!q||JSON.stringify(r).toLowerCase().includes(q.toLowerCase())||pName(r.party).toLowerCase().includes(q.toLowerCase()));
   const total=filt.reduce((a,r)=>a+Number(r.grand_total||0),0);
@@ -1375,7 +1375,7 @@ function VouchersView({initialQuery,onNav}){
         <h2 className="text-2xl font-extrabold text-slate-800">Sales & Transactions</h2>
         <div className="flex gap-2 items-center">
           <div className="relative"><span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
-            <input className="p-2.5 pl-9 text-sm rounded-xl border border-slate-200" style={{minWidth:220}} placeholder="Search no/party…" value={q} onChange={e=>setQ(e.target.value)} /></div>
+            <input className="p-2.5 pl-9 text-sm rounded-xl border border-slate-200" style={{minWidth:220}} placeholder="Search no./party…" value={q} onChange={e=>setQ(e.target.value)} /></div>
           <button onClick={()=>onNav&&onNav("sale","SALE")} className="text-white px-4 py-2.5 rounded-xl text-sm font-bold" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>+ New</button>
         </div>
       </div>
@@ -1411,8 +1411,8 @@ function VouchersView({initialQuery,onNav}){
                 {r.converted_to && <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 mr-3" title="Invoice ban chuka">✓ Invoiced</span>}
                 {canConvert(r.voucher_type) && !r.converted_to && <button onClick={()=>convert(r,"SALE")} className="text-xs font-bold text-orange-700 mr-3 hover:underline">→ Invoice</button>}
                 {r.voucher_type==="ESTIMATE" && !r.converted_to && <button onClick={()=>convert(r,"SALE_ORDER")} className="text-xs font-bold text-indigo-600 mr-3 hover:underline">→ Order</button>}
-                {r.voucher_type==="SALE" && <button onClick={()=>setRecFor(r)} className="text-xs font-semibold text-purple-700 mr-3" title="Auto Invoice banao">↻ Auto</button>}
-                <button onClick={async()=>{try{const x=await api(`/vouchers/${r.id}/email/`,{method:"POST",body:JSON.stringify({})});setMsg(x.sent?`✓ Email bheja ${x.to}`:`Email: ${x.to||"party ka email nahi"}`);setTimeout(()=>setMsg(""),3000);}catch(e){setMsg("Email fail — party ka email add karein");setTimeout(()=>setMsg(""),3000);}}} className="text-blue-600 text-xs font-semibold mr-3">Email</button>
+                {r.voucher_type==="SALE" && <button onClick={()=>setRecFor(r)} className="text-xs font-semibold text-purple-700 mr-3" title="Create Auto Invoice">↻ Auto</button>}
+                <button onClick={async()=>{try{const x=await api(`/vouchers/${r.id}/email/`,{method:"POST",body:JSON.stringify({})});setMsg(x.sent?`✓ Email bheja ${x.to}`:`Email: ${x.to||"party has no email"}`);setTimeout(()=>setMsg(""),3000);}catch(e){setMsg("Email fail — party ka email add karein");setTimeout(()=>setMsg(""),3000);}}} className="text-blue-600 text-xs font-semibold mr-3">Email</button>
                 <button onClick={()=>shareWhatsApp(r.id)} className="text-emerald-600 text-xs font-semibold mr-3">WhatsApp</button>
                 <a className="text-blue-700 text-xs font-semibold" href={`/invoice/${r.id}/?token=`+getToken()} target="_blank">Print</a>
               </td>
@@ -1496,7 +1496,7 @@ function Settings({onSaved}){
               <div className="font-semibold text-slate-600 mb-2">Item Settings</div>
               <div className="mb-2"><label className="text-xs font-semibold text-slate-500">What do you sell?</label>
                 <select className={inp} value={p.sell_type} onChange={e=>set("sell_type",e.target.value)}><option value="PRODUCT">Product</option><option value="SERVICE">Service</option><option value="BOTH">Product / Service</option></select></div>
-              <Toggle k="enable_barcode" label="Barcode Scan" /><Toggle k="enable_stock_maintenance" label="Stock Maintenance" /><Toggle k="enable_manufacturing" label="Manufacturing" /><Toggle k="show_low_stock_dialog" label="Show Low Stock Dialog" /><Toggle k="enable_default_unit" label="Default Unit" /><Toggle k="enable_item_category" label="Item Category" /><Toggle k="party_wise_rate" label="Party Wise Item Rate" /><Toggle k="enable_description" label="Item Description" /><Toggle k="item_wise_discount" label="Item wise Discount" /><Toggle k="update_sale_price_from_transaction" label="Update Sale Price from Transaction" /><Toggle k="enable_wholesale_price" label="Wholesale Price" />
+              <Toggle k="enable_barcode" label="Barcode Scan" /><Toggle k="enable_stock_maintenance" label="Stock Maintenance" /><Toggle k="enable_manufacturing" label="Manufacturing" /><Toggle k="show_low_stock_dialog" label="Show Low Stock Dialog" /><Toggle k="enable_default_unit" label="Default Unit" /><Toggle k="enable_item_category" label="Item Category" /><Toggle k="party_wise_rate" label="Party-wise Item Rate" /><Toggle k="enable_description" label="Item Description" /><Toggle k="item_wise_discount" label="Item-wise Discount" /><Toggle k="update_sale_price_from_transaction" label="Update Sale Price from Transaction" /><Toggle k="enable_wholesale_price" label="Wholesale Price" />
               <div className="mt-1"><label className="text-xs font-semibold text-slate-500">Quantity decimal places</label><input type="number" min="0" max="4" className="border border-slate-200 w-20 p-1 rounded ml-2" value={p.quantity_decimals} onChange={e=>set("quantity_decimals",+e.target.value)} /></div>
             </div>
             <div className="card p-5">
@@ -1519,7 +1519,7 @@ function Settings({onSaved}){
               <label className="bg-slate-200 px-3 py-2 rounded-lg cursor-pointer">Logo upload
                 <input type="file" accept="image/*" className="hidden" onChange={async e=>{const fd=new FormData();fd.append("logo",e.target.files[0]);await fetch(API+"/business-profile/logo/",{method:"POST",headers:{Authorization:"Bearer "+getToken()},body:fd});setMsg("Logo uploaded ✓");}} /></label>
               <label className="bg-slate-200 px-3 py-2 rounded-lg cursor-pointer">✍ Signature upload
-                <input type="file" accept="image/*" className="hidden" onChange={async e=>{const fd=new FormData();fd.append("signature",e.target.files[0]);await fetch(API+"/business-profile/signature/",{method:"POST",headers:{Authorization:"Bearer "+getToken()},body:fd});setMsg("Signature uploaded ✓ (invoice par print hoga)");}} /></label>
+                <input type="file" accept="image/*" className="hidden" onChange={async e=>{const fd=new FormData();fd.append("signature",e.target.files[0]);await fetch(API+"/business-profile/signature/",{method:"POST",headers:{Authorization:"Bearer "+getToken()},body:fd});setMsg("Signature uploaded ✓ (will print on invoice)");}} /></label>
               <a href="#" onClick={e=>{e.preventDefault();fetch(API+"/items-export/",{headers:{Authorization:"Bearer "+getToken()}}).then(r=>r.blob()).then(b=>{const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="items.csv";a.click();});}} className="bg-slate-200 px-3 py-2 rounded-lg">Export Items CSV</a>
               <a href="#" onClick={e=>{e.preventDefault();fetch(API+"/parties-export/",{headers:{Authorization:"Bearer "+getToken()}}).then(r=>r.blob()).then(b=>{const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="parties.csv";a.click();});}} className="bg-slate-200 px-3 py-2 rounded-lg">Export Parties CSV</a>
               <label className="bg-slate-200 px-3 py-2 rounded-lg cursor-pointer">Import Items CSV
@@ -1675,7 +1675,7 @@ function ReportsView(){
       </div>}
       {tab==="stmt" && <div className="mb-4 flex gap-2 items-center">
         <select className="p-2.5" value={pid} onChange={e=>setPid(e.target.value)}><option value="">— party choose karein —</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>
-        <button onClick={()=>pid&&load("stmt",pid)} className="bg-blue-900 text-white px-4 py-2.5 rounded-xl text-sm">Dekho</button></div>}
+        <button onClick={()=>pid&&load("stmt",pid)} className="bg-blue-900 text-white px-4 py-2.5 rounded-xl text-sm">View</button></div>}
       {body()}
     </div>);
 }
@@ -1787,7 +1787,7 @@ function WhatsAppView(){
       </div>
 
       <div className="card p-4 text-xs text-slate-500" style={{background:"#fafafa"}}>
-        <b>Note:</b> "WhatsApp Web QR scan karke app ke andar chat" — yeh sirf desktop apps mein possible hai (web browser WhatsApp Web ko embed nahi kar sakta, aur QR-automation WhatsApp ke Terms ke against hai → number ban ho sakta hai). Isiliye humne <b>compliant</b> tareeka diya hai: Quick Share (abhi) + official Cloud API (auto-send). Future desktop version mein QR-scan add ho sakta hai.
+        <b>Note:</b> "Scan WhatsApp Web QR to chat inside the app" — yeh sirf desktop apps mein possible hai (web browser WhatsApp Web ko embed nahi kar sakta, aur QR-automation WhatsApp ke Terms ke against hai → number ban ho sakta hai). Isiliye humne <b>compliant</b> tareeka diya hai: Quick Share (abhi) + official Cloud API (auto-send). Future desktop version mein QR-scan add ho sakta hai.
       </div>
     </div>);
 }
@@ -1816,13 +1816,13 @@ function Employees({emps,reload}){
   const blank={name:"",designation:"",department:"",phone:"",basic_salary:"",hra:"",allowances:"",deductions:"",working_days:30,joining_date:""};
   const [f,setF]=useState(blank),[msg,setMsg]=useState("");
   const set=k=>e=>setF({...f,[k]:e.target.value});
-  const save=async()=>{ setMsg(""); if(!f.name){setMsg("Naam zaroori hai");return;}
+  const save=async()=>{ setMsg(""); if(!f.name){setMsg("Name zaroori hai");return;}
     try{ await api("/employees/",{method:"POST",body:JSON.stringify(f)}); setF(blank); setMsg("Employee added ✓"); reload(); }
     catch(e){ setMsg("Error: "+JSON.stringify(e)); } };
   return (<div>
     {msg && <div className="bg-green-50 text-green-700 p-2 rounded mb-3 text-sm">{msg}</div>}
     <div className="card p-4 mb-4 grid md:grid-cols-4 gap-2">
-      <input className="border p-2 rounded" placeholder="Naam" value={f.name} onChange={set("name")} />
+      <input className="border p-2 rounded" placeholder="Name" value={f.name} onChange={set("name")} />
       <input className="border p-2 rounded" placeholder="Designation" value={f.designation} onChange={set("designation")} />
       <input className="border p-2 rounded" placeholder="Department" value={f.department} onChange={set("department")} />
       <input className="border p-2 rounded" placeholder="Phone" value={f.phone} onChange={set("phone")} />
@@ -1864,7 +1864,7 @@ function LeaveTab({emps}){
   const [rows,setRows]=useState([]),[f,setF]=useState({employee:"",leave_type:"CASUAL",from_date:"",to_date:"",reason:""}),[msg,setMsg]=useState("");
   const load=()=>apiList("/leaves/?page_size=500").then(setRows);
   useEffect(()=>{ load(); },[]);
-  const add=async()=>{ if(!f.employee||!f.from_date||!f.to_date){setMsg("Employee aur dates zaroori");return;}
+  const add=async()=>{ if(!f.employee||!f.from_date||!f.to_date){setMsg("Employee and dates are required");return;}
     await api("/leaves/",{method:"POST",body:JSON.stringify(f)}); setF({employee:"",leave_type:"CASUAL",from_date:"",to_date:"",reason:""}); setMsg("Leave added"); load(); };
   const setStatus=async(id,s)=>{ await api("/leaves/"+id+"/set_status/",{method:"POST",body:JSON.stringify({status:s})}); load(); };
   return (<div>
@@ -2027,7 +2027,7 @@ function POSView(){
       <div className="md:col-span-2 flex flex-col min-h-0">
         <div className="flex gap-2 mb-3">
           <input ref={scanRef} value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();scanEnter();}}}
-            placeholder="📷 Scan barcode ya item search…" className="flex-1 border border-slate-200 p-3 rounded-xl text-sm" />
+            placeholder="📷 Scan barcode or search item…" className="flex-1 border border-slate-200 p-3 rounded-xl text-sm" />
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 overflow-y-auto pr-1">
           {filt.slice(0,60).map(v=><button key={v.id} onClick={()=>add(v)} className="card p-3 text-left hover-lift">
@@ -2137,9 +2137,9 @@ function JournalModal({je,accounts,onClose,onSaved}){
   const dr=f.lines.reduce((a,l)=>a+(+l.debit||0),0), cr=f.lines.reduce((a,l)=>a+(+l.credit||0),0);
   const save=async()=>{ setErr("");
     if(dr!==cr){setErr(`Debit (${dr}) ≠ Credit (${cr})`);return;}
-    if(dr===0){setErr("Amount 0 nahi");return;}
+    if(dr===0){setErr("Amount cannot be 0");return;}
     const lines=f.lines.filter(l=>l.account&&((+l.debit||0)||(+l.credit||0))).map(l=>({account:+l.account,debit:String(l.debit||0),credit:String(l.credit||0)}));
-    if(lines.length<2){setErr("Kam se kam 2 lines");return;}
+    if(lines.length<2){setErr("At least 2 lines required");return;}
     setBusy(true);
     try{ await api("/journals/",{method:"POST",body:JSON.stringify({date:f.date,narration:f.narration,reference:f.reference||"",lines})}); onSaved();
     }catch(e){ setErr(typeof e==="object"?(e.detail||JSON.stringify(e)):"Save fail"); setBusy(false);} };
@@ -2185,7 +2185,7 @@ function FirmSwitcher(){
         <div className="border-t mt-1 pt-1">
           {!adding ? <button onClick={()=>setAdding(true)} className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-orange-700 hover:bg-orange-50">+ Add Firm</button>
           : <div className="p-2 space-y-2">
-            <input autoFocus className="border border-slate-200 p-1.5 rounded-lg w-full text-sm" placeholder="Firm naam" value={name} onChange={e=>setName(e.target.value)} />
+            <input autoFocus className="border border-slate-200 p-1.5 rounded-lg w-full text-sm" placeholder="Firm name" value={name} onChange={e=>setName(e.target.value)} />
             <select className="border border-slate-200 p-1.5 rounded-lg w-full text-sm" value={btype} onChange={e=>setBtype(e.target.value)}>
               <option value="GENERAL">General</option><option value="RETAIL">Retail / Kirana</option><option value="WHOLESALE">Wholesale</option><option value="RESTAURANT">Restaurant</option><option value="PHARMACY">Pharmacy</option><option value="SERVICE">Service</option><option value="MANUFACTURER">Manufacturer</option></select>
             <div className="flex gap-2"><button onClick={add} disabled={busy} className="flex-1 text-white py-1.5 rounded-lg text-sm font-bold" style={{background:"#ea6a1e"}}>{busy?"…":"Create"}</button>
@@ -2201,9 +2201,9 @@ function CommandPalette({nav,onGo,onClose}){
   const [q,setQ]=useState(""); const ref=useRef(null);
   useEffect(()=>{ if(ref.current)ref.current.focus(); },[]);
   const actions=[
-    {label:"New Sale / Invoice",hint:"Naya bill banao",go:()=>onGo("sale","SALE")},
-    {label:"New Purchase",hint:"Purchase entry",go:()=>onGo("sale","PURCHASE")},
-    {label:"Add Expense",hint:"Kharcha add karo",go:()=>onGo("cashbank")},
+    {label:"New Sale / Invoice",hint:"New Invoice",go:()=>onGo("sale","SALE")},
+    {label:"New Purchase",hint:"Purchase Entry",go:()=>onGo("sale","PURCHASE")},
+    {label:"Add Expense",hint:"Add Expense",go:()=>onGo("cashbank")},
     {label:"Payment Reminders",hint:"Overdue parties",go:()=>onGo("reports")},
     {label:"Barcode & Labels",hint:"Label print",go:()=>onGo("utils")},
     ...nav.map(([k,l])=>({label:l,hint:"Open",go:()=>onGo(k)})),
@@ -2215,7 +2215,7 @@ function CommandPalette({nav,onGo,onClose}){
       <div className="card w-full max-w-xl overflow-hidden" onClick={e=>e.stopPropagation()}>
         <div className="flex items-center gap-2 px-4 py-3 border-b">
           <span className="text-slate-400">⌘</span>
-          <input ref={ref} value={q} onChange={e=>setQ(e.target.value)} placeholder="Kuch bhi karo — type karo (e.g. sale, party, report)…"
+          <input ref={ref} value={q} onChange={e=>setQ(e.target.value)} placeholder="Type anything (e.g. sale, party, report)…"
             onKeyDown={e=>{if(e.key==="Enter"&&filt[0])run(filt[0]); if(e.key==="Escape")onClose();}}
             className="flex-1 outline-none text-sm" />
           <span className="text-xs text-slate-400 border rounded px-1.5 py-0.5">Esc</span>

@@ -108,13 +108,40 @@ def _tokens(user):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+def send_otp(request):
+    """Signup ke liye mobile OTP. SMS gateway ho to bheje, warna dev-mode me OTP response me."""
+    import random
+    from django.core.cache import cache
+    digits = "".join(c for c in str(request.data.get("phone") or "") if c.isdigit())
+    if len(digits) < 10:
+        return Response({"detail": "Valid 10-digit mobile number daalein"}, status=400)
+    otp = f"{random.randint(0, 999999):06d}"
+    cache.set(f"otp:{digits}", otp, 600)  # 10 min
+    # TODO: SMS gateway (MSG91/Twilio) se bhejo jab keys mil jayein.
+    sms_configured = False
+    resp = {"sent": sms_configured}
+    if not sms_configured:
+        resp["dev_otp"] = otp
+        resp["message"] = "Dev mode: OTP screen par (SMS gateway baad me)."
+    return Response(resp)
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
 def signup(request):
-    """Naya business register + 7-day trial. Returns JWT."""
+    """Naya business register + 7-day trial. Mobile + OTP zaroori. Returns JWT."""
+    from django.core.cache import cache
     d = request.data
-    required = ["username", "password", "org_name"]
+    required = ["username", "password", "org_name", "phone"]
     missing = [f for f in required if not d.get(f)]
     if missing:
         return Response({"detail": f"Required: {', '.join(missing)}"}, status=400)
+    digits = "".join(c for c in str(d.get("phone", "")) if c.isdigit())
+    if len(digits) < 10:
+        return Response({"detail": "Valid 10-digit mobile number daalein"}, status=400)
+    cached = cache.get(f"otp:{digits}")
+    if not cached or str(d.get("otp", "")).strip() != cached:
+        return Response({"detail": "OTP galat ya expire ho gaya — dobara bhejein"}, status=400)
     try:
         user, org, sub = signup_organization(
             username=d["username"], password=d["password"],
@@ -123,6 +150,7 @@ def signup(request):
         )
     except ValueError as e:
         return Response({"detail": str(e)}, status=400)
+    cache.delete(f"otp:{digits}")
     return Response({
         "tokens": _tokens(user),
         "organization": org.name,

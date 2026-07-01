@@ -78,6 +78,7 @@ urlpatterns = [
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     # SaaS: signup, plans, subscription billing
+    path("api/send-otp/", tenant_views.send_otp, name="send_otp"),
     path("api/signup/", tenant_views.signup, name="signup"),
     path("api/plans/", tenant_views.plans, name="plans"),
     path("api/subscription/", tenant_views.subscription_status, name="subscription"),

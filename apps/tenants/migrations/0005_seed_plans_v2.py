@@ -1,8 +1,6 @@
-"""Default subscription plans banata hai. Admin se prices edit ho sakti hain.
-Run: python manage.py seed_plans
-"""
-from django.core.management.base import BaseCommand
-from apps.tenants.models import Plan
+"""Naye plans (Starter/Pro/Business) upsert + purane (basic/premium) hide.
+Deploy pe migrate ke saath prod DB me apne aap lag jaayega."""
+from django.db import migrations
 
 PLANS = [
     dict(code="starter", name="Starter", price_monthly=149, price_yearly=1499,
@@ -18,15 +16,26 @@ PLANS = [
          features=["Sab Pro ka", "Multi-firm", "HR & Payroll",
                    "Supplier marketplace", "Unlimited users + priority support"]),
 ]
-RETIRE_CODES = ["basic", "premium"]
+RETIRE = ["basic", "premium"]
 
 
-class Command(BaseCommand):
-    help = "Seed default subscription plans."
+def apply(apps, schema_editor):
+    Plan = apps.get_model("tenants", "Plan")
+    for p in PLANS:
+        Plan.objects.update_or_create(code=p["code"], defaults={**p, "is_active": True})
+    Plan.objects.filter(code__in=RETIRE).update(is_active=False)
 
-    def handle(self, *args, **options):
-        for p in PLANS:
-            Plan.objects.update_or_create(code=p["code"], defaults={**p, "is_active": True})
-        Plan.objects.filter(code__in=RETIRE_CODES).update(is_active=False)
-        self.stdout.write(self.style.SUCCESS(
-            f"{Plan.objects.filter(is_active=True).count()} active plans ready."))
+
+def noop(apps, schema_editor):
+    pass
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('tenants', '0004_organization_referral'),
+    ]
+
+    operations = [
+        migrations.RunPython(apply, noop),
+    ]

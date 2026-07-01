@@ -15,7 +15,12 @@
 <meta name="apple-mobile-web-app-title" content="Digital Munshi">
 <link rel="apple-touch-icon" href="/static/pwa/icon-192.png">
 <link rel="icon" type="image/png" href="/static/pwa/icon-192.png">
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});}).catch(function(){});if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});}).catch(function(){});}}</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}
+// Install prompt: "Install app" button dikhao jab browser allow kare
+var __dmInstall=null;
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();__dmInstall=e;var b=document.getElementById("dmInstallBtn");if(b)b.style.display="inline-flex";});
+function dmInstallApp(){ if(__dmInstall){__dmInstall.prompt();__dmInstall.userChoice.finally(function(){__dmInstall=null;var b=document.getElementById("dmInstallBtn");if(b)b.style.display="none";});} }
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
@@ -131,6 +136,7 @@
 </head>
 <body>
 <div id="root"></div>
+<button id="dmInstallBtn" onclick="dmInstallApp()" style="display:none;position:fixed;bottom:20px;left:20px;z-index:50;align-items:center;gap:6px;background:linear-gradient(135deg,#ea6a1e,#c2410c);color:#fff;border:none;padding:10px 16px;border-radius:999px;font-weight:700;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.2);cursor:pointer">📲 Install App</button>
 <script type="text/babel">
 {% verbatim %}
 const { useState, useEffect, useRef } = React;

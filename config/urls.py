@@ -5,13 +5,32 @@ from django.views.generic import TemplateView
 
 # ---- PWA service worker (served at root so its scope covers the whole app) ----
 _SW_JS = """
-// Kill-switch SW: purane clients pe cache clear + unregister (PWA offline cache hata diya).
-self.addEventListener("install", e => { self.skipWaiting(); });
+// Digital Munshi PWA service worker (v2). SAFE: HTML/navigations hamesha network se
+// (stale app.html ka purana bug na aaye), sirf icons/static cache hote hain.
+const CACHE = "dm-pwa-v2";
+const ASSETS = ["/static/pwa/icon-192.png", "/static/pwa/icon-512.png", "/static/pwa/manifest.json"];
+self.addEventListener("install", e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{}))); });
 self.addEventListener("activate", e => { e.waitUntil((async () => {
-  try { const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); } catch (_) {}
-  try { await self.registration.unregister(); } catch (_) {}
-  try { const cs = await self.clients.matchAll(); cs.forEach(c => c.navigate(c.url)); } catch (_) {}
+  try { const ks = await caches.keys(); await Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))); } catch (_) {}
+  await self.clients.claim();
 })()); });
+self.addEventListener("fetch", e => {
+  const req = e.request;
+  if (req.method !== "GET") return;
+  const accept = req.headers.get("accept") || "";
+  // App HTML: hamesha network (kabhi stale nahi)
+  if (req.mode === "navigate" || accept.includes("text/html")) {
+    e.respondWith(fetch(req).catch(() => caches.match(req)));
+    return;
+  }
+  // Static assets (icons): cache-first (tez)
+  if (req.url.includes("/static/")) {
+    e.respondWith(caches.match(req).then(c => c || fetch(req).then(r => { const cp = r.clone(); caches.open(CACHE).then(ca => ca.put(req, cp)).catch(()=>{}); return r; })));
+    return;
+  }
+  // API vagairah: network only
+  e.respondWith(fetch(req));
+});
 """
 
 def service_worker(request):

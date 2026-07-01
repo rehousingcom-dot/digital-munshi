@@ -96,3 +96,14 @@ _Priority order: bugs first, then missing features in waves._
 ## Security TODO (rotate — chat me expose hue)
 - [ ] GitHub PAT revoke, Gmail app-password, Resend key, Razorpay test key, **Cloudinary secret** rotate.
 - [ ] `SECRET_KEY` ko strong unique value se replace (abhi placeholder).
+
+## Improvements wave (July 2026) — DONE
+- [x] ✅ Auto DB backup (`backup_db`) → Cloudinary + email link. Cron via /api/cron/run/ + cron-job.org.
+- [x] ✅ Daily sales summary (`daily_summary`) → owner ko email.
+- [x] ✅ Dead/Slow/Fast movers report (Reports tab).
+- [x] ✅ Camera barcode scan (New Sale — BarcodeDetector).
+- [x] ✅ Sentry error monitoring (SENTRY_DSN env-gated).
+- [x] ✅ Online Catalog — public /shop/<uuid>/, WhatsApp order, Settings share card + toggle.
+- [x] ✅ Loyalty points — 1pt/Rs100 auto on sale; Party form + New Sale display.
+- [x] ✅ Marketing landing /welcome/ (SEO, pricing) + robots.txt + sitemap.xml + app SEO meta.
+- Secure cron endpoint: `/api/cron/run/?token=<CRON_TOKEN>`. PWA service worker DISABLED (kill-switch).

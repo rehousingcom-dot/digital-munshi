@@ -44,6 +44,21 @@ def cron_run(request):
 
     threading.Thread(target=_run, daemon=True).start()
     return JsonResponse({"status": "started", "tasks": tasks})
+
+
+def robots_txt(request):
+    return HttpResponse("User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\n"
+                        "Sitemap: https://erp.reloaddigital.in/sitemap.xml\n",
+                        content_type="text/plain")
+
+
+def sitemap_xml(request):
+    urls = ["https://erp.reloaddigital.in/welcome/", "https://erp.reloaddigital.in/"]
+    body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+    for u in urls:
+        body += f"<url><loc>{u}</loc><changefreq>weekly</changefreq></url>"
+    body += "</urlset>"
+    return HttpResponse(body, content_type="application/xml")
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -152,6 +167,9 @@ urlpatterns = [
     path("api/expense-summary/", cashbank_views.expense_summary, name="expense_summary"),
     path("api/trial-balance/", acc_views.trial_balance, name="trial_balance"),
     path("portal/<uuid:share>/", party_extra.customer_portal, name="customer_portal"),
+    path("welcome/", core_views.landing, name="landing"),
+    path("robots.txt", robots_txt, name="robots"),
+    path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),
     path("api/catalog/toggle/", tenant_views.catalog_toggle, name="catalog_toggle"),
     path("api/", include(router.urls)),

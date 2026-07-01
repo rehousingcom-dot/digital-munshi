@@ -167,3 +167,12 @@ def catalog_shop(request, catalog_uuid):
         "wa": wa, "logo": logo, "items": items,
     }
     return render(request, "catalog.html", ctx)
+
+
+def landing(request):
+    """Public marketing landing page (SEO) — pricing plans ke saath. Signup ke liye
+    app pe le jaata hai. Search engines ke liye server-rendered."""
+    from django.shortcuts import render
+    from apps.tenants.models import Plan
+    plans = list(Plan.objects.filter(is_active=True).order_by("sort_order", "price_monthly"))
+    return render(request, "landing.html", {"plans": plans})

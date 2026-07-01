@@ -17,8 +17,9 @@ _Priority order: bugs first, then missing features in waves._
 
 ## Slide 2 — Login / Signup
 - [x] ✅ Auto-logout fix (upar).
-- [ ] 🟠 Signup: **mobile no. mandatory + OTP verify** (abhi phone optional, no OTP).
-      Needs: OTP send/verify (SMS gateway — e.g. MSG91/Twilio) + signup form change.
+- [x] ✅ Signup: **mobile mandatory + OTP verify** — `/api/send-otp/` + signup me OTP check.
+      SMS gateway abhi nahi, isliye **dev-mode me OTP screen par** dikhta hai (testing ke liye).
+      _Real SMS ke liye MSG91/Twilio keys chahiye — send_otp view me `sms_configured` wire karna._ _(4de69b6)_
 
 ## Slide 3 — New Sale (billing window)
 - [x] ✅ Party billing window se add — **inline "+ New"** quick-add (naam+phone → Save & Select). _(233604d)_
@@ -28,25 +29,30 @@ _Priority order: bugs first, then missing features in waves._
 - [x] ✅ Price with/without tax + auto tax calc — `price_inclusive_tax` + row me **+T/−T toggle**.
 - [x] ✅ Item add pe **row auto-open** — item select karte hi nayi khaali row auto-add. _(0845bfa)_
 - [x] ✅ **Description column** per line (+ invoice par print). _(0845bfa)_
-- [ ] 🟠 **Image upload** (item/line) — missing (task #62 ke saath).
-- [ ] 🟡 **Document upload** — party-level hai, line/invoice-level add (task #62).
+- [x] ✅ **Image upload** — Item photo upload (ItemForm → `/items/<id>/upload_image/`), preview + shows in form. _(7d0c0ae)_
+- [~] 🟡 **Document upload** — party-level document upload HAI. Invoice/line-level attachment abhi nahi (v2 me).
 
 ## Slide 4 — Transactions
-- [ ] 🟠 Sale Order → invoice **once**; generate pe billing window; qty change → partial/close prompt.
-- [ ] 🟡 Estimate → **2 options** (Order ya Invoice).
-- [ ] 🟠 Delivery Challan → invoice me **returned qty** prompt → billing.
-- [ ] 🟡 **Recurring → rename** "Auto / Repeated Invoice".
+- [x] ✅ Sale Order/Estimate/Challan → invoice **sirf ek baar** (converted-once guard; "✓ Invoiced" badge). _(75add7b)_
+- [x] ✅ Estimate → **2 options**: "→ Invoice" aur "→ Order" buttons. _(75add7b)_
+- [~] 🟡 Delivery Challan → invoice **returned qty** prompt — abhi seedha convert hota hai; returned-qty
+      prompt v2 me (partial-invoice qty tracking ke saath).
+- [x] ✅ **Recurring → "Auto Invoice"** rename (tab, buttons, modal). _(75add7b)_
 
 ## Slide 5 — Batch details
 - [x] 🟢 size/colour/model (ItemVariant) + expiry (Batch) — HAI.
-- [ ] 🟠 **mfg date** field + **multiple batch ek saath add** wala alag window UI.
+- [x] ✅ **Batch me mfg_date + size + colour + model** fields add (model + ItemForm inputs). _(7d0c0ae)_
+- [~] 🟡 **Multiple batch ek saath add** (grid window) — abhi ek batch per item form; multi-batch grid v2 me.
 
 ## Slide 6 — Reports
-- [ ] 🟡 Report **header/branding** + **filters** improve (reference jaisa look).
+- [x] ✅ Report **branded header** (business name, report title, date-range, Generated timestamp, **Print/PDF**)
+      + **working date-range filter** (start/end → backend `_range`). _(0c3c610)_
 
 ## Slide 7 — Barcode
-- [x] 🟢 Barcode designer — HAI.
-- [ ] 🟠 printer choice, fix-print column, **batch-wise** barcode, **unique per unit**, custom size.
+- [x] 🟢 Barcode designer — HAI (symbology, custom W×H mm, copies).
+- [x] ✅ **Columns/row (fix print)**, **unique barcode per unit** (…-0001), name/price design toggles,
+      printer choice (browser print dialog). Custom size pehle se tha. _(7ab92ec)_
+- [~] 🟡 **Batch-wise barcode** (batch se) — v2 (batch selector barcode designer me).
 
 ## Slide 8 — Cash & Bank
 - [x] 🟢 Bank detail edit — HAI.

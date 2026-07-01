@@ -16,6 +16,34 @@ self.addEventListener("activate", e => { e.waitUntil((async () => {
 
 def service_worker(request):
     return HttpResponse(_SW_JS, content_type="application/javascript")
+
+
+def cron_run(request):
+    """Secure cron trigger — koi bhi external scheduler (cron-job.org) roz hit kare.
+    ?token=<CRON_TOKEN env> match hone pe daily_summary + backup_db background me chalate hain.
+    Turant response deta hai (thread me chalta hai) taaki HTTP timeout na ho."""
+    import os
+    import threading
+    token = request.GET.get("token", "")
+    expected = os.environ.get("CRON_TOKEN", "")
+    if not expected or token != expected:
+        return JsonResponse({"error": "forbidden"}, status=403)
+
+    tasks = (request.GET.get("tasks") or "daily_summary,backup_db").split(",")
+
+    def _run():
+        from django.core.management import call_command
+        for t in tasks:
+            t = t.strip()
+            if not t:
+                continue
+            try:
+                call_command(t)
+            except Exception:
+                pass
+
+    threading.Thread(target=_run, daemon=True).start()
+    return JsonResponse({"status": "started", "tasks": tasks})
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -88,6 +116,7 @@ router.register("journals", acc_views.JournalEntryViewSet)
 urlpatterns = [
     path("", TemplateView.as_view(template_name="app.html"), name="app"),
     path("sw.js", service_worker, name="service_worker"),
+    path("api/cron/run/", cron_run, name="cron_run"),
     path("admin/", admin.site.urls),
     path("api/health/", health, name="health"),
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),

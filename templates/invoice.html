@@ -109,6 +109,20 @@
   </table>
 
   <div class="foot">
+    {% if bank or upi_qr %}
+    <table style="width:100%;margin-bottom:8px;border-top:1px solid #eee;padding-top:6px;"><tr>
+      <td style="vertical-align:top;font-size:10px;">
+        {% if bank %}<strong>Bank Details</strong><br>
+        {% if bank.bank_name %}Bank: {{ bank.bank_name }}<br>{% endif %}
+        {% if bank.account_no %}A/C No: {{ bank.account_no }}<br>{% endif %}
+        {% if bank.ifsc %}IFSC: {{ bank.ifsc }}<br>{% endif %}
+        {% if bank.upi_id %}UPI: {{ bank.upi_id }}{% endif %}{% endif %}
+      </td>
+      {% if upi_qr %}<td style="width:110px;text-align:center;font-size:9px;color:#555;">
+        <img src="{{ upi_qr }}" style="width:96px;height:96px;"><br>Scan &amp; Pay (UPI)
+      </td>{% endif %}
+    </tr></table>
+    {% endif %}
     Total Discount: {{ v.total_discount }} &nbsp;|&nbsp; Total Tax: {{ v.total_tax }}<br><br>
     <div style="text-align:right;">For <strong>{% if company %}{{ company.name }}{% else %}My Business{% endif %}</strong><br>
       {% if company and company.signature %}<img src="{{ company.signature.url }}" style="max-height:48px;margin:4px 0;">{% else %}<br><br>{% endif %}

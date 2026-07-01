@@ -11,5 +11,6 @@ djangorestframework-simplejwt>=5.3   # JWT auth
 gunicorn==21.2.0             # production server (pinned stable; avoids gunicorn 26 control-socket issues on Railway)
 whitenoise>=6.6              # static files serving (production)
 xhtml2pdf>=0.2.16            # invoice PDF generation
+qrcode>=7.4                  # UPI QR code on invoice
 drf-spectacular>=0.27        # OpenAPI / Swagger API docs
 # razorpay>=1.4              # SIRF live payments ke liye (dev mode bina iske chalta hai)

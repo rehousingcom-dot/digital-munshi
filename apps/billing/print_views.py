@@ -31,12 +31,41 @@ def _get_voucher(request, pk):
     return get_object_or_404(Voucher, pk=pk)
 
 
+def _upi_qr_data_uri(upi_id, name, amount):
+    """UPI payment QR (upi://pay...) ko base64 PNG data-URI banata hai — invoice par print hota hai."""
+    if not upi_id:
+        return None
+    try:
+        import base64, qrcode
+        s = f"upi://pay?pa={upi_id}&pn={name or 'Merchant'}&am={amount}&cu=INR"
+        img = qrcode.make(s)
+        b = BytesIO()
+        img.save(b, format="PNG")
+        return "data:image/png;base64," + base64.b64encode(b.getvalue()).decode()
+    except Exception:
+        return None
+
+
+def _bank_for(voucher):
+    """Invoice par dikhane ke liye org ka pehla active bank account."""
+    try:
+        from apps.cashbank.models import BankAccount
+        return BankAccount.all_objects.filter(
+            organization_id=voucher.organization_id, account_type="BANK", is_active=True
+        ).first()
+    except Exception:
+        return None
+
+
 def _context(voucher):
     company = Company.objects.filter(is_active=True).first()
     if voucher.voucher_type == "SALE":
         title = "TAX INVOICE" if (company and company.charges_gst) else "BILL OF SUPPLY"
     else:
         title = voucher.get_voucher_type_display().upper()
+    bank = _bank_for(voucher)
+    upi_id = (bank.upi_id if bank else "") or ""
+    payee = (company.name if company else "") or (bank.name if bank else "")
     return {
         "v": voucher,
         "company": company,
@@ -44,6 +73,8 @@ def _context(voucher):
         "title": title,
         "amount_words": amount_in_words(voucher.grand_total),
         "is_igst": voucher.igst and voucher.igst > 0,
+        "bank": bank,
+        "upi_qr": _upi_qr_data_uri(upi_id, payee, voucher.grand_total),
     }
 
 

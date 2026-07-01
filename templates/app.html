@@ -1788,7 +1788,10 @@ function ReportsView(){
   const tabs=[["pnl",t("P&L","लाभ-हानि")],["bsheet",t("Balance Sheet","बैलेंस शीट")],["stock",t("Live Stock","लाइव स्टॉक")],["reminders",t("Payment Reminders","भुगतान रिमाइंडर")],["aging",t("Receivables Aging","प्राप्य एजिंग")],["daybook",t("Day Book","डे बुक")],["gstr1",t("GSTR-1","GSTR-1")],["gstr3b",t("GSTR-3B","GSTR-3B")],["hsn",t("HSN Summary","HSN सारांश")],["lowstock",t("Low Stock","लो स्टॉक")],["dead",t("Dead / Fast Movers","रुका / तेज़ बिकने वाला")],["purchase",t("Purchase Register","खरीद रजिस्टर")],["stmt",t("Party Statement","पार्टी स्टेटमेंट")]];
   const D=data;
   const body=()=>{
+    if(tab==="stmt" && (!D||!Array.isArray(D.entries)) && !(D&&D.error))
+      return <div className="card p-6 text-slate-400">{t("Upar dropdown se party chuno, phir View dabao.","Choose a party from the dropdown above, then click View.")}</div>;
     if(!D) return <div className="card p-6 text-slate-400">Loading…</div>;
+    if(D.error) return <div className="card p-6 text-red-500">{t("Report load nahi hui","Report failed")}: {String(D.error)}</div>;
     if(D.error) return <div className="card p-6 text-red-500">{D.error}</div>;
     if(tab==="pnl") return <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
       <StatCard label="Revenue (Sales)" value={money(D.revenue)} accent="#ea6a1e"/>
@@ -1814,9 +1817,12 @@ function ReportsView(){
       <StatCard label="Total Stock Value" value={money(D.total_value)} accent="#ea6a1e"/>
       <RTable head={["Item","Code","Godown","Qty","Purchase ₹","Sale ₹","Value"]} rows={(D.items||[]).map(x=>[x.item,x.item_code,x.godown,x.qty+" "+x.unit,money(x.purchase_price),money(x.sale_price),money(x.value)])}/></div>;
     if(tab==="reminders") return <UdhaarReminders D={D}/>;
-    if(tab==="stmt") return <div className="space-y-3">
+    if(tab==="stmt"){
+      if(!D||!Array.isArray(D.entries)) return <div className="card p-6 text-slate-400">{t("Upar dropdown se party chuno, phir View dabao.","Choose a party from the dropdown above, then click View.")}</div>;
+      return <div className="space-y-3">
       <div className="flex gap-4"><StatCard label="Closing Balance" value={money(D.closing_balance)} accent="#ea6a1e"/><StatCard label="Status" value={D.closing_type}/></div>
       <RTable head={["Date","Particulars","No","Debit","Credit","Balance"]} rows={D.entries.map(e=>[e.date,e.type,e.number,e.debit?money(e.debit):"",e.credit?money(e.credit):"",money(e.balance)])}/></div>;
+    }
     if(tab==="gstr1") return <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4"><StatCard label="B2B Taxable" value={money(D.b2b? D.b2b.invoices.reduce((a,x)=>a+x.taxable,0):0)} accent="#ea6a1e"/><StatCard label="B2C Taxable" value={money(D.b2c.taxable)} accent="#7C3AED"/></div>
       <div className="font-semibold text-slate-600">B2B Invoices</div>
@@ -1859,7 +1865,7 @@ function ReportsView(){
         <button onClick={()=>window.print()} className="bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-semibold">🖨 Print / PDF</button>
       </div>
       <div className="flex flex-wrap gap-2 mb-3">
-        {tabs.map(([k,l])=><button key={k} onClick={()=>k==="stmt"?setTab("stmt"):load(k)} className={"px-4 py-2 rounded-xl text-sm font-semibold "+(tab===k?"bg-blue-900 text-white":"bg-white text-slate-600 border border-slate-200")}>{l}</button>)}
+        {tabs.map(([k,l])=><button key={k} onClick={()=>k==="stmt"?(setTab("stmt"),setData(null),setPid("")):load(k)} className={"px-4 py-2 rounded-xl text-sm font-semibold "+(tab===k?"bg-blue-900 text-white":"bg-white text-slate-600 border border-slate-200")}>{l}</button>)}
       </div>
       {/* Date filter (date-based reports) */}
       {DATE_REPORTS.includes(tab) && <div className="mb-4 flex flex-wrap gap-2 items-end card p-3">
@@ -1868,9 +1874,10 @@ function ReportsView(){
         <button onClick={()=>load(tab)} className="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">Apply Filter</button>
         {(start||end)&&<button onClick={()=>{setStart("");setEnd("");setTimeout(()=>load(tab),0);}} className="text-slate-500 px-2 py-2 text-sm">Clear</button>}
       </div>}
-      {tab==="stmt" && <div className="mb-4 flex gap-2 items-center">
-        <select className="p-2.5" value={pid} onChange={e=>setPid(e.target.value)}><option value="">— choose party —</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>
-        <button onClick={()=>pid&&load("stmt",pid)} className="bg-blue-900 text-white px-4 py-2.5 rounded-xl text-sm">View</button></div>}
+      {tab==="stmt" && <div className="mb-4 flex flex-wrap gap-2 items-center card p-3">
+        <label className="text-sm font-semibold text-slate-600">{t("Party","पार्टी")}:</label>
+        <select className="p-2.5 border border-slate-200 rounded-lg text-sm bg-white min-w-[220px]" value={pid} onChange={e=>{setPid(e.target.value); if(e.target.value)load("stmt",e.target.value);}}><option value="">— {t("choose party","पार्टी चुनो")} —</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>
+        <button onClick={()=>pid&&load("stmt",pid)} className="bg-blue-900 text-white px-4 py-2.5 rounded-xl text-sm font-semibold">{t("View","देखें")}</button></div>}
       {body()}
     </div>);
 }

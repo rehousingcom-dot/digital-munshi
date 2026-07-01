@@ -356,3 +356,30 @@ def verify_payment(request):
         "status": "activated",
         "subscription": SubscriptionSerializer(sub).data,
     })
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def razorpay_callback(request):
+    """Razorpay REDIRECT-mode callback. Razorpay yahan form-encoded POST karta hai
+    (order/payment/signature), koi auth nahi. Order-id se subscription dhoondh ke
+    verify + activate, phir app pe redirect (popup/blank-tab issue se bachne ke liye)."""
+    from django.shortcuts import redirect as _redirect
+    data = request.data if hasattr(request, "data") else {}
+    order_id = data.get("razorpay_order_id") or request.POST.get("razorpay_order_id")
+    payment_id = data.get("razorpay_payment_id") or request.POST.get("razorpay_payment_id") or ""
+    signature = data.get("razorpay_signature") or request.POST.get("razorpay_signature") or ""
+    pay = SubscriptionPayment.objects.filter(gateway_order_id=order_id).order_by("-id").first()
+    if not pay:
+        return _redirect("/?pay=notfound")
+    if not gw.verify_signature(order_id, payment_id, signature):
+        pay.status = SubscriptionPayment.Status.FAILED
+        pay.save(update_fields=["status"])
+        return _redirect("/?pay=failed")
+    pay.status = SubscriptionPayment.Status.PAID
+    pay.gateway_payment_id = payment_id
+    pay.gateway_signature = signature
+    pay.paid_at = timezone.now()
+    pay.save()
+    pay.subscription.activate(pay.plan, pay.cycle)
+    return _redirect("/?pay=success")

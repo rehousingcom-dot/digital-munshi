@@ -344,12 +344,11 @@ function Subscribe({sub,onActivated}){
         const v=await api("/subscription/verify/",{method:"POST",body:JSON.stringify({razorpay_order_id:o.order_id})});
         onActivated(v.subscription); setBusy(""); return;
       }
+      // REDIRECT mode — popup/handler ki jagah server callback (blank-tab issue fix).
       const rzp=new Razorpay({ key:o.key_id, amount:o.amount, currency:o.currency, order_id:o.order_id,
         name:"Digital Munshi ERP", description:`${o.plan} (${cycle})`,
-        handler:async(resp)=>{ try{ const v=await api("/subscription/verify/",{method:"POST",body:JSON.stringify({
-            razorpay_order_id:resp.razorpay_order_id, razorpay_payment_id:resp.razorpay_payment_id, razorpay_signature:resp.razorpay_signature})});
-          setErr(""); onActivated(v.subscription); alert("✓ Payment successful — plan activate ho gaya!"); }
-          catch(e){ setErr("Payment hua par verify fail: "+(e&&e.detail?e.detail:JSON.stringify(e))+" — RAZORPAY_KEY_SECRET check karo."); } },
+        redirect:true,
+        callback_url: window.location.origin + "/api/subscription/callback/",
         modal:{ ondismiss:()=>{ setBusy(""); } },
         theme:{color:"#1F4E79"} });
       rzp.on("payment.failed",function(r){ setErr("Payment failed: "+((r&&r.error&&r.error.description)||"unknown")); });
@@ -2372,6 +2371,13 @@ function App(){
   useEffect(()=>{ document.body.dataset.theme=theme; localStorage.setItem("dm_theme",theme); },[theme]);
   const loadSub=()=>api("/subscription/").then(s=>{setSub(s);setLoaded(true);}).catch(()=>setLoaded(true));
   useEffect(()=>{ if(authed){ loadSub(); api("/me/").then(setMe).catch(()=>{}); } },[authed]);
+  useEffect(()=>{ const q=new URLSearchParams(window.location.search); const pay=q.get("pay");
+    if(pay){ setTab("plan");
+      if(pay==="success") alert("✓ Payment successful — plan activate ho gaya!");
+      else if(pay==="failed") alert("✗ Payment verify fail — dobara try karo (ya RAZORPAY_KEY_SECRET check karo).");
+      else if(pay==="notfound") alert("Order not found — dobara try karo.");
+      if(authed) loadSub();
+      window.history.replaceState({}, "", window.location.pathname); } },[]);
   if(!authed) return <Login onLogin={()=>setAuthed(true)} />;
   const expired = loaded && sub && !sub.access_allowed;
   const isAdmin = me && me.is_platform_admin;

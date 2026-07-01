@@ -106,6 +106,7 @@ urlpatterns = [
     path("api/subscription/", tenant_views.subscription_status, name="subscription"),
     path("api/subscription/create_order/", tenant_views.create_order, name="create_order"),
     path("api/subscription/verify/", tenant_views.verify_payment, name="verify_payment"),
+    path("api/subscription/callback/", tenant_views.razorpay_callback, name="razorpay_callback"),
     path("api/subscription/create_recurring/", tenant_views.create_recurring, name="create_recurring"),
     path("api/subscription/webhook/", tenant_views.razorpay_webhook, name="razorpay_webhook"),
     # Platform admin metrics (SaaS owner)

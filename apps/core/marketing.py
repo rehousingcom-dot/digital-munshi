@@ -199,4 +199,125 @@ BLOG_POSTS = {
 <p>Digital Munshi invoice se seedha <b>e-way bill JSON</b> generate kar deta hai jo portal par upload-ready hota hai — manually type karne ki zaroorat nahi.</p>
 """,
     },
+    "gstr1-gstr3b-antar": {
+        "title": "GSTR-1 aur GSTR-3B me Kya Antar Hai? | Digital Munshi",
+        "desc": "GSTR-1 vs GSTR-3B — dono kya hain, kab file karne hain, aur software se aasan tarika. Simple bhasha me guide.",
+        "h1": "GSTR-1 aur GSTR-3B me Kya Antar Hai?",
+        "html": """
+<p>GST me do sabse common returns hain — GSTR-1 aur GSTR-3B. Naye business owners aksar confuse ho jaate hain. Aaiye simple bhasha me samajhte hain.</p>
+<h2>GSTR-1 kya hai?</h2>
+<p>GSTR-1 aapki <b>sales (outward supplies)</b> ki detail hai — kisko, kya, kitne me becha, kitna GST liya. Ye har invoice ki detail hoti hai. Monthly ya quarterly file hoti hai (turnover ke hisaab se).</p>
+<h2>GSTR-3B kya hai?</h2>
+<p>GSTR-3B ek <b>summary return</b> hai — total sales, total purchase, input tax credit (ITC), aur net GST jo bharna hai. Ye har mahine file hoti hai aur isi ke saath tax payment hota hai.</p>
+<h2>Dono me antar (short)</h2>
+<ul>
+<li><b>GSTR-1</b> = invoice-wise sales detail (kya becha).</li>
+<li><b>GSTR-3B</b> = summary + tax payment (kitna GST dena hai).</li>
+</ul>
+<h2>Software se aasan</h2>
+<p>Digital Munshi me har sale record hoti hai, to <b>GSTR-1 aur GSTR-3B ke reports apne aap ban jaate hain</b> — aapko sirf portal par values daalni/upload karni hoti hain. Manually calculation ki zaroorat nahi.</p>
+""",
+    },
+    "billing-software-kaise-chune": {
+        "title": "Billing Software Kaise Chune — 7 Zaroori Baatein | Digital Munshi",
+        "desc": "Apne business ke liye sahi billing software kaise chune — GST, inventory, price, mobile, support. 7 checklist points.",
+        "h1": "Billing Software Kaise Chune — 7 Zaroori Baatein",
+        "html": """
+<p>Market me bahut billing software hain — Vyapar, Tally, Zoho, Marg. Sahi kaunsa hai? In 7 baaton par dhyaan do.</p>
+<h2>1. GST support</h2>
+<p>GST invoice, e-invoice, e-way bill aur GSTR reports honi chahiye — warna baad me dikkat.</p>
+<h2>2. Inventory + billing saath</h2>
+<p>Sirf billing kaafi nahi — stock, batch, low-stock alert bhi ek hi jagah ho to behtar.</p>
+<h2>3. Mobile + cloud</h2>
+<p>Cloud-based ho to mobile aur laptop dono par chale, data auto-backup ho, kahin se access.</p>
+<h2>4. Aasan (Hinglish)</h2>
+<p>Staff bina training ke chala sake — complex software chhod diya jaata hai.</p>
+<h2>5. Price + free trial</h2>
+<p>Free trial se pehle try karo. Chhoti dukaan ke liye ₹300-500/mo theek hai.</p>
+<h2>6. WhatsApp + UPI</h2>
+<p>Invoice WhatsApp par bhejna aur UPI QR — aaj ke customers ke liye zaroori.</p>
+<h2>7. Support</h2>
+<p>Setup me help mile aur dikkat par jawaab. Digital Munshi in saaton par khara utarta hai.</p>
+""",
+    },
+    "udhaar-vasooli-tips": {
+        "title": "Udhaar Vasooli Kaise Kare — 6 Aasan Tips | Digital Munshi",
+        "desc": "Customer se udhaar time par kaise vasoole — payment reminder, credit limit, aur app se tracking. Practical tips.",
+        "h1": "Udhaar Vasooli Kaise Kare — 6 Aasan Tips",
+        "html": """
+<p>Har dukaandaar ki sabse badi problem — udhaar time par wapas na aana. In tips se vasooli behtar hogi.</p>
+<h2>1. Har udhaar record karo</h2>
+<p>Zubaani mat rakho. App me har udhaar entry karo — kaun, kitna, kab. Bhoolna khatam.</p>
+<h2>2. Credit limit set karo</h2>
+<p>Har customer ki ek limit rakho. Limit cross ho to naya udhaar mat do.</p>
+<h2>3. Due date decide karo</h2>
+<p>Udhaar dete waqt clear karo kab wapas dena hai (credit days). App reminder de dega.</p>
+<h2>4. WhatsApp reminder</h2>
+<p>Due hone par polite WhatsApp reminder bhejo. Digital Munshi se ek click me reminder + statement jaata hai.</p>
+<h2>5. Statement do</h2>
+<p>Customer ko poora ledger statement (PDF) bhejo — clarity se payment jaldi aata hai.</p>
+<h2>6. Regular follow-up</h2>
+<p>Overdue list roz dekho. Digital Munshi ka "Payment Reminders" report ye kaam aasan karta hai.</p>
+""",
+    },
+    "hsn-code-kya-hai": {
+        "title": "HSN Code Kya Hai aur Kaise Dhoondhe? | Digital Munshi",
+        "desc": "HSN code kya hota hai, GST me kyun zaroori hai, kitne digit chahiye, aur kaise dhoondhe. Simple guide.",
+        "h1": "HSN Code Kya Hai aur Kaise Dhoondhe?",
+        "html": """
+<p>HSN (Harmonized System of Nomenclature) code har product ka ek standard number hai jo GST me item classify karta hai.</p>
+<h2>HSN code kyun zaroori?</h2>
+<p>GST invoice par sahi HSN code likhna zaroori hai. Isse tax rate decide hota hai aur GST return me item classify hota hai.</p>
+<h2>Kitne digit chahiye?</h2>
+<ul>
+<li>Turnover ₹5 crore tak: <b>4 digit</b> HSN.</li>
+<li>Turnover ₹5 crore se zyada: <b>6 digit</b> HSN.</li>
+<li>Export/import: 8 digit.</li>
+</ul>
+<h2>HSN code kaise dhoondhe?</h2>
+<p>GST portal par HSN search tool hai, ya apne product category se pata kar sakte ho. Ek baar item me HSN save kar do — phir har invoice par apne aap aata hai.</p>
+<h2>Digital Munshi me</h2>
+<p>Item banate waqt HSN/SAC daal do — uske baad har bill par automatically HSN aur sahi GST rate lagta hai. HSN summary report bhi ready milti hai.</p>
+""",
+    },
+    "dukaan-online-kaise-laaye": {
+        "title": "Chhoti Dukaan Online Kaise Laaye — 5 Step | Digital Munshi",
+        "desc": "Apni chhoti dukaan ko online kaise laaye — online catalog, WhatsApp order, digital payment. Aasan 5 step guide.",
+        "h1": "Chhoti Dukaan Online Kaise Laaye — 5 Step",
+        "html": """
+<p>Online hone ke liye website ya app banane ki zaroorat nahi. In 5 step me apni dukaan ghar-ghar pahunchao.</p>
+<h2>1. Products digital karo</h2>
+<p>Apne items app me daalo — naam, photo, price. Ye aapka digital catalog ban jaata hai.</p>
+<h2>2. Online catalog link banao</h2>
+<p>Digital Munshi ek public catalog link deta hai. Customer link kholke saare products dekh sakta hai.</p>
+<h2>3. WhatsApp par order lo</h2>
+<p>Customer catalog se items choose karke seedha WhatsApp par order bhejta hai — aapke number par.</p>
+<h2>4. Digital payment</h2>
+<p>Invoice par UPI QR lagao — customer scan karke turant pay kare. Cash ki tension kam.</p>
+<h2>5. Delivery + reminder</h2>
+<p>Order pack karke bhejo, aur payment/udhaar ka reminder WhatsApp par. Dukaan ab online.</p>
+""",
+    },
+    "composition-scheme-gst": {
+        "title": "GST Composition Scheme Kya Hai — Kiske Liye? | Digital Munshi",
+        "desc": "GST composition scheme kya hai, kaun le sakta hai, rate kya hai, aur fayde-nuksaan. Chhote business ke liye guide.",
+        "h1": "GST Composition Scheme Kya Hai?",
+        "html": """
+<p>Composition scheme chhote businesses ke liye ek aasan GST option hai — kam paperwork, fixed low rate.</p>
+<h2>Kaun le sakta hai?</h2>
+<p>Jinka turnover ek limit tak hai (goods ke liye aam taur par ₹1.5 crore tak) wo composition scheme choose kar sakte hain. Kuch categories exclude hoti hain.</p>
+<h2>Rate kya hai?</h2>
+<ul>
+<li>Traders/manufacturers: ~1%</li>
+<li>Restaurants: ~5%</li>
+<li>Other service providers: ~6% (special scheme)</li>
+</ul>
+<h2>Fayde</h2>
+<p>Kam GST rate, simple quarterly return, aur kam compliance. Chhoti dukaan ke liye aasan.</p>
+<h2>Nuksaan</h2>
+<p>Aap GST invoice par tax alag se charge nahi kar sakte (Bill of Supply banta hai), aur input tax credit nahi milta. Inter-state sale ki limit hoti hai.</p>
+<h2>Digital Munshi me</h2>
+<p>Composition business ke liye Digital Munshi <b>Bill of Supply</b> banata hai aur composition-friendly reports deta hai.</p>
+""",
+    },
 }

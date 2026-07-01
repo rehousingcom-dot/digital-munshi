@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Committee, CommitteeMember, CommitteeRound, CommitteePayment
+from .models import (Committee, CommitteeMember, CommitteeRound, CommitteePayment,
+                     CommitteeBid, CommitteeJoinRequest)
 
 
 class CommitteeSerializer(serializers.ModelSerializer):
@@ -49,4 +50,20 @@ class CommitteePaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommitteePayment
+        fields = "__all__"
+
+
+class CommitteeBidSerializer(serializers.ModelSerializer):
+    member_name = serializers.CharField(source="member.name", read_only=True)
+
+    class Meta:
+        model = CommitteeBid
+        fields = "__all__"
+
+
+class CommitteeJoinRequestSerializer(serializers.ModelSerializer):
+    committee_name = serializers.CharField(source="committee.name", read_only=True)
+
+    class Meta:
+        model = CommitteeJoinRequest
         fields = "__all__"

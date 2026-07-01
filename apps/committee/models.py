@@ -8,6 +8,7 @@ bharte hain. Coupon organizer ke hote hain (collection me add hote hain).
 per_head (har member ka us month ka contribution) =
     (total_value - boli + coupon_total) / members_count
 """
+import uuid
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import date, timedelta
 from django.db import models
@@ -50,6 +51,13 @@ class Committee(OrgOwned):
 
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.ACTIVE)
     notes = models.TextField(blank=True)
+
+    # Public sharing (online boli + join link)
+    public_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    bidding_open = models.BooleanField(default=False)
+    open_month = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                  help_text="Kaunse month ki boli abhi khuli hai")
+    allow_join = models.BooleanField(default=True, help_text="Public join link se log apply kar sakte hain")
 
     class Meta:
         ordering = ["-created_at"]
@@ -172,3 +180,40 @@ class CommitteePayment(OrgOwned):
     @property
     def committee_late_rate(self):
         return self.round.committee.late_fee_per_day
+
+
+class CommitteeBid(OrgOwned):
+    """Online boli — member public link se apni bid daalta hai (transparency)."""
+    committee = models.ForeignKey(Committee, on_delete=models.CASCADE, related_name="bids")
+    month_no = models.PositiveSmallIntegerField()
+    member = models.ForeignKey(CommitteeMember, on_delete=models.CASCADE, related_name="bids")
+    bid_amount = models.DecimalField(max_digits=14, decimal_places=2, default=0,
+                                     help_text="Jitna discount/loss dekar uthana chahta hai")
+
+    class Meta:
+        unique_together = ("committee", "month_no", "member")
+        ordering = ["-bid_amount"]
+
+    def __str__(self):
+        return f"{self.member.name} R{self.month_no} bid {self.bid_amount}"
+
+
+class CommitteeJoinRequest(OrgOwned):
+    """Public join link se aaya naya member request (growth loop)."""
+
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Pending"
+        APPROVED = "APPROVED", "Approved"
+        REJECTED = "REJECTED", "Rejected"
+
+    committee = models.ForeignKey(Committee, on_delete=models.CASCADE, related_name="join_requests")
+    name = models.CharField(max_length=120)
+    phone = models.CharField(max_length=15, blank=True)
+    message = models.CharField(max_length=255, blank=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.name} → {self.committee.name} ({self.status})"

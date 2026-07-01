@@ -1,5 +1,18 @@
 from django.contrib import admin
-from .models import Committee, CommitteeMember, CommitteeRound, CommitteePayment
+from .models import (Committee, CommitteeMember, CommitteeRound, CommitteePayment,
+                     CommitteeBid, CommitteeJoinRequest)
+
+
+@admin.register(CommitteeBid)
+class CommitteeBidAdmin(admin.ModelAdmin):
+    list_display = ("committee", "month_no", "member", "bid_amount")
+    list_filter = ("committee",)
+
+
+@admin.register(CommitteeJoinRequest)
+class CommitteeJoinRequestAdmin(admin.ModelAdmin):
+    list_display = ("name", "committee", "phone", "status", "created_at")
+    list_filter = ("status", "committee")
 
 
 @admin.register(Committee)

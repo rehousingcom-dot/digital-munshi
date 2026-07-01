@@ -1,0 +1,78 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ c.name }} — Committee / BC | Digital Munshi</title>
+<meta name="robots" content="noindex">
+<script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-md mx-auto px-4 py-6">
+  <div class="flex items-center gap-2 mb-4">
+    <div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div>
+    <span class="font-extrabold">Digital Munshi</span>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
+    <div class="text-xs text-slate-400 font-semibold uppercase">Committee / BC</div>
+    <h1 class="text-2xl font-extrabold">{{ c.name }}</h1>
+    <div class="text-3xl font-extrabold mt-1" style="color:#c2410c">₹{{ c.total_value|floatformat:0 }}</div>
+    <div class="text-sm text-slate-500 mt-1">{{ c.members_count }} members · per-head base ₹{{ per_head_base|floatformat:0 }} · coupon ₹{{ coupon_total|floatformat:0 }}</div>
+  </div>
+
+  <!-- Online boli -->
+  <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
+    <div class="font-bold text-lg mb-1">🔨 Online Boli</div>
+    {% if c.bidding_open and c.open_month %}
+      <p class="text-sm text-slate-500 mb-3">Month <b>{{ c.open_month }}</b> ki boli khuli hai. Sabse zyada boli (discount) wala uthayega.</p>
+      <div id="bidForm">
+        <label class="text-sm font-semibold">Aap kaun ho?</label>
+        <select id="member" class="w-full p-3 mt-1 mb-3 border border-slate-200 rounded-xl">
+          <option value="">— apna naam chuno —</option>
+          {% for m in members %}<option value="{{ m.id }}">{{ m.name }}</option>{% endfor %}
+        </select>
+        <label class="text-sm font-semibold">Aapki boli (₹ discount)</label>
+        <input id="bid" type="number" class="w-full p-3 mt-1 mb-3 border border-slate-200 rounded-xl" placeholder="e.g. 90000">
+        <button onclick="submitBid()" class="w-full text-white py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Boli daalo</button>
+        <div id="bidMsg" class="text-sm mt-2"></div>
+      </div>
+    {% else %}
+      <p class="text-sm text-slate-500">Boli abhi band hai. Organizer jab kholenge tab yahan boli daal sakte ho.</p>
+    {% endif %}
+  </div>
+
+  <!-- Join -->
+  {% if c.allow_join %}
+  <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
+    <div class="font-bold text-lg mb-1">➕ Committee join karo</div>
+    <p class="text-sm text-slate-500 mb-3">Is committee me shaamil hona chahte ho? Apna naam aur number do — organizer confirm karenge.</p>
+    <input id="jname" class="w-full p-3 mb-2 border border-slate-200 rounded-xl" placeholder="Aapka naam">
+    <input id="jphone" class="w-full p-3 mb-2 border border-slate-200 rounded-xl" placeholder="Mobile number">
+    <input id="jmsg" class="w-full p-3 mb-3 border border-slate-200 rounded-xl" placeholder="Message (optional)">
+    <button onclick="submitJoin()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold">Join request bhejo</button>
+    <div id="joinMsg" class="text-sm mt-2"></div>
+  </div>
+  {% endif %}
+
+  <div class="text-center text-xs text-slate-400 mt-4">Powered by <a href="/software/committee-management-software/" class="text-orange-600 font-semibold">Digital Munshi</a> — apni committee online chalao</div>
+</div>
+<script>
+var UUID="{{ c.public_uuid }}";
+async function submitBid(){
+  var m=document.getElementById("member").value, b=document.getElementById("bid").value;
+  var msg=document.getElementById("bidMsg");
+  if(!m){msg.textContent="Naam chuno";msg.className="text-sm mt-2 text-red-600";return;}
+  if(!b){msg.textContent="Boli amount daalo";msg.className="text-sm mt-2 text-red-600";return;}
+  try{ var r=await fetch("/c/"+UUID+"/bid/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member:m,bid_amount:b})});
+    var d=await r.json(); if(r.ok){msg.textContent="✓ Boli daal di — ₹"+Number(b).toLocaleString('en-IN')+". Organizer band karenge to result aayega.";msg.className="text-sm mt-2 text-green-600";}
+    else {msg.textContent=d.detail||"Error";msg.className="text-sm mt-2 text-red-600";} }
+  catch(e){msg.textContent="Network error";msg.className="text-sm mt-2 text-red-600";}
+}
+async function submitJoin(){
+  var n=document.getElementById("jname").value, p=document.getElementById("jphone").value, m=document.getElementById("jmsg").value;
+  var msg=document.getElementById("joinMsg");
+  if(!n){msg.textContent="Naam daalo";msg.className="text-sm mt-2 text-red-600";return;}
+  try{ var r=await fetch("/c/"+UUID+"/join/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:n,phone:p,message:m})});
+    var d=await r.json(); if(r.ok){msg.textContent="✓ Request bhej di! Organizer jaldi confirm karenge.";msg.className="text-sm mt-2 text-green-600";document.getElementById("jname").value="";document.getElementById("jphone").value="";document.getElementById("jmsg").value="";}
+    else {msg.textContent=d.detail||"Error";msg.className="text-sm mt-2 text-red-600";} }
+  catch(e){msg.textContent="Network error";msg.className="text-sm mt-2 text-red-600";}
+}
+</script>
+</body></html>

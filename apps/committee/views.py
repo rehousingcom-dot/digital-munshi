@@ -4,10 +4,12 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from apps.tenants.tenancy import OrgScopedQuerysetMixin
-from .models import Committee, CommitteeMember, CommitteeRound, CommitteePayment, money
+from .models import (Committee, CommitteeMember, CommitteeRound, CommitteePayment,
+                     CommitteeBid, CommitteeJoinRequest, money)
 from .serializers import (
     CommitteeSerializer, CommitteeMemberSerializer,
     CommitteeRoundSerializer, CommitteePaymentSerializer,
+    CommitteeBidSerializer, CommitteeJoinRequestSerializer,
 )
 
 
@@ -103,6 +105,85 @@ class CommitteeViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
             "members_ledger": out,
         })
 
+    @action(detail=True, methods=["post"])
+    def open_bidding(self, request, pk=None):
+        """Ek month ki online boli kholo. body: {month_no}"""
+        c = self.get_object()
+        mn = int(request.data.get("month_no") or 0)
+        if mn < 1:
+            return Response({"detail": "month_no required"}, status=400)
+        c.open_month = mn
+        c.bidding_open = True
+        c.save(update_fields=["open_month", "bidding_open"])
+        return Response(CommitteeSerializer(c).data)
+
+    @action(detail=True, methods=["post"])
+    def close_bidding(self, request, pk=None):
+        """Boli band karo — sabse zyada bid (max discount) wala winner banega,
+        round record ho jaayega, payment rows ban jaayenge."""
+        c = self.get_object()
+        mn = c.open_month
+        if not mn:
+            return Response({"detail": "no open month"}, status=400)
+        top = CommitteeBid.objects.filter(committee=c, month_no=mn).order_by("-bid_amount").first()
+        if not top:
+            c.bidding_open = False
+            c.save(update_fields=["bidding_open"])
+            return Response({"detail": "no bids", "closed": True})
+        rnd, _ = CommitteeRound.objects.get_or_create(committee=c, month_no=mn)
+        rnd.winner_id = top.member_id
+        rnd.bid_amount = money(top.bid_amount)
+        rnd.date = rnd.date or timezone.localdate()
+        rnd.compute()
+        _sync_payments(rnd)
+        c.bidding_open = False
+        c.save(update_fields=["bidding_open"])
+        return Response({"round": CommitteeRoundSerializer(rnd).data,
+                         "winner": top.member.name, "bid": str(money(top.bid_amount))})
+
+    @action(detail=True, methods=["get"])
+    def bids(self, request, pk=None):
+        """Ek month ke saare bids (organizer transparency). ?month=N"""
+        c = self.get_object()
+        mn = request.query_params.get("month") or c.open_month
+        qs = CommitteeBid.objects.filter(committee=c)
+        if mn:
+            qs = qs.filter(month_no=mn)
+        return Response(CommitteeBidSerializer(qs.order_by("-bid_amount"), many=True).data)
+
+
+def member_statement_data(member):
+    """Ek member ka statement: har round me kitna diya, kya mila, interest."""
+    c = member.committee
+    n = c.members_count or 1
+    rounds = list(c.rounds.all())
+    total_per_head = sum((r.per_head for r in rounds), Decimal("0"))
+    pays = {p.round_id: p for p in CommitteePayment.objects.filter(round__committee=c, member=member)}
+    win = next((r for r in rounds if r.winner_id == member.id), None)
+    received = money(win.net_payable) if win else Decimal("0")
+    paid = sum((p.amount_paid for p in pays.values()), Decimal("0"))
+    late = sum((p.late_fee for p in pays.values()), Decimal("0"))
+    gain = money(received - total_per_head)
+    annual = None
+    if win and total_per_head > 0:
+        annual = round(float(gain / total_per_head) * (12.0 / n) * 100, 1)
+    rows = []
+    for r in rounds:
+        p = pays.get(r.id)
+        rows.append({
+            "month_no": r.month_no, "per_head": money(r.per_head),
+            "is_win": bool(win and r.id == win.id),
+            "paid": money(p.amount_paid) if p else Decimal("0"),
+            "late_fee": money(p.late_fee) if p else Decimal("0"),
+            "status": p.status if p else "PENDING",
+        })
+    return {
+        "member": member, "committee": c, "rows": rows,
+        "total_contribution": money(total_per_head), "received": received,
+        "won_month": win.month_no if win else None, "paid": money(paid),
+        "late": money(late), "gain": gain, "annual": annual,
+    }
+
 
 class CommitteeMemberViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
     queryset = CommitteeMember.objects.select_related("committee", "party").all()
@@ -167,3 +248,49 @@ class CommitteePaymentViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
         p.amount_paid = money(amt) if amt not in (None, "") else p.total_due
         p.save()
         return Response(CommitteePaymentSerializer(p).data)
+
+
+class CommitteeBidViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
+    queryset = CommitteeBid.objects.select_related("member", "committee").all()
+    serializer_class = CommitteeBidSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        cid = self.request.query_params.get("committee")
+        mn = self.request.query_params.get("month")
+        if cid:
+            qs = qs.filter(committee_id=cid)
+        if mn:
+            qs = qs.filter(month_no=mn)
+        return qs
+
+
+class CommitteeJoinRequestViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
+    queryset = CommitteeJoinRequest.objects.select_related("committee").all()
+    serializer_class = CommitteeJoinRequestSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        cid = self.request.query_params.get("committee")
+        st = self.request.query_params.get("status")
+        if cid:
+            qs = qs.filter(committee_id=cid)
+        if st:
+            qs = qs.filter(status=st)
+        return qs
+
+    @action(detail=True, methods=["post"])
+    def approve(self, request, pk=None):
+        """Join request approve → member ban jaata hai."""
+        jr = self.get_object()
+        jr.status = "APPROVED"
+        jr.save(update_fields=["status"])
+        m = CommitteeMember.objects.create(committee=jr.committee, name=jr.name, phone=jr.phone)
+        return Response({"approved": True, "member": CommitteeMemberSerializer(m).data})
+
+    @action(detail=True, methods=["post"])
+    def reject(self, request, pk=None):
+        jr = self.get_object()
+        jr.status = "REJECTED"
+        jr.save(update_fields=["status"])
+        return Response({"rejected": True})

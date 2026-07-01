@@ -111,6 +111,7 @@ from apps.hr import print_views as hr_print
 from apps.cashbank import views as cashbank_views
 from apps.accounting import views as acc_views
 from apps.committee import views as committee_views
+from apps.committee import public_views as committee_public
 
 
 def health(request):
@@ -157,6 +158,8 @@ router.register("committees", committee_views.CommitteeViewSet)
 router.register("committee-members", committee_views.CommitteeMemberViewSet)
 router.register("committee-rounds", committee_views.CommitteeRoundViewSet)
 router.register("committee-payments", committee_views.CommitteePaymentViewSet)
+router.register("committee-bids", committee_views.CommitteeBidViewSet)
+router.register("committee-join-requests", committee_views.CommitteeJoinRequestViewSet)
 # Cash & Bank
 router.register("bank-accounts", cashbank_views.BankAccountViewSet)
 router.register("bank-transactions", cashbank_views.BankTransactionViewSet)
@@ -234,6 +237,12 @@ urlpatterns = [
     path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),
     path("api/catalog/toggle/", tenant_views.catalog_toggle, name="catalog_toggle"),
+    # Committee public (online boli + join) + member statement
+    path("c/<uuid:public_uuid>/", committee_public.committee_public, name="committee_public"),
+    path("c/<uuid:public_uuid>/bid/", committee_public.api_public_bid, name="committee_public_bid"),
+    path("c/<uuid:public_uuid>/join/", committee_public.api_public_join, name="committee_public_join"),
+    path("committee/member/<int:pk>/statement/", committee_public.member_statement_html, name="committee_stmt"),
+    path("committee/member/<int:pk>/statement.pdf", committee_public.member_statement_pdf, name="committee_stmt_pdf"),
     path("api/", include(router.urls)),
     path("api/reports/", include("apps.reports.urls")),
     # API docs (Swagger)

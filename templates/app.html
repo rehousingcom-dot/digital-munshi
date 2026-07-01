@@ -2140,7 +2140,7 @@ function CommitteeDetail({c,onBack}){
   const [members,setMembers]=useState([]);
   const reloadMembers=()=>apiList("/committee-members/?committee="+c.id+"&page_size=200").then(setMembers);
   useEffect(()=>{ reloadMembers(); },[]);
-  const tabs=[["members",t("Members","सदस्य")],["rounds",t("Boli / Rounds","बोली / राउंड")],["payments",t("Payments","भुगतान")],["ledger",t("Interest Ledger","ब्याज लेजर")]];
+  const tabs=[["members",t("Members","सदस्य")],["rounds",t("Boli / Rounds","बोली / राउंड")],["payments",t("Payments","भुगतान")],["ledger",t("Interest Ledger","ब्याज लेजर")],["share",t("Online Boli / Link","ऑनलाइन बोली")],["requests",t("Join Requests","जॉइन रिक्वेस्ट")]];
   return (<div className="p-6">
     <button onClick={onBack} className="text-blue-700 text-sm mb-2">← {t("All committees","सभी कमेटी")}</button>
     <div className="flex flex-wrap items-baseline gap-3 mb-1">
@@ -2155,6 +2155,70 @@ function CommitteeDetail({c,onBack}){
     {sub==="rounds" && <RoundsTab c={c} members={members} />}
     {sub==="payments" && <PaymentsTab c={c} members={members} />}
     {sub==="ledger" && <LedgerTab c={c} />}
+    {sub==="share" && <ShareTab c={c} />}
+    {sub==="requests" && <RequestsTab c={c} reloadMembers={reloadMembers} />}
+  </div>);
+}
+
+function ShareTab({c}){
+  const [st,setSt]=useState({bidding_open:c.bidding_open,open_month:c.open_month});
+  const [month,setMonth]=useState(c.open_month||1),[bids,setBids]=useState([]),[msg,setMsg]=useState("");
+  const link=window.location.origin+"/c/"+c.public_uuid+"/";
+  const loadBids=()=>{ if(st.open_month)api("/committees/"+c.id+"/bids/?month="+st.open_month).then(d=>setBids(Array.isArray(d)?d:[])).catch(()=>{}); };
+  useEffect(()=>{ loadBids(); },[st.open_month]);
+  const openBid=async()=>{ const r=await api("/committees/"+c.id+"/open_bidding/",{method:"POST",body:JSON.stringify({month_no:month})}); setSt({bidding_open:true,open_month:month}); setMsg(t("Bidding opened for month","बोली खुली महीना")+" "+month); setTimeout(()=>setMsg(""),2500); };
+  const closeBid=async()=>{ if(!confirm(t("Close bidding? Highest bid wins.","बोली बंद करें? सबसे ऊंची बोली जीतेगी।")))return;
+    const r=await api("/committees/"+c.id+"/close_bidding/",{method:"POST",body:JSON.stringify({})});
+    setSt({bidding_open:false,open_month:st.open_month}); setMsg(r.winner?(t("Winner","विजेता")+": "+r.winner+" (₹"+Number(r.bid).toLocaleString('en-IN')+")"):t("No bids came","koi boli nahi aayi")); loadBids(); setTimeout(()=>setMsg(""),6000); };
+  const copy=()=>{ navigator.clipboard.writeText(link); setMsg(t("Link copied!","लिंक कॉपी!")); setTimeout(()=>setMsg(""),1500); };
+  const wa=()=>{ const txt=t("Join our committee / boli daalo","hamari committee join karo / boli daalo")+": "+c.name+" — "+link; window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank"); };
+  return (<div className="grid md:grid-cols-2 gap-4">
+    <div className="card p-4">
+      <div className="font-bold mb-2">🔗 {t("Public link (members)","पब्लिक लिंक")}</div>
+      <div className="bg-slate-50 rounded-lg p-2 text-xs break-all border">{link}</div>
+      <div className="flex gap-2 mt-2">
+        <button onClick={copy} className="bg-slate-700 text-white px-3 py-1.5 rounded text-sm flex-1">{t("Copy","कॉपी")}</button>
+        <button onClick={wa} className="bg-green-600 text-white px-3 py-1.5 rounded text-sm flex-1">{t("WhatsApp","व्हाट्सएप")}</button>
+        <a href={link} target="_blank" className="bg-blue-900 text-white px-3 py-1.5 rounded text-sm flex-1 text-center">{t("Open","खोलो")}</a>
+      </div>
+      <p className="text-xs text-slate-400 mt-2">{t("Members open this link to place bids & new people can request to join.","members is link se boli daalte hain, naye log join maang sakte hain.")}</p>
+      {msg&&<div className="text-green-600 text-sm mt-2 font-semibold">{msg}</div>}
+    </div>
+    <div className="card p-4">
+      <div className="font-bold mb-2">🔨 {t("Online bidding","ऑनलाइन बोली")}</div>
+      {st.bidding_open
+        ? <div><div className="text-sm mb-2">{t("Bidding OPEN for month","बोली खुली महीना")} <b>{st.open_month}</b></div>
+            <button onClick={closeBid} className="bg-red-600 text-white px-3 py-2 rounded text-sm w-full">{t("Close & pick winner (highest bid)","बंद करो व विजेता चुनो")}</button></div>
+        : <div className="flex gap-2 items-center">
+            <label className="text-sm text-slate-500">{t("Month","महीना")}</label>
+            <input type="number" className="border p-2 rounded w-20" value={month} onChange={e=>setMonth(+e.target.value)} />
+            <button onClick={openBid} className="bg-blue-900 text-white px-3 py-2 rounded text-sm">{t("Open bidding","बोली खोलो")}</button>
+          </div>}
+      <div className="mt-3">
+        <div className="flex items-center justify-between"><div className="text-sm font-semibold">{t("Live bids","लाइव बोली")} {st.open_month?("(month "+st.open_month+")"):""}</div><button onClick={loadBids} className="text-blue-700 text-xs">↻ {t("Refresh","रिफ्रेश")}</button></div>
+        <table className="w-full text-sm mt-1"><tbody>
+          {bids.length===0&&<tr><td className="text-slate-400 py-1">{t("No bids yet","abhi koi boli nahi")}</td></tr>}
+          {bids.map((b,i)=><tr key={b.id} className="border-b"><td className="py-1">{i===0&&<span title="highest">🏆 </span>}{b.member_name}</td><td className="py-1 text-right font-semibold">{money(b.bid_amount)}</td></tr>)}
+        </tbody></table>
+      </div>
+    </div>
+  </div>);
+}
+
+function RequestsTab({c,reloadMembers}){
+  const [rows,setRows]=useState([]),[msg,setMsg]=useState("");
+  const load=()=>apiList("/committee-join-requests/?committee="+c.id+"&page_size=200").then(setRows);
+  useEffect(()=>{ load(); },[]);
+  const act=async(id,which)=>{ await api("/committee-join-requests/"+id+"/"+which+"/",{method:"POST",body:JSON.stringify({})}); setMsg(which==="approve"?t("Approved & added as member","सदस्य जोड़ा"):t("Rejected","अस्वीकृत")); load(); if(which==="approve")reloadMembers(); setTimeout(()=>setMsg(""),2500); };
+  return (<div>
+    {msg&&<div className="bg-green-50 text-green-700 p-2 rounded mb-2 text-sm">{msg}</div>}
+    <p className="text-xs text-slate-500 mb-2">{t("People who requested to join via the public link.","public link se jo log join maang rahe hain.")}</p>
+    <div className="card overflow-hidden"><table className="w-full text-sm">
+      <thead className="bg-slate-100"><tr><th className="text-left p-2">{t("Name","नाम")}</th><th className="text-left p-2">{t("Phone","फोन")}</th><th className="text-left p-2">{t("Message","संदेश")}</th><th className="p-2">{t("Status","स्थिति")}</th><th></th></tr></thead>
+      <tbody>{rows.length===0&&<tr><td colSpan="5" className="p-3 text-slate-400">{t("No join requests yet","abhi koi request nahi")}</td></tr>}
+        {rows.map(r=><tr key={r.id} className="border-b"><td className="p-2 font-medium">{r.name}</td><td className="p-2">{r.phone||"—"}</td><td className="p-2 text-slate-500">{r.message||"—"}</td><td className="p-2">{r.status}</td>
+          <td className="p-2 text-right">{r.status==="PENDING"&&<span><button onClick={()=>act(r.id,"approve")} className="text-green-600 text-xs font-semibold mr-2">{t("Approve","स्वीकार")}</button><button onClick={()=>act(r.id,"reject")} className="text-red-500 text-xs">{t("Reject","अस्वीकार")}</button></span>}</td></tr>)}</tbody>
+    </table></div>
   </div>);
 }
 
@@ -2265,14 +2329,17 @@ function LedgerTab({c}){
     </div>
     <div className="card overflow-x-auto"><table className="w-full text-sm">
       <thead className="bg-slate-100"><tr><th className="text-left p-2">{t("Member","सदस्य")}</th><th className="text-center p-2">{t("Won month","जीता महीना")}</th>
-        <th className="text-right p-2">{t("Received","मिला")}</th><th className="text-right p-2">{t("Total pays","कुल देय")}</th><th className="text-right p-2">{t("Gain / (cost)","लाभ/(लागत)")}</th><th className="text-right p-2">{t("Interest/yr","ब्याज/वर्ष")}</th></tr></thead>
-      <tbody>{d.members_ledger.map(m=>{const g=Number(m.gain);return (<tr key={m.member} className="border-b">
+        <th className="text-right p-2">{t("Received","मिला")}</th><th className="text-right p-2">{t("Total pays","कुल देय")}</th><th className="text-right p-2">{t("Gain / (cost)","लाभ/(लागत)")}</th><th className="text-right p-2">{t("Interest/yr","ब्याज/वर्ष")}</th><th className="p-2">{t("Statement","स्टेटमेंट")}</th></tr></thead>
+      <tbody>{d.members_ledger.map(m=>{const g=Number(m.gain);
+        const waStmt=()=>{const digits=(m.phone||"").replace(/\D/g,"");const txt=c.name+" — "+m.name+"\n"+t("Received","मिला")+": ₹"+Number(m.received).toLocaleString('en-IN')+"\n"+t("Total contribution","कुल देय")+": ₹"+Number(m.total_contribution).toLocaleString('en-IN')+"\n"+t("Net","नेट")+": ₹"+Number(m.gain).toLocaleString('en-IN')+(m.annual_interest!=null?"\n"+t("Interest/yr","ब्याज")+": "+m.annual_interest+"%":"");window.open("https://wa.me/"+(digits?("91"+digits.slice(-10)):"")+"?text="+encodeURIComponent(txt),"_blank");};
+        return (<tr key={m.member} className="border-b">
         <td className="p-2 font-medium">{m.name}</td>
         <td className="p-2 text-center">{m.won_month||<span className="text-slate-400">—</span>}</td>
         <td className="p-2 text-right">{m.won_month?money(m.received):"—"}</td>
         <td className="p-2 text-right">{money(m.total_contribution)}</td>
         <td className="p-2 text-right font-semibold" style={{color:g<0?"#dc2626":"#059669"}}>{g<0?"-":""}{money(Math.abs(g))}</td>
-        <td className="p-2 text-right font-semibold" style={{color:m.annual_interest<0?"#dc2626":"#059669"}}>{m.annual_interest==null?"—":(m.annual_interest>0?"+":"")+m.annual_interest+"%"}</td></tr>);})}</tbody>
+        <td className="p-2 text-right font-semibold" style={{color:m.annual_interest<0?"#dc2626":"#059669"}}>{m.annual_interest==null?"—":(m.annual_interest>0?"+":"")+m.annual_interest+"%"}</td>
+        <td className="p-2 text-center whitespace-nowrap"><a href={"/committee/member/"+m.member+"/statement.pdf?token="+getToken()} target="_blank" className="text-blue-700 text-xs font-semibold mr-2">PDF</a><button onClick={waStmt} className="text-green-600 text-xs font-semibold">WA</button></td></tr>);})}</tbody>
     </table></div>
     <p className="text-xs text-slate-400 mt-2">{t("Early taker (low month) pays interest; late taker earns. Interest is approximate annualised on the recorded rounds.","jaldi lene wala interest deta, baad wala kamata. Approx annual figure.")}</p>
   </div>);

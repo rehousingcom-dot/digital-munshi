@@ -14,3 +14,6 @@ xhtml2pdf>=0.2.16            # invoice PDF generation
 qrcode>=7.4                  # UPI QR code on invoice
 drf-spectacular>=0.27        # OpenAPI / Swagger API docs
 razorpay>=1.4                # payments (test + live). Bina keys ke dev-mode chalta hai.
+
+cloudinary>=1.40             # media SDK
+django-cloudinary-storage>=0.3  # Django media storage backend (persistent uploads)

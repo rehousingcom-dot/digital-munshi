@@ -119,12 +119,30 @@ _static_src = BASE_DIR / "static"
 STATICFILES_DIRS = [_static_src] if _static_src.exists() else []
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
-# WhiteNoise compressed static storage — sirf jab whitenoise installed ho
-if _WHITENOISE:
-    STORAGES = {
-        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+
+# --- Cloudinary media storage (Railway disk ephemeral hai — uploads persist karne ke liye) ---
+# Jab teeno env vars set ho, item photos/logo/signature Cloudinary pe jaate hain (permanent).
+# Warna local FileSystem (dev). Secret sirf Railway env me — code me nahi.
+CLOUDINARY_CLOUD_NAME = env("CLOUDINARY_CLOUD_NAME", default="")
+CLOUDINARY_API_KEY = env("CLOUDINARY_API_KEY", default="")
+CLOUDINARY_API_SECRET = env("CLOUDINARY_API_SECRET", default="")
+_USE_CLOUDINARY = bool(CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)
+if _USE_CLOUDINARY:
+    INSTALLED_APPS += ["cloudinary", "cloudinary_storage"]
+    CLOUDINARY_STORAGE = {
+        "CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
+        "API_KEY": CLOUDINARY_API_KEY,
+        "API_SECRET": CLOUDINARY_API_SECRET,
     }
+
+_default_storage = ("cloudinary_storage.storage.MediaCloudinaryStorage"
+                    if _USE_CLOUDINARY else "django.core.files.storage.FileSystemStorage")
+_static_storage = ("whitenoise.storage.CompressedManifestStaticFilesStorage"
+                   if _WHITENOISE else "django.contrib.staticfiles.storage.StaticFilesStorage")
+STORAGES = {
+    "default": {"BACKEND": _default_storage},
+    "staticfiles": {"BACKEND": _static_storage},
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

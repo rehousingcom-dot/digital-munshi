@@ -212,8 +212,8 @@ function Login({onLogin}){
   const [showPass,setShowPass]=useState(false);
   const [otpSent,setOtpSent]=useState(false),[devOtp,setDevOtp]=useState("");
   const sendOtp=async()=>{ setErr("");
-    if((f.phone||"").replace(/\D/g,"").length<10){ setErr("Enter a valid 10-digit mobile number"); return; }
-    try{ const r=await fetch(API+"/send-otp/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone:f.phone})}); const d=await r.json();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email||"")){ setErr("Enter a valid email address"); return; }
+    try{ const r=await fetch(API+"/send-otp/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:f.email})}); const d=await r.json();
       if(r.ok){ setOtpSent(true); setDevOtp(d.dev_otp||""); } else setErr(d.detail||"Could not send OTP"); }
     catch(e){ setErr("Could not send OTP"); } };
   const BTYPES=[["RETAIL","Retail Shop / Kirana"],["WHOLESALE","Wholesale / Distributor"],["RESTAURANT","Restaurant / Cafe"],["PHARMACY","Pharmacy / Medical"],["SERVICES","Services / Professional"],["MANUFACTURER","Manufacturer"],["GENERAL","General / Other"]];
@@ -245,8 +245,8 @@ function Login({onLogin}){
 
           <div className="my-8 lg:my-0">
             <div className="inline-flex items-center gap-2 bg-white/10 text-orange-50 text-xs font-semibold px-3 py-1.5 rounded-full mb-5">⭐ 4.8/5 — 10,000+ Indian businesses ka bharosa</div>
-            <h1 style={{fontSize:"clamp(32px,4.2vw,54px)",lineHeight:1.07,fontWeight:800,letterSpacing:"-0.02em"}}>Billing software nahi,<br/><span style={{color:"#ffedd5"}}>aapka digital Munshi.</span></h1>
-            <p className="text-orange-100 mt-5 text-lg" style={{maxWidth:490,opacity:0.95}}>GST invoice, stock, payments aur staff payroll — sab ek hi jagah. Kisi bhi business ke liye, sirf 5 minute me shuru.</p>
+            <h1 style={{fontSize:"clamp(32px,4.2vw,54px)",lineHeight:1.07,fontWeight:800,letterSpacing:"-0.02em"}}>More than billing software,<br/><span style={{color:"#ffedd5"}}>your digital Munshi.</span></h1>
+            <p className="text-orange-100 mt-5 text-lg" style={{maxWidth:490,opacity:0.95}}>GST invoicing, stock, payments and staff payroll — all in one place. For any business, live in just 5 minutes.</p>
 
             <div className="mt-7 grid sm:grid-cols-2 gap-x-8 gap-y-3" style={{maxWidth:580}}>
               {FEATURES.map((t,i)=>(
@@ -293,15 +293,15 @@ function Login({onLogin}){
               {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder={t("Business / Shop name","बिज़नेस / दुकान का नाम")} value={f.org_name} onChange={set("org_name")} />}
               {mode==="signup" && <select className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-100" value={f.business_type} onChange={set("business_type")}>
                 {BTYPES.map(([c,l])=><option key={c} value={c}>{l}</option>)}</select>}
-              <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Username" value={f.username} onChange={set("username")} />
-              {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Email (optional)" value={f.email} onChange={set("email")} />}
+              <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder={t("Username","यूज़रनेम")} value={f.username} onChange={set("username")} />
+              {mode==="signup" && <input className="w-full p-3 mb-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder={t("Mobile number (optional)","मोबाइल नंबर (वैकल्पिक)")} value={f.phone} onChange={set("phone")} />}
               {mode==="signup" && <div className="mb-3">
                 <div className="flex gap-2">
-                  <input className="flex-1 p-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder="Mobile number *" value={f.phone} onChange={set("phone")} />
-                  <button type="button" onClick={sendOtp} className="px-4 rounded-xl font-bold text-white text-sm whitespace-nowrap" style={{background:otpSent?"#64748b":"linear-gradient(135deg,#f97316,#ea580c)"}}>{otpSent?"Resend":"Send OTP"}</button>
+                  <input className="flex-1 p-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" placeholder={t("Email address *","ईमेल पता *")} value={f.email} onChange={set("email")} />
+                  <button type="button" onClick={sendOtp} className="px-4 rounded-xl font-bold text-white text-sm whitespace-nowrap" style={{background:otpSent?"#64748b":"linear-gradient(135deg,#f97316,#ea580c)"}}>{otpSent?t("Resend","फिर भेजें"):t("Send OTP","OTP भेजें")}</button>
                 </div>
-                {otpSent && <input className="w-full mt-2 p-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 tracking-widest" placeholder="6-digit OTP" value={f.otp} onChange={set("otp")} />}
-                {devOtp && <div className="text-xs text-emerald-600 mt-1">Dev OTP: <b>{devOtp}</b> (SMS gateway lagne par yeh SMS me aayega)</div>}
+                {otpSent && <input className="w-full mt-2 p-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 tracking-widest" placeholder={t("6-digit OTP (check email)","6-अंक OTP (ईमेल देखें)")} value={f.otp} onChange={set("otp")} />}
+                {devOtp && <div className="text-xs text-emerald-600 mt-1">{t("Dev OTP","डेव OTP")}: <b>{devOtp}</b> ({t("email SMTP set hone par inbox me aayega","ईमेल SMTP सेट होने पर इनबॉक्स में आएगा")})</div>}
               </div>}
               <div className="relative mb-5">
                 <input className="w-full p-3 pr-16 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100" type={showPass?"text":"password"} placeholder={t("Password","पासवर्ड")} value={f.password} onChange={set("password")} />
@@ -348,7 +348,7 @@ function Subscribe({sub,onActivated}){
     <div className="p-6">
       <h2 className="text-xl font-bold text-slate-700 mb-1">Subscription Plans</h2>
       {expired
-        ? <div className="bg-red-50 text-red-600 p-3 rounded mb-4">Aapka trial/plan khatam ho gaya hai. Aage badhne ke liye plan choose karein.</div>
+        ? <div className="bg-red-50 text-red-600 p-3 rounded mb-4">Your trial/plan has ended. Choose a plan to continue.</div>
         : <p className="text-slate-500 mb-4">Trial chal raha hai — kabhi bhi upgrade kar sakte hain.</p>}
       {err && <div className="bg-red-50 text-red-600 p-2 rounded mb-3 text-sm">{err}</div>}
       <div className="inline-flex bg-slate-200 rounded-lg p-1 mb-5">
@@ -511,7 +511,7 @@ function Dashboard({onNav}){
           <div className="flex-1">
             <div className="flex items-center gap-2"><div className="font-bold text-slate-800">WhatsApp Connect</div><span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background:"#dcfce7",color:"#16a34a"}}>ENABLED</span></div>
             <div className="text-sm text-slate-500 mt-1">Invoices, estimates aur reminders seedha customer ko WhatsApp pe bhejein.</div>
-            <button onClick={()=>onNav&&onNav("settings")} className="text-sm font-semibold text-green-700 mt-2">Number set karein →</button>
+            <button onClick={()=>onNav&&onNav("settings")} className="text-sm font-semibold text-green-700 mt-2">Set number →</button>
           </div>
         </div>
         <div className="card p-5 hover-lift">
@@ -531,7 +531,7 @@ function Dashboard({onNav}){
         <table className="w-full text-sm">
           <thead><tr><th className="text-left p-3">Date</th><th className="text-left p-3">No.</th><th className="text-left p-3">Type</th><th className="text-right p-3">Amount</th><th className="text-right p-3">Action</th></tr></thead>
           <tbody>
-            {recent.length===0 && <tr><td className="p-4 text-slate-400" colSpan="5">Koi transaction nahi</td></tr>}
+            {recent.length===0 && <tr><td className="p-4 text-slate-400" colSpan="5">No transactions</td></tr>}
             {recent.map(v=><tr key={v.id} className="border-b">
               <td className="p-3">{v.date}</td><td className="p-3 font-medium">{v.number}</td>
               <td className="p-3"><span className="text-xs px-2 py-0.5 rounded-full" style={{background:v.voucher_type==="SALE"?"#ecfdf5":"#eff6ff",color:v.voucher_type==="SALE"?"#059669":"#2563eb"}}>{v.voucher_type}</span></td>
@@ -562,7 +562,7 @@ function ListView({title,path,columns,initialQuery}){
         <table className="w-full text-sm">
           <thead className="bg-slate-100 text-slate-600"><tr>{columns.map(c=><th key={c.key} className="text-left p-2">{c.label}</th>)}</tr></thead>
           <tbody>
-            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={columns.length}>Koi record nahi</td></tr>}
+            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={columns.length}>No records</td></tr>}
             {filt.map((r,i)=><tr key={i} className="border-b hover:bg-slate-50">{columns.map(c=><td key={c.key} className="p-2">{c.render?c.render(r):r[c.key]}</td>)}</tr>)}
           </tbody>
         </table>
@@ -594,7 +594,7 @@ function PartyView(){
             <th className="text-left p-2.5">Name</th><th className="text-left p-2.5">Type</th><th className="text-left p-2.5">GSTIN</th>
             <th className="text-left p-2.5">Phone</th><th className="text-left p-2.5">City</th><th className="text-right p-2.5">Opening Bal</th><th className="text-left p-2.5">Docs</th><th></th></tr></thead>
           <tbody>
-            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={8}>Koi party nahi — "+ Add Party" se shuru karein</td></tr>}
+            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={8}>No parties — start with "+ Add Party"</td></tr>}
             {filt.map(r=><tr key={r.id} className="border-b hover:bg-slate-50">
               <td className="p-2.5 font-semibold text-slate-700">{r.name}{r.legal_name?<div className="text-xs text-slate-400">{r.legal_name}</div>:null}</td>
               <td className="p-2.5"><span className="text-xs px-2 py-0.5 rounded-full" style={{background:r.party_type==="SUPPLIER"?"#fef3c7":"#dbeafe",color:r.party_type==="SUPPLIER"?"#92400e":"#1e40af"}}>{r.party_type==="SUPPLIER"?"Creditor":r.party_type==="BOTH"?"Both":"Debtor"}</span></td>
@@ -657,7 +657,7 @@ function PartyForm({party,onClose,onSaved}){
               <div className="flex gap-2 mt-1"><input className="border border-slate-200 w-full p-2 rounded-lg text-sm" value={f.gstin||""} onChange={e=>set("gstin",e.target.value.toUpperCase())} placeholder="06CBZPN8878H1ZH"/>
                 <button onClick={verify} className="px-3 py-2 rounded-lg text-sm font-semibold text-white whitespace-nowrap" style={{background:"#1e3a8a"}}>Verify</button></div>
               {gst && (gst.loading?<div className="text-xs text-slate-400 mt-1">Verifying…</div>:
-                gst.valid?<div className="text-xs text-green-700 mt-1">✓ Valid · {gst.state} · PAN {gst.pan}{gst.source==="gst_api"?" · GST se auto-filled ✨":gst.source==="existing_record"?" · record mila":" · (name/address ke liye GST API key set karein)"}</div>:
+                gst.valid?<div className="text-xs text-green-700 mt-1">✓ Valid · {gst.state} · PAN {gst.pan}{gst.source==="gst_api"?" · GST se auto-filled ✨":gst.source==="existing_record"?" · record mila":" · (set a GST API key for name/address)"}</div>:
                 <div className="text-xs text-red-600 mt-1">✗ {gst.detail||"Invalid GSTIN"}</div>)}</div>
             {I("PAN","pan")}
           </div>
@@ -727,7 +727,7 @@ function ItemView(){
             <th className="text-left p-2.5">Name</th><th className="text-left p-2.5">Type</th><th className="text-left p-2.5">Item Code</th>
             <th className="text-left p-2.5">HSN</th><th className="text-right p-2.5">MRP</th><th className="text-center p-2.5">Variants</th><th></th></tr></thead>
           <tbody>
-            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={7}>Koi item nahi — "+ Add Item" se shuru karein</td></tr>}
+            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={7}>No items — start with "+ Add Item"</td></tr>}
             {filt.map(r=><tr key={r.id} className="border-b hover:bg-slate-50">
               <td className="p-2.5 font-semibold text-slate-700">{r.name}</td>
               <td className="p-2.5"><span className="text-xs px-2 py-0.5 rounded-full" style={{background:r.item_type==="SERVICE"?"#ede9fe":"#dcfce7",color:r.item_type==="SERVICE"?"#6d28d9":"#166534"}}>{r.item_type==="SERVICE"?"Service":"Product"}</span></td>
@@ -1141,7 +1141,7 @@ function BarcodeDesigner(){
           <label className="flex items-center gap-1.5"><input type="checkbox" checked={showName} onChange={e=>setShowName(e.target.checked)}/> Name</label>
           <label className="flex items-center gap-1.5"><input type="checkbox" checked={showPrice} onChange={e=>setShowPrice(e.target.checked)}/> Price</label>
         </div>
-        <div className="text-xs text-slate-400">🖨 Printer aur paper size browser ke print dialog me choose karein. "Unique per unit" on kro to har label ka barcode alag (…-0001, …-0002).</div>
+        <div className="text-xs text-slate-400">🖨 Choose printer & paper size in the browser print dialog. Turn on "Unique per unit" to give each label a different barcode (…-0001, …-0002).</div>
         <button onClick={printSheet} className="text-white px-4 py-2.5 rounded-xl text-sm font-bold w-full" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>🖨 Print Labels</button>
       </div>
       <div className="card p-5">
@@ -1170,18 +1170,18 @@ function PriceListManager(){
         <div className="font-bold text-slate-700 mb-3">Price Lists (Retail / Wholesale / Distributor)</div>
         <div className="flex gap-2 mb-3"><input className={cell+" flex-1"} placeholder="New list (e.g. Wholesale)" value={newName} onChange={e=>setNewName(e.target.value)}/>
           <button onClick={create} className="text-white px-4 rounded-lg text-sm font-bold" style={{background:"#ea6a1e"}}>+ Create</button></div>
-        {lists.length===0 && <div className="text-sm text-slate-400">Koi price list nahi.</div>}
+        {lists.length===0 && <div className="text-sm text-slate-400">No price lists.</div>}
         {lists.map(l=><button key={l.id} onClick={()=>setSel(l)} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-semibold mb-1" style={{background:sel&&sel.id===l.id?"#fff7ed":"#f8fafc",color:sel&&sel.id===l.id?"#c2410c":"#475569"}}>{l.name} <span className="text-xs text-slate-400">· {(l.items||[]).length} items</span></button>)}
       </div>
       <div className="card p-5">
-        {!sel ? <div className="text-sm text-slate-400">Ek price list select karein prices add karne ke liye.</div>
+        {!sel ? <div className="text-sm text-slate-400">Select a price list to add prices.</div>
         : <><div className="font-bold text-slate-700 mb-2">{sel.name} — Prices</div>
           {msg && <div className="text-xs text-green-700 mb-2">{msg}</div>}
           <div className="flex gap-2 mb-3"><select className={cell+" flex-1"} value={row.variant} onChange={e=>setRow({...row,variant:e.target.value})}><option value="">— item —</option>{variants.map(v=><option key={v.id} value={v.id}>{v.label}</option>)}</select>
             <input type="number" className={cell+" w-24"} placeholder="₹" value={row.price} onChange={e=>setRow({...row,price:e.target.value})}/>
             <button onClick={addItem} className="text-white px-3 rounded-lg text-sm font-bold" style={{background:"#ea6a1e"}}>+</button></div>
           <table className="w-full text-sm"><thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2">Item</th><th className="text-right p-2">Price</th></tr></thead>
-            <tbody>{(sel.items||[]).length===0&&<tr><td className="p-2 text-slate-400" colSpan={2}>Koi price nahi</td></tr>}
+            <tbody>{(sel.items||[]).length===0&&<tr><td className="p-2 text-slate-400" colSpan={2}>No price</td></tr>}
               {(sel.items||[]).map(it=><tr key={it.id} className="border-b"><td className="p-2">{it.variant_label}</td><td className="p-2 text-right font-semibold">{money(it.price)}</td></tr>)}</tbody></table>
           <div className="text-xs text-slate-400 mt-2">New Sale screen pe yeh list choose karke rates auto-apply honge.</div></>}
       </div>
@@ -1250,7 +1250,7 @@ function CashBankView(){
       </div>
       {tab==="accounts" && <div className="card overflow-hidden"><table className="w-full text-sm">
         <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Name</th><th className="text-left p-2.5">Type</th><th className="text-left p-2.5">A/c No</th><th className="text-left p-2.5">Bank/UPI</th><th className="text-right p-2.5">Balance</th><th className="text-right p-2.5">Action</th></tr></thead>
-        <tbody>{accounts.length===0&&<tr><td className="p-3 text-slate-400" colSpan={6}>Koi account nahi</td></tr>}
+        <tbody>{accounts.length===0&&<tr><td className="p-3 text-slate-400" colSpan={6}>No accounts</td></tr>}
           {accounts.map(a=><tr key={a.id} className="border-b hover:bg-slate-50"><td className="p-2.5 font-semibold">{a.name}</td>
             <td className="p-2.5"><span className="text-xs px-2 py-0.5 rounded-full" style={{background:a.account_type==="CASH"?"#dcfce7":"#dbeafe",color:a.account_type==="CASH"?"#166534":"#1e40af"}}>{a.account_type}</span></td>
             <td className="p-2.5 text-xs">{a.account_no||"—"}</td><td className="p-2.5 text-xs">{a.bank_name||a.upi_id||"—"}</td>
@@ -1259,7 +1259,7 @@ function CashBankView(){
         </tbody></table></div>}
       {tab==="cheques" && <div className="card overflow-hidden"><table className="w-full text-sm">
         <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Cheque No</th><th className="text-left p-2.5">Type</th><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">Due</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Action</th></tr></thead>
-        <tbody>{cheques.length===0&&<tr><td className="p-3 text-slate-400" colSpan={7}>Koi cheque nahi</td></tr>}
+        <tbody>{cheques.length===0&&<tr><td className="p-3 text-slate-400" colSpan={7}>No cheques</td></tr>}
           {cheques.map(c=><tr key={c.id} className="border-b hover:bg-slate-50"><td className="p-2.5 font-semibold">{c.cheque_no}</td>
             <td className="p-2.5 text-xs">{c.cheque_type==="RECEIVABLE"?"In":"Out"}</td><td className="p-2.5">{c.party_name||pName(c.party)}</td>
             <td className="p-2.5 text-xs">{c.due_date||"—"}</td><td className="p-2.5 text-right">{money(c.amount)}</td>
@@ -1270,7 +1270,7 @@ function CashBankView(){
         </tbody></table></div>}
       {tab==="loans" && <div className="card overflow-hidden"><table className="w-full text-sm">
         <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Lender</th><th className="text-right p-2.5">Principal</th><th className="text-right p-2.5">Rate %</th><th className="text-right p-2.5">Tenure</th><th className="text-right p-2.5">EMI</th><th className="text-right p-2.5">Total Interest</th><th className="text-right p-2.5">Outstanding</th></tr></thead>
-        <tbody>{loans.length===0&&<tr><td className="p-3 text-slate-400" colSpan={7}>Koi loan nahi</td></tr>}
+        <tbody>{loans.length===0&&<tr><td className="p-3 text-slate-400" colSpan={7}>No loans</td></tr>}
           {loans.map(l=><tr key={l.id} className="border-b hover:bg-slate-50"><td className="p-2.5 font-semibold">{l.lender}</td>
             <td className="p-2.5 text-right">{money(l.principal)}</td><td className="p-2.5 text-right">{l.interest_rate}</td><td className="p-2.5 text-right">{l.tenure_months}m</td>
             <td className="p-2.5 text-right font-bold" style={{color:"#c2410c"}}>{money(l.emi)}</td><td className="p-2.5 text-right">{money(l.total_interest)}</td><td className="p-2.5 text-right">{money(l.current_balance)}</td></tr>)}
@@ -1282,7 +1282,7 @@ function CashBankView(){
         </div>}
         <div className="card overflow-hidden"><table className="w-full text-sm">
           <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Date</th><th className="text-left p-2.5">Category</th><th className="text-left p-2.5">Vendor</th><th className="text-left p-2.5">Mode</th><th className="text-right p-2.5">Amount</th><th className="text-right p-2.5">Tax</th><th className="text-right p-2.5">Total</th></tr></thead>
-          <tbody>{expenses.length===0&&<tr><td className="p-3 text-slate-400" colSpan={7}>Koi expense nahi — rent, bijli, diesel, labour add karein</td></tr>}
+          <tbody>{expenses.length===0&&<tr><td className="p-3 text-slate-400" colSpan={7}>No expenses — add rent, electricity, diesel, labour</td></tr>}
             {expenses.map(e=><tr key={e.id} className="border-b hover:bg-slate-50"><td className="p-2.5 text-xs">{e.date}</td><td className="p-2.5 font-semibold">{e.category_name||"Other"}</td>
               <td className="p-2.5">{pName(e.party)}</td><td className="p-2.5 text-xs">{e.mode}</td><td className="p-2.5 text-right">{money(e.amount)}</td><td className="p-2.5 text-right text-slate-400">{money(e.tax_amount)}</td><td className="p-2.5 text-right font-bold" style={{color:"#dc2626"}}>{money(e.total)}</td></tr>)}
           </tbody></table></div>
@@ -1396,7 +1396,7 @@ function VouchersView({initialQuery,onNav}){
       {type==="RECURRING"
         ? <div className="card overflow-x-auto"><table className="w-full text-sm" style={{minWidth:760}}>
             <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Name</th><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">Frequency</th><th className="text-left p-2.5">Next Run</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Generated</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Actions</th></tr></thead>
-            <tbody>{recs.length===0 && <tr><td className="p-3 text-slate-400" colSpan={8}>Koi auto invoice nahi — kisi Invoice ke "↻ Auto" se banao (monthly AMC, rent, contracts)</td></tr>}
+            <tbody>{recs.length===0 && <tr><td className="p-3 text-slate-400" colSpan={8}>No auto invoices — create one from any Invoice via "↻ Auto" (monthly AMC, rent, contracts)</td></tr>}
               {recs.map(r=><tr key={r.id} className="border-b hover:bg-slate-50"><td className="p-2.5 font-semibold">{r.name}</td><td className="p-2.5">{r.party_name}</td>
                 <td className="p-2.5 text-xs">{r.frequency}</td><td className="p-2.5 text-xs">{r.next_run}</td><td className="p-2.5 text-right font-semibold">{money(r.amount)}</td>
                 <td className="p-2.5 text-center">{r.generated_count}</td>
@@ -1410,7 +1410,7 @@ function VouchersView({initialQuery,onNav}){
             <th className="text-left p-2.5">Number</th><th className="text-left p-2.5">Type</th><th className="text-left p-2.5">Date</th>
             <th className="text-left p-2.5">Party</th><th className="text-right p-2.5">Total</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Actions</th></tr></thead>
           <tbody>
-            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={7}>Koi transaction nahi</td></tr>}
+            {filt.length===0 && <tr><td className="p-3 text-slate-400" colSpan={7}>No transactions</td></tr>}
             {filt.map(r=><tr key={r.id} className="border-b hover:bg-slate-50">
               <td className="p-2.5 font-semibold text-slate-700">{r.number}</td>
               <td className="p-2.5 text-xs">{(TABS.find(t=>t[0]===r.voucher_type)||[,r.voucher_type])[1]}</td>
@@ -1422,7 +1422,7 @@ function VouchersView({initialQuery,onNav}){
                 {canConvert(r.voucher_type) && !r.converted_to && <button onClick={()=>convert(r,"SALE")} className="text-xs font-bold text-orange-700 mr-3 hover:underline">→ Invoice</button>}
                 {r.voucher_type==="ESTIMATE" && !r.converted_to && <button onClick={()=>convert(r,"SALE_ORDER")} className="text-xs font-bold text-indigo-600 mr-3 hover:underline">→ Order</button>}
                 {r.voucher_type==="SALE" && <button onClick={()=>setRecFor(r)} className="text-xs font-semibold text-purple-700 mr-3" title="Create Auto Invoice">↻ Auto</button>}
-                <button onClick={async()=>{try{const x=await api(`/vouchers/${r.id}/email/`,{method:"POST",body:JSON.stringify({})});setMsg(x.sent?`✓ Email bheja ${x.to}`:`Email: ${x.to||"party has no email"}`);setTimeout(()=>setMsg(""),3000);}catch(e){setMsg("Email fail — party ka email add karein");setTimeout(()=>setMsg(""),3000);}}} className="text-blue-600 text-xs font-semibold mr-3">Email</button>
+                <button onClick={async()=>{try{const x=await api(`/vouchers/${r.id}/email/`,{method:"POST",body:JSON.stringify({})});setMsg(x.sent?`✓ Email bheja ${x.to}`:`Email: ${x.to||"party has no email"}`);setTimeout(()=>setMsg(""),3000);}catch(e){setMsg("Email failed — add the party's email");setTimeout(()=>setMsg(""),3000);}}} className="text-blue-600 text-xs font-semibold mr-3">Email</button>
                 <button onClick={()=>shareWhatsApp(r.id)} className="text-emerald-600 text-xs font-semibold mr-3">WhatsApp</button>
                 <a className="text-blue-700 text-xs font-semibold" href={`/invoice/${r.id}/?token=`+getToken()} target="_blank">Print</a>
               </td>
@@ -1431,7 +1431,7 @@ function VouchersView({initialQuery,onNav}){
           <tfoot><tr className="bg-slate-50 font-bold"><td className="p-2.5" colSpan={4}>Total ({filt.length})</td><td className="p-2.5 text-right" style={{color:"#c2410c"}}>{money(total)}</td><td colSpan={2}></td></tr></tfoot>
         </table>
       </div>}
-      {recFor && <RecurringModal voucher={recFor} onClose={()=>setRecFor(null)} onSaved={()=>{setRecFor(null);loadRecs();setMsg("✓ Recurring set ho gaya");setTimeout(()=>setMsg(""),3000);}}/>}
+      {recFor && <RecurringModal voucher={recFor} onClose={()=>setRecFor(null)} onSaved={()=>{setRecFor(null);loadRecs();setMsg("✓ Auto invoice set");setTimeout(()=>setMsg(""),3000);}}/>}
     </div>);
 }
 
@@ -1574,7 +1574,7 @@ function AdminPanel(){
 function RTable({head,rows}){
   return (<div className="card overflow-auto"><table className="w-full text-sm">
     <thead><tr>{head.map((h,i)=><th key={i} className={"p-3 "+(i===0?"text-left":"text-right")}>{h}</th>)}</tr></thead>
-    <tbody>{rows.length===0&&<tr><td className="p-4 text-slate-400" colSpan={head.length}>Koi data nahi</td></tr>}
+    <tbody>{rows.length===0&&<tr><td className="p-4 text-slate-400" colSpan={head.length}>No data</td></tr>}
       {rows.map((r,i)=><tr key={i} className="border-b">{r.map((c,j)=><td key={j} className={"p-3 "+(j===0?"text-left":"text-right")}>{c}</td>)}</tr>)}</tbody>
   </table></div>);
 }
@@ -1621,7 +1621,7 @@ function ReportsView(){
       <StatCard label="Total To Receive" value={money(D.total_receivable)} accent="#dc2626"/>
       <div className="card overflow-hidden"><table className="w-full text-sm">
         <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Party</th><th className="text-left p-2.5">Phone</th><th className="text-right p-2.5">Amount</th><th className="text-center p-2.5">Days Overdue</th><th className="text-right p-2.5">Reminder</th></tr></thead>
-        <tbody>{(D.parties||[]).length===0&&<tr><td className="p-3 text-slate-400" colSpan={5}>Sab clear — koi outstanding nahi 🎉</td></tr>}
+        <tbody>{(D.parties||[]).length===0&&<tr><td className="p-3 text-slate-400" colSpan={5}>All clear — nothing outstanding 🎉</td></tr>}
           {(D.parties||[]).map(x=>{const digits=(x.phone||"").replace(/\D/g,"");const ph=digits.length===10?"91"+digits:digits;
             const msg=encodeURIComponent(`Namaste ${x.name},\nAapka ₹${x.amount} ka payment baaki hai${x.days_overdue>0?` (${x.days_overdue} din se due)`:""}. Kripya jaldi clear karein. Dhanyavaad.`);
             return <tr key={x.party_id} className="border-b hover:bg-slate-50"><td className="p-2.5 font-semibold">{x.name}</td><td className="p-2.5 text-xs">{x.phone||"—"}</td>
@@ -1684,7 +1684,7 @@ function ReportsView(){
         {(start||end)&&<button onClick={()=>{setStart("");setEnd("");setTimeout(()=>load(tab),0);}} className="text-slate-500 px-2 py-2 text-sm">Clear</button>}
       </div>}
       {tab==="stmt" && <div className="mb-4 flex gap-2 items-center">
-        <select className="p-2.5" value={pid} onChange={e=>setPid(e.target.value)}><option value="">— party choose karein —</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>
+        <select className="p-2.5" value={pid} onChange={e=>setPid(e.target.value)}><option value="">— choose party —</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>
         <button onClick={()=>pid&&load("stmt",pid)} className="bg-blue-900 text-white px-4 py-2.5 rounded-xl text-sm">View</button></div>}
       {body()}
     </div>);
@@ -1697,7 +1697,7 @@ function StaffView(){
   const load=()=>{ apiList("/staff/").then(setRows); api("/staff/meta/").then(setMeta).catch(()=>{}); };
   useEffect(()=>{ load(); },[]);
   const add=async()=>{ setMsg("");setErr("");
-    if(!f.username||!f.password){ setErr("Username aur password dono daalein"); return; }
+    if(!f.username||!f.password){ setErr("Enter both username and password"); return; }
     setBusy(true);
     try{ const r=await api("/staff/",{method:"POST",body:JSON.stringify(f)});
       setMsg(`✓ "${r.username}" add ho gaya (role: ${r.role}${r.temp_password?`, password: ${r.temp_password}`:""})`);
@@ -1729,7 +1729,7 @@ function StaffView(){
       </div>
       <div className="card overflow-hidden">
         <table className="w-full text-sm"><thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Username</th><th className="text-left p-2.5">Phone</th><th className="text-left p-2.5">Role</th><th className="text-center p-2.5">Status</th><th className="text-right p-2.5">Action</th></tr></thead>
-        <tbody>{rows.length===0&&<tr><td className="p-3 text-slate-400" colSpan={5}>Sirf aap (owner). Staff add karein.</td></tr>}
+        <tbody>{rows.length===0&&<tr><td className="p-3 text-slate-400" colSpan={5}>Only you (owner). Add staff.</td></tr>}
           {rows.map(r=>{const c=roleColor[r.role]||roleColor.VIEWER;return <tr key={r.id} className="border-b hover:bg-slate-50">
             <td className="p-2.5 font-semibold text-slate-700">{r.username}</td><td className="p-2.5 text-xs">{r.phone||"—"}</td>
             <td className="p-2.5"><span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{background:c[0],color:c[1]}}>{r.role}</span></td>
@@ -1770,7 +1770,7 @@ function WhatsAppView(){
         <div className="card p-5">
           <div className="flex items-center justify-between"><div className="font-bold text-slate-700">Auto-Send (Cloud API)</div>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background:cloudReady?"#dcfce7":"#fef3c7",color:cloudReady?"#16a34a":"#b45309"}}>{cloudReady?"CONFIGURED":"NOT SET"}</span></div>
-          <p className="text-sm text-slate-500 mt-2">Official WhatsApp Business API se documents <b>bina click</b> auto-send. Meta se token chahiye (compliant, ban nahi hota).</p>
+          <p className="text-sm text-slate-500 mt-2">Official WhatsApp Business API se documents <b>bina click</b> auto-send. Requires a token from Meta (compliant, no ban risk).</p>
         </div>
       </div>
 
@@ -1826,7 +1826,7 @@ function Employees({emps,reload}){
   const blank={name:"",designation:"",department:"",phone:"",basic_salary:"",hra:"",allowances:"",deductions:"",working_days:30,joining_date:""};
   const [f,setF]=useState(blank),[msg,setMsg]=useState("");
   const set=k=>e=>setF({...f,[k]:e.target.value});
-  const save=async()=>{ setMsg(""); if(!f.name){setMsg("Name zaroori hai");return;}
+  const save=async()=>{ setMsg(""); if(!f.name){setMsg("Name is required");return;}
     try{ await api("/employees/",{method:"POST",body:JSON.stringify(f)}); setF(blank); setMsg("Employee added ✓"); reload(); }
     catch(e){ setMsg("Error: "+JSON.stringify(e)); } };
   return (<div>
@@ -1934,7 +1934,7 @@ function Banner({sub,onUpgrade}){
         {t("Free trial","फ्री ट्रायल")} — <b>{sub.days_left} {t("days","दिन")}</b> {t("left","बचे")} {sub.plan?`(${sub.plan.name})`:""}</span>
       <button onClick={onUpgrade} className="bg-blue-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold">{t("Upgrade Now","अभी अपग्रेड करें")}</button></div>;
   return <div className={wrap} style={{background:"linear-gradient(135deg,#fef2f2,#fee2e2)",border:"1px solid #fecaca"}}>
-    <span className="font-semibold text-red-700">⚠ Plan expire ho gaya — features unlock karne ke liye upgrade karein</span>
+    <span className="font-semibold text-red-700">⚠ Plan expired — upgrade to unlock features</span>
     <button onClick={onUpgrade} className="bg-blue-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold">Upgrade</button></div>;
 }
 
@@ -2025,7 +2025,7 @@ function POSView(){
   const scanEnter=async()=>{ const code=q.trim(); if(!code)return; const v=variants.find(x=>x.barcode===code||x.code===code);
     if(v){ add(v); setQ(""); } };
   const checkout=async()=>{ setErr(""); if(cart.length===0){setErr("Cart khaali hai");return;}
-    if(!godowns[0]){setErr("Pehle ek godown banao (Items se)");return;}
+    if(!godowns[0]){setErr("First create a godown (from Items)");return;}
     let pid=party; if(!pid){ const walk=parties.find(p=>/walk/i.test(p.name)); if(walk)pid=walk.id;
       else { try{const np=await api("/parties/",{method:"POST",body:JSON.stringify({name:"Walk-in Customer",party_type:"CUSTOMER"})});pid=np.id;setParties(x=>[...x,np]);}catch(e){} } }
     const payload={voucher_type:"SALE",date:new Date().toISOString().slice(0,10),party:+pid,godown:godowns[0].id,company_state_code:"",
@@ -2059,7 +2059,7 @@ function POSView(){
         {done && <div className="text-xs rounded-lg p-2 mb-2" style={{background:"#ecfdf5",color:"#166534"}}>✓ {done.number} — {money(done.grand_total)} · receipt printed</div>}
         {err && <div className="text-xs rounded-lg p-2 mb-2 bg-red-50 text-red-600">{err}</div>}
         <div className="flex-1 overflow-y-auto">
-          {cart.length===0 && <div className="text-sm text-slate-400 text-center mt-6">Item pe click/scan karo</div>}
+          {cart.length===0 && <div className="text-sm text-slate-400 text-center mt-6">Click/scan an item</div>}
           {cart.map((c,i)=><div key={i} className="flex items-center justify-between py-2 border-b">
             <div className="min-w-0"><div className="text-sm font-semibold text-slate-700 truncate">{c.label}</div><div className="text-xs text-slate-400">{money(c.rate)} × {c.qty}</div></div>
             <div className="flex items-center gap-1.5 shrink-0">
@@ -2108,14 +2108,14 @@ function AccountingView(){
         </tbody></table></div>}
       {tab==="journal" && <div className="card overflow-hidden"><table className="w-full text-sm">
         <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Date</th><th className="text-left p-2.5">Narration</th><th className="text-left p-2.5">Ref</th><th className="text-right p-2.5">Debit</th><th className="text-right p-2.5">Credit</th><th className="text-center p-2.5">✓</th></tr></thead>
-        <tbody>{journals.length===0&&<tr><td className="p-3 text-slate-400" colSpan={6}>Koi journal entry nahi</td></tr>}
+        <tbody>{journals.length===0&&<tr><td className="p-3 text-slate-400" colSpan={6}>No journal entries</td></tr>}
           {journals.map(j=><tr key={j.id} className="border-b hover:bg-slate-50"><td className="p-2.5 text-xs">{j.date}</td><td className="p-2.5">{j.narration}</td><td className="p-2.5 text-xs">{j.reference}</td>
             <td className="p-2.5 text-right">{money(j.total_debit)}</td><td className="p-2.5 text-right">{money(j.total_credit)}</td>
             <td className="p-2.5 text-center">{j.is_balanced?<span className="text-green-600">✓</span>:<span className="text-red-500">✗</span>}</td></tr>)}
         </tbody></table></div>}
       {tab==="tb" && tb && <div className="card overflow-hidden"><table className="w-full text-sm">
         <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">Code</th><th className="text-left p-2.5">Account</th><th className="text-right p-2.5">Debit</th><th className="text-right p-2.5">Credit</th></tr></thead>
-        <tbody>{(tb.rows||[]).length===0&&<tr><td className="p-3 text-slate-400" colSpan={4}>Koi balance nahi (sales/journals add karo)</td></tr>}
+        <tbody>{(tb.rows||[]).length===0&&<tr><td className="p-3 text-slate-400" colSpan={4}>No balance (add sales/journals)</td></tr>}
           {(tb.rows||[]).map((r,i)=><tr key={i} className="border-b"><td className="p-2.5 text-xs font-mono">{r.code}</td><td className="p-2.5">{r.name}</td><td className="p-2.5 text-right">{r.debit?money(r.debit):""}</td><td className="p-2.5 text-right">{r.credit?money(r.credit):""}</td></tr>)}</tbody>
         <tfoot><tr className="bg-slate-50 font-bold"><td className="p-2.5" colSpan={2}>Total {tb.balanced?<span className="text-green-600 text-xs">(balanced ✓)</span>:<span className="text-red-500 text-xs">(mismatch)</span>}</td><td className="p-2.5 text-right">{money(tb.total_debit)}</td><td className="p-2.5 text-right">{money(tb.total_credit)}</td></tr></tfoot>
       </table></div>}
@@ -2127,7 +2127,7 @@ function AccountingView(){
 function AccountModal({acc,onClose,onSaved}){
   const [f,setF]=useState(acc),[err,setErr]=useState(""),[busy,setBusy]=useState(false);
   const cell="border border-slate-200 p-2 rounded-lg w-full text-sm mt-1";
-  const save=async()=>{ if(!f.code||!f.name){setErr("Code aur name zaroori");return;} setBusy(true);
+  const save=async()=>{ if(!f.code||!f.name){setErr("Code and name are required");return;} setBusy(true);
     try{ await api("/accounts-ledger/",{method:"POST",body:JSON.stringify({code:f.code,name:f.name,account_type:f.account_type,opening_balance:String(f.opening_balance||0)})}); onSaved();
     }catch(e){ setErr(typeof e==="object"?JSON.stringify(e):"Save fail"); setBusy(false);} };
   return (<div className="fixed inset-0 z-50 flex items-start justify-center pt-24" style={{background:"rgba(15,23,42,.45)"}} onClick={onClose}>
@@ -2235,7 +2235,7 @@ function CommandPalette({nav,onGo,onClose}){
           <span className="text-xs text-slate-400 border rounded px-1.5 py-0.5">Esc</span>
         </div>
         <div className="max-h-80 overflow-y-auto">
-          {filt.length===0 && <div className="p-4 text-sm text-slate-400">Kuch nahi mila</div>}
+          {filt.length===0 && <div className="p-4 text-sm text-slate-400">Nothing found</div>}
           {filt.map((a,i)=><button key={i} onClick={()=>run(a)} className="w-full text-left px-4 py-2.5 hover:bg-orange-50 flex items-center justify-between border-b border-slate-50">
             <span className="text-sm font-semibold text-slate-700">{a.label}</span><span className="text-xs text-slate-400">{a.hint}</span></button>)}
         </div>

@@ -106,51 +106,71 @@ def _tokens(user):
     return {"access": str(r.access_token), "refresh": str(r)}
 
 
+def _send_email_otp(email):
+    """Generate + cache an OTP for the email and try to send it. Returns (otp, sent)."""
+    import random
+    from django.core.cache import cache
+    from django.core.mail import send_mail
+    from django.conf import settings
+    otp = f"{random.randint(0, 999999):06d}"
+    cache.set(f"otp:{email}", otp, 600)  # 10 min
+    sent = False
+    host = getattr(settings, "EMAIL_HOST", "") or ""
+    if getattr(settings, "EMAIL_HOST_USER", "") or host not in ("", "localhost"):
+        try:
+            send_mail(
+                "Your Digital Munshi OTP",
+                f"Your OTP is {otp}. It is valid for 10 minutes.\n\n— Digital Munshi ERP",
+                getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@digitalmunshi.in"),
+                [email], fail_silently=False,
+            )
+            sent = True
+        except Exception:
+            sent = False
+    return otp, sent
+
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def send_otp(request):
-    """Signup ke liye mobile OTP. SMS gateway ho to bheje, warna dev-mode me OTP response me."""
-    import random
-    from django.core.cache import cache
-    digits = "".join(c for c in str(request.data.get("phone") or "") if c.isdigit())
-    if len(digits) < 10:
-        return Response({"detail": "Valid 10-digit mobile number daalein"}, status=400)
-    otp = f"{random.randint(0, 999999):06d}"
-    cache.set(f"otp:{digits}", otp, 600)  # 10 min
-    # TODO: SMS gateway (MSG91/Twilio) se bhejo jab keys mil jayein.
-    sms_configured = False
-    resp = {"sent": sms_configured}
-    if not sms_configured:
+    """Signup email OTP. If email (SMTP) is configured it is sent to the inbox,
+    otherwise dev-mode returns the OTP so testing still works."""
+    email = str(request.data.get("email") or "").strip().lower()
+    if "@" not in email or "." not in email.split("@")[-1]:
+        return Response({"detail": "Enter a valid email address"}, status=400)
+    otp, sent = _send_email_otp(email)
+    resp = {"sent": sent}
+    if not sent:
         resp["dev_otp"] = otp
-        resp["message"] = "Dev mode: OTP screen par (SMS gateway baad me)."
+        resp["message"] = "Email not configured yet — OTP shown on screen (dev mode)."
     return Response(resp)
 
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def signup(request):
-    """Naya business register + 7-day trial. Mobile + OTP zaroori. Returns JWT."""
+    """Register a new business + 7-day trial. Email + OTP required. Returns JWT."""
     from django.core.cache import cache
     d = request.data
-    required = ["username", "password", "org_name", "phone"]
+    required = ["username", "password", "org_name", "email"]
     missing = [f for f in required if not d.get(f)]
     if missing:
         return Response({"detail": f"Required: {', '.join(missing)}"}, status=400)
-    digits = "".join(c for c in str(d.get("phone", "")) if c.isdigit())
-    if len(digits) < 10:
-        return Response({"detail": "Valid 10-digit mobile number daalein"}, status=400)
-    cached = cache.get(f"otp:{digits}")
+    email = str(d.get("email", "")).strip().lower()
+    if "@" not in email:
+        return Response({"detail": "Enter a valid email address"}, status=400)
+    cached = cache.get(f"otp:{email}")
     if not cached or str(d.get("otp", "")).strip() != cached:
-        return Response({"detail": "OTP galat ya expire ho gaya — dobara bhejein"}, status=400)
+        return Response({"detail": "OTP is wrong or expired — please resend"}, status=400)
     try:
         user, org, sub = signup_organization(
             username=d["username"], password=d["password"],
-            email=d.get("email", ""), org_name=d["org_name"], phone=d.get("phone", ""),
+            email=email, org_name=d["org_name"], phone=d.get("phone", ""),
             business_type=d.get("business_type", "GENERAL"),
         )
     except ValueError as e:
         return Response({"detail": str(e)}, status=400)
-    cache.delete(f"otp:{digits}")
+    cache.delete(f"otp:{email}")
     return Response({
         "tokens": _tokens(user),
         "organization": org.name,

@@ -42,7 +42,7 @@
   <h2 class="text-xl font-extrabold mb-2 text-slate-800">How a committee (BC) works</h2>
   <p>A committee (also called BC, chit fund or kitty) is a group savings scheme. For example, 10 people put in money for 10 months to build a pool. Every month there is a bid (boli) — whoever needs the money bids a discount (a "loss" they accept). The highest bidder takes the pool minus their bid, and that bid amount is shared among all members as a dividend, lowering everyone's payment that month.</p>
   <h2 class="text-xl font-extrabold mb-2 mt-4 text-slate-800">What is the interest rate?</h2>
-  <p>Whoever takes the money early is effectively borrowing and pays interest; whoever takes it last is effectively investing and earns interest. This calculator estimates the effective annual interest for your chosen month using the cash-flow (IRR) method. A negative number means you are paying interest (taking early); a positive number means you are earning (taking late).</p>
+  <p>Whoever takes the money early is effectively borrowing: the discount (bid) they gave up is the cost of getting the money early. This calculator estimates that as an approximate annual interest rate = discount ÷ amount received × (12 ÷ months) × 100. Whoever takes the pool last earns the shared dividends instead. Figures are indicative; actual returns depend on each month's bid.</p>
 </section>
 <section class="bg-slate-50 py-10"><div class="px-5">{% include "_leadform.html" %}</div></section>
 <footer class="border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
@@ -51,8 +51,6 @@
 function fmt(n){return "₹"+Math.round(n).toLocaleString("en-IN");}
 function syncMonths(){var n=parseInt(document.getElementById("n").value)||0;var m=document.getElementById("m");if(!m.value||m.dataset.auto!=="0")m.value=n;calc();}
 document.getElementById("m").addEventListener("input",function(){this.dataset.auto="0";});
-function npv(rate,cf){var s=0;for(var t=0;t<cf.length;t++)s+=cf[t]/Math.pow(1+rate,t);return s;}
-function irr(cf){var lo=-0.9999,hi=5.0,mid;var flo=npv(lo,cf);for(var i=0;i<200;i++){mid=(lo+hi)/2;var f=npv(mid,cf);if(Math.abs(f)<0.01)return mid;if((f>0)===(flo>0)){lo=mid;flo=f;}else{hi=mid;}}return mid;}
 function calc(){
  var V=parseFloat(document.getElementById("v").value)||0;
  var n=parseInt(document.getElementById("n").value)||1;
@@ -61,15 +59,16 @@ function calc(){
  var k=parseInt(document.getElementById("k").value)||1; if(k<1)k=1; if(k>months)k=months;
  var cpct=parseFloat(document.getElementById("c").value)||0;
  var comm=V*cpct/100;
- var base=V/n;
- var div=D/n;                 // bid shared among members
- var net=base-div;            // net monthly payment
- var payout=V-D-comm;         // what winner receives
+ var base=V/n;                // base monthly contribution
+ var div=D/n;                 // bid shared among members (that month's dividend)
+ var net=base-div;            // your net monthly payment (if avg bid applies)
+ var payout=V-D-comm;         // what the winner receives
  var totalPay=net*months;
  var gain=payout-totalPay;
- // cash flows monthly (outflow each month, inflow at month k)
- var cf=[];for(var t=0;t<months;t++){var x=-net;if(t===(k-1))x+=payout;cf.push(x);}
- var r=irr(cf); var annual=(Math.pow(1+r,12)-1)*100;
+ // Approx annual interest = cost of taking money early (discount over the holding period)
+ var holdMonths=(months-k+1);  // roughly how long you hold the early money
+ if(holdMonths<1)holdMonths=1;
+ var annual = payout>0 ? (D/payout)*(12/months)*100 : 0;
  document.getElementById("rBase").textContent=fmt(base);
  document.getElementById("rDiv").textContent=fmt(div);
  document.getElementById("rNet").textContent=fmt(net);
@@ -77,9 +76,11 @@ function calc(){
  document.getElementById("rTot").textContent=fmt(totalPay);
  document.getElementById("rGain").textContent=(gain<0?"-":"")+fmt(Math.abs(gain));
  document.getElementById("rGain").style.color=gain<0?"#dc2626":"#059669";
- var ann=isFinite(annual)?annual.toFixed(1):"0";
- document.getElementById("rIrr").textContent=ann+"%";
- document.getElementById("note").textContent = annual<0 ? ("You are paying about "+Math.abs(ann)+"% annual interest (taking money early).") : ("You are earning about "+ann+"% annual return (taking money later).");
+ document.getElementById("rIrr").textContent=(isFinite(annual)?annual.toFixed(1):"0")+"%";
+ var half=Math.ceil(months/2);
+ document.getElementById("note").textContent = (k<=half)
+   ? ("Taking early — you pay about "+annual.toFixed(1)+"% per year as the cost of getting money sooner.")
+   : ("Taking late — you skip the cost and earn the shared dividends instead.");
 }
 calc();
 </script></body></html>

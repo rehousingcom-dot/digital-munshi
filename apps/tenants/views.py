@@ -278,6 +278,9 @@ def me(request):
                 logo = request.build_absolute_uri(company.logo.url)
             except Exception:
                 logo = None
+    from .features import allowed_features
+    sub = getattr(org, "subscription", None) if org else None
+    tier, feats = allowed_features(sub)
     return Response({
         "username": u.username, "role": getattr(u, "role", ""),
         "is_platform_admin": bool(u.is_staff or u.is_superuser),
@@ -285,6 +288,9 @@ def me(request):
         "logo": logo,
         "catalog_uuid": str(org.catalog_uuid) if org else None,
         "catalog_enabled": bool(org.catalog_enabled) if org else False,
+        "plan_tier": tier,
+        "plan_code": (sub.plan.code if (sub and sub.plan) else None),
+        "features": feats,
     })
 
 

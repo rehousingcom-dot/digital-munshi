@@ -350,6 +350,19 @@ function Login({onLogin}){
 }
 
 // ---------- Subscribe / Plans ----------
+function UpgradeGate({tab,nav,onUpgrade,onHome}){
+  const label=((nav||[]).find(x=>x[0]===tab)||[,"Ye feature"])[1];
+  return (<div className="p-6">
+    <div className="max-w-md mx-auto card p-8 text-center" style={{background:"linear-gradient(135deg,#fff7ed,#fff)"}}>
+      <div className="text-5xl mb-3">🔒</div>
+      <div className="text-xl font-extrabold text-slate-800">{label}</div>
+      <p className="text-slate-500 mt-2">{t("Ye feature aapke current plan me nahi hai. Upgrade karke unlock karein.","This feature isn't in your current plan. Upgrade to unlock.")}</p>
+      <button onClick={onUpgrade} className="mt-5 text-white px-6 py-3 rounded-xl font-bold" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>{t("Plan upgrade karein →","Upgrade plan →")}</button>
+      <div><button onClick={onHome} className="mt-3 text-slate-400 text-sm">{t("Dashboard pe wapas","Back to dashboard")}</button></div>
+    </div>
+  </div>);
+}
+
 function ReferCard(){
   const [r,setR]=useState(null),[msg,setMsg]=useState("");
   useEffect(()=>{ api("/referral/me/").then(setR).catch(()=>{}); },[]);
@@ -3063,11 +3076,16 @@ function App(){
   const logout=()=>{ clearAuth(); setAuthed(false); setSub(null); };
   const nav=[["dash",t("Dashboard","डैशबोर्ड")],["pos",t("POS Billing","POS बिलिंग")],["sale",t("New Sale","नई बिक्री")],["vouchers",t("Sales & Transactions","बिक्री व लेन-देन")],["orders",t("Online Orders","ऑनलाइन ऑर्डर")],["items",t("Items","आइटम")],["parties",t("Parties","पार्टी")],["cashbank",t("Cash & Bank","कैश व बैंक")],["accounting",t("Accounting","अकाउंटिंग")],["reports",t("Reports","रिपोर्ट")],["utils",t("Utilities","यूटिलिटीज़")],["whatsapp",t("WhatsApp","व्हाट्सएप")],["hr",t("HR / Payroll","HR / पेरोल")],["committee",t("Committee / BC","कमेटी / BC")],["market",t("Marketplace","मार्केटप्लेस")],["staff",t("App Users","ऐप यूज़र")],["settings",t("Settings","सेटिंग्स")],["plan",t("Subscription","सब्सक्रिप्शन")]];
   if(isAdmin) nav.push(["admin","Platform Admin"]);
+  // Plan-based feature gating — jo plan me hai wahi feature dikhe
+  const feats = (me && me.features) || null;
+  const allow = k => !feats || feats.includes(k) || k==="admin";
+  const navShown = nav.filter(([k])=>allow(k));
+  const gated = feats && !allow(tab) && tab!=="admin";
   const onActivated=s=>{ setSub(s); setTab("dash"); };
   const go=(k,mode)=>{ setTab(k); if(mode)setSaleMode(mode); setOpen(false); };
   return (
     <div className="md:flex md:h-screen md:overflow-hidden">
-      {cmdOpen && <CommandPalette nav={nav} onGo={go} onClose={()=>setCmdOpen(false)} />}
+      {cmdOpen && <CommandPalette nav={navShown} onGo={go} onClose={()=>setCmdOpen(false)} />}
       {/* Mobile top bar */}
       <div className="md:hidden bg-blue-900 text-white flex items-center justify-between p-3">
         <button onClick={()=>setOpen(!open)} className="text-xl">☰</button>
@@ -3083,7 +3101,7 @@ function App(){
         </div>
         <div className="mt-4 mb-1 hidden md:block"><FirmSwitcher /></div>
         <div className="mt-2 mb-1 px-2 text-[10px] uppercase tracking-wider text-indigo-300 hidden md:block">Menu</div>
-        {nav.map(([k,l])=><button key={k} onClick={()=>go(k)} className={"flex items-center gap-3 text-left mb-1 "+(tab===k?"bg-blue-700":"")+(k==="plan"?" mt-2":"")}><Icon n={k} size={17}/><span>{l}</span></button>)}
+        {navShown.map(([k,l])=><button key={k} onClick={()=>go(k)} className={"flex items-center gap-3 text-left mb-1 "+(tab===k?"bg-blue-700":"")+(k==="plan"?" mt-2":"")}><Icon n={k} size={17}/><span>{l}</span></button>)}
         <button onClick={()=>{clearAuth();setAuthed(false);setSub(null);}} className="md:mt-auto flex items-center gap-3 text-left text-indigo-300"><Icon n="logout" size={17}/><span>Logout</span></button>
       </aside>
       <main className="flex-1 md:h-screen overflow-y-auto">
@@ -3091,6 +3109,8 @@ function App(){
         <Banner sub={sub} onUpgrade={()=>setTab("plan")} />
         {expired && tab!=="plan" && tab!=="settings"
           ? <Subscribe sub={sub} onActivated={onActivated} />
+          : gated
+          ? <UpgradeGate tab={tab} nav={nav} onUpgrade={()=>setTab("plan")} onHome={()=>setTab("dash")} />
           : <>
             {tab==="dash" && <Dashboard onNav={go}/>}
             {tab==="sale" && <NewSale key={saleMode} initialDoc={saleMode}/>}

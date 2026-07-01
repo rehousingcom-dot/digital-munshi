@@ -51,8 +51,8 @@ _Priority order: bugs first, then missing features in waves._
 ## Slide 8 — Cash & Bank
 - [x] 🟢 Bank detail edit — HAI.
 - [x] 🟢 Multiple bank accounts (name, A/C, IFSC, UPI id) — HAI.
-- [ ] 🟠 **Bank details print on invoice**.
-- [ ] 🟠 **UPI QR code on invoice** (payment ke liye).
+- [x] ✅ **Bank details print on invoice** — org ka active bank (name/A-C/IFSC/UPI). _(6617b19)_
+- [x] ✅ **UPI QR code on invoice** — "Scan & Pay" QR (upi://pay, amount ke saath). _(6617b19)_
 
 ---
 ### Suggested build order (waves)

@@ -1,0 +1,25 @@
+<div id="leadbox" style="scroll-margin-top:80px" class="max-w-md mx-auto bg-white rounded-2xl border border-orange-100 shadow-sm p-6">
+  <div class="font-extrabold text-lg text-slate-800">Free Demo Book Karo</div>
+  <div class="text-sm text-slate-500 mb-3">Naam aur number chhodo — hum call karke setup me help karenge.</div>
+  <form id="leadForm" onsubmit="return submitLead(event)">
+    <input name="name" required placeholder="Aapka naam *" class="w-full p-3 mb-2 border border-slate-200 rounded-xl text-sm">
+    <input name="phone" required type="tel" placeholder="Mobile number *" class="w-full p-3 mb-2 border border-slate-200 rounded-xl text-sm">
+    <input name="business" placeholder="Business / dukaan ka naam" class="w-full p-3 mb-2 border border-slate-200 rounded-xl text-sm">
+    <button type="submit" class="w-full text-white py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Free Demo Chahiye →</button>
+    <div id="leadMsg" class="text-sm mt-2 text-center"></div>
+  </form>
+</div>
+<script>
+function submitLead(e){
+  e.preventDefault();
+  var f=e.target, msg=document.getElementById("leadMsg");
+  var data=new FormData(f); data.append("source", location.pathname);
+  msg.textContent="Bhej rahe hain…"; msg.style.color="#64748b";
+  fetch("/api/lead/",{method:"POST",body:data})
+    .then(function(r){return r.json();})
+    .then(function(d){ if(d.ok){ msg.textContent="✓ "+d.message; msg.style.color="#059669"; f.reset(); }
+      else { msg.textContent=d.error||"Kuch galat hua"; msg.style.color="#dc2626"; } })
+    .catch(function(){ msg.textContent="Network error — dobara try karo"; msg.style.color="#dc2626"; });
+  return false;
+}
+</script>

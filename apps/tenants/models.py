@@ -146,3 +146,19 @@ class SubscriptionPayment(models.Model):
 
     def __str__(self):
         return f"{self.subscription.organization.name} — {self.amount} ({self.status})"
+
+
+class Lead(models.Model):
+    """Marketing website se aaya lead (public form). Tenant-scoped nahi — SaaS owner ke liye."""
+    name = models.CharField(max_length=120)
+    phone = models.CharField(max_length=20)
+    business = models.CharField(max_length=160, blank=True)
+    message = models.TextField(blank=True)
+    source = models.CharField(max_length=120, blank=True, help_text="Kaunse page se aaya")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.name} ({self.phone})"

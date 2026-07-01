@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ post.title }}</title>
+<meta name="description" content="{{ post.desc }}">
+<link rel="canonical" href="https://erp.reloaddigital.in/blog/{{ slug }}/">
+<meta property="og:title" content="{{ post.title }}">
+<meta property="og:description" content="{{ post.desc }}">
+<meta property="og:type" content="article">
+<meta name="robots" content="index, follow">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"{{ post.h1|escapejs }}","description":"{{ post.desc|escapejs }}","author":{"@type":"Organization","name":"Digital Munshi"},"publisher":{"@type":"Organization","name":"Reload Digital India"}}
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>.prose h2{font-size:1.35rem;font-weight:800;margin:1.4rem 0 .5rem}.prose p{margin:.7rem 0;line-height:1.7;color:#334155}.prose ul{margin:.6rem 0;padding-left:1.2rem;list-style:disc}.prose li{margin:.3rem 0;color:#334155}</style>
+</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20">
+  <div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+    <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+    <a href="/" class="text-white px-4 py-2 rounded-xl text-sm font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Free Trial</a>
+  </div>
+</header>
+<article class="max-w-3xl mx-auto px-5 py-12">
+  <a href="/blog/" class="text-sm text-orange-600 font-semibold">← Blog</a>
+  <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mt-3 mb-4">{{ post.h1 }}</h1>
+  <div class="prose">{{ post.html|safe }}</div>
+  <div class="mt-8 p-5 rounded-2xl" style="background:linear-gradient(135deg,#fff7ed,#fff)">
+    <div class="font-bold text-slate-800">Digital Munshi try karo — free</div>
+    <p class="text-sm text-slate-500 mt-1">Billing, GST, inventory, accounting — ek app me. 7 din free trial.</p>
+    <a href="/" class="inline-block mt-3 text-white px-6 py-2.5 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Free shuru karo →</a>
+  </div>
+</article>
+<section class="bg-slate-50 py-12"><div class="px-5">{% include "_leadform.html" %}</div></section>
+<footer class="border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+</body>
+</html>

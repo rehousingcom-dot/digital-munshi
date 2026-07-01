@@ -252,3 +252,6 @@ SMS_API_URL = env("SMS_API_URL", default="")
 SMS_METHOD = env("SMS_METHOD", default="GET")
 SMS_OTP_TEXT = env("SMS_OTP_TEXT", default="Your Digital Munshi OTP is {otp}. Valid 10 min. Do not share.")
 SMS_OTP_TID = env("SMS_OTP_TID", default="")
+
+# Marketing: naye leads is email par notify honge (Resend). Khaali = BACKUP_EMAIL.
+LEADS_EMAIL = env("LEADS_EMAIL", default="rehousing.com@gmail.com")

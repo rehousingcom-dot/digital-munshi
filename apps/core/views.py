@@ -176,3 +176,76 @@ def landing(request):
     from apps.tenants.models import Plan
     plans = list(Plan.objects.filter(is_active=True).order_by("sort_order", "price_monthly"))
     return render(request, "landing.html", {"plans": plans})
+
+
+def _notify_lead_email(lead):
+    """Naya lead aane par owner ko email (Resend)."""
+    from django.conf import settings
+    key = getattr(settings, "RESEND_API_KEY", "")
+    to = getattr(settings, "LEADS_EMAIL", "") or getattr(settings, "BACKUP_EMAIL", "")
+    if not key or not to:
+        return
+    try:
+        import requests
+        requests.post("https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+            json={"from": getattr(settings, "RESEND_FROM", "onboarding@resend.dev"), "to": [to],
+                  "subject": f"🔔 Naya Lead: {lead.name} ({lead.phone})",
+                  "text": f"Naam: {lead.name}\nPhone: {lead.phone}\nBusiness: {lead.business}\n"
+                          f"Message: {lead.message}\nPage: {lead.source}\n\nWhatsApp: https://wa.me/91{lead.phone[-10:]}"},
+            timeout=10)
+    except Exception:
+        pass
+
+
+from django.views.decorators.csrf import csrf_exempt as _csrf_exempt
+
+
+@_csrf_exempt
+def lead_create(request):
+    """Public lead form submit (marketing pages se). Save + owner ko email notify."""
+    from django.http import JsonResponse
+    if request.method != "POST":
+        return JsonResponse({"error": "POST only"}, status=405)
+    from apps.tenants.models import Lead
+    name = (request.POST.get("name") or "").strip()
+    phone = (request.POST.get("phone") or "").strip()
+    if not name or len(phone) < 8:
+        return JsonResponse({"error": "Naam aur sahi phone number daalo"}, status=400)
+    lead = Lead.objects.create(
+        name=name[:120], phone=phone[:20],
+        business=(request.POST.get("business") or "")[:160],
+        message=(request.POST.get("message") or "")[:1000],
+        source=(request.POST.get("source") or "")[:120],
+    )
+    _notify_lead_email(lead)
+    return JsonResponse({"ok": True, "message": "Dhanyavaad! Hum jaldi contact karenge."})
+
+
+def keyword_page(request, slug):
+    from django.shortcuts import render
+    from django.http import HttpResponseNotFound
+    from .marketing import KEYWORD_PAGES
+    page = KEYWORD_PAGES.get(slug)
+    if not page:
+        return HttpResponseNotFound("Page not found")
+    other = [(s, p["h1"]) for s, p in KEYWORD_PAGES.items() if s != slug]
+    return render(request, "keyword_page.html", {"p": page, "slug": slug, "other": other})
+
+
+def blog_index(request):
+    from django.shortcuts import render
+    from .marketing import BLOG_POSTS
+    posts = [(s, p["title"], p["desc"]) for s, p in BLOG_POSTS.items()]
+    return render(request, "blog_index.html", {"posts": posts})
+
+
+def blog_post(request, slug):
+    from django.shortcuts import render
+    from django.http import HttpResponseNotFound
+    from .marketing import BLOG_POSTS
+    post = BLOG_POSTS.get(slug)
+    if not post:
+        return HttpResponseNotFound("Post not found")
+    other = [(s, p["title"]) for s, p in BLOG_POSTS.items() if s != slug]
+    return render(request, "blog_post.html", {"post": post, "slug": slug, "other": other})

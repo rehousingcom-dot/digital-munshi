@@ -71,7 +71,11 @@ def robots_txt(request):
 
 
 def sitemap_xml(request):
-    urls = ["https://erp.reloaddigital.in/welcome/", "https://erp.reloaddigital.in/"]
+    from apps.core.marketing import KEYWORD_PAGES, BLOG_POSTS
+    base = "https://erp.reloaddigital.in"
+    urls = [base + "/welcome/", base + "/", base + "/blog/"]
+    urls += [base + "/software/" + s + "/" for s in KEYWORD_PAGES]
+    urls += [base + "/blog/" + s + "/" for s in BLOG_POSTS]
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     for u in urls:
         body += f"<url><loc>{u}</loc><changefreq>weekly</changefreq></url>"
@@ -188,6 +192,10 @@ urlpatterns = [
     path("portal/<uuid:share>/", party_extra.customer_portal, name="customer_portal"),
     path("party/<int:pk>/statement/", party_extra.party_statement_doc, name="party_statement_doc"),
     path("welcome/", core_views.landing, name="landing"),
+    path("api/lead/", core_views.lead_create, name="lead_create"),
+    path("software/<slug:slug>/", core_views.keyword_page, name="keyword_page"),
+    path("blog/", core_views.blog_index, name="blog_index"),
+    path("blog/<slug:slug>/", core_views.blog_post, name="blog_post"),
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),

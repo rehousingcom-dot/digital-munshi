@@ -346,10 +346,13 @@ function Subscribe({sub,onActivated}){
       }
       const rzp=new Razorpay({ key:o.key_id, amount:o.amount, currency:o.currency, order_id:o.order_id,
         name:"Digital Munshi ERP", description:`${o.plan} (${cycle})`,
-        handler:async(resp)=>{ const v=await api("/subscription/verify/",{method:"POST",body:JSON.stringify({
+        handler:async(resp)=>{ try{ const v=await api("/subscription/verify/",{method:"POST",body:JSON.stringify({
             razorpay_order_id:resp.razorpay_order_id, razorpay_payment_id:resp.razorpay_payment_id, razorpay_signature:resp.razorpay_signature})});
-          onActivated(v.subscription); },
+          setErr(""); onActivated(v.subscription); alert("✓ Payment successful — plan activate ho gaya!"); }
+          catch(e){ setErr("Payment hua par verify fail: "+(e&&e.detail?e.detail:JSON.stringify(e))+" — RAZORPAY_KEY_SECRET check karo."); } },
+        modal:{ ondismiss:()=>{ setBusy(""); } },
         theme:{color:"#1F4E79"} });
+      rzp.on("payment.failed",function(r){ setErr("Payment failed: "+((r&&r.error&&r.error.description)||"unknown")); });
       rzp.open(); setBusy("");
     }catch(e){ setErr(JSON.stringify(e)); setBusy(""); } };
   const expired = sub && !sub.access_allowed;

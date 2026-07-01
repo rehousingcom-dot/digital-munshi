@@ -16,15 +16,30 @@ def _get_committee(public_uuid):
 
 
 def committee_public(request, public_uuid):
-    """Online boli + join page (public)."""
+    """Online boli + join page (public) — results, live bids, history sabko dikhe."""
     c = _get_committee(public_uuid)
     if not c:
         raise Http404("Committee not found")
     members = list(c.members.all().values("id", "name"))
+    # Completed rounds (history) — sabke liye transparent
+    done = []
+    for r in c.rounds.filter(winner__isnull=False).order_by("month_no"):
+        done.append({
+            "month_no": r.month_no, "winner": r.winner.name if r.winner else "—",
+            "bid": money(r.bid_amount), "net_payable": money(r.net_payable),
+            "per_head": money(r.per_head),
+        })
+    # Live bids (jab boli khuli ho)
+    live = []
+    if c.bidding_open and c.open_month:
+        for b in c.bids.filter(month_no=c.open_month).select_related("member").order_by("-bid_amount"):
+            live.append({"name": b.member.name, "bid": money(b.bid_amount)})
     ctx = {
         "c": c, "members": members,
         "per_head_base": money(c.monthly_base),
         "coupon_total": money(c.coupon_total),
+        "done": done, "live": live,
+        "months_left": max(0, (c.members_count or 0) - len(done)),
     }
     return render(request, "committee_public.html", ctx)
 

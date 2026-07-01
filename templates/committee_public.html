@@ -19,9 +19,9 @@
 
   <!-- Online boli -->
   <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
-    <div class="font-bold text-lg mb-1">🔨 Online Boli</div>
+    <div class="font-bold text-lg mb-1">🔨 Online Boli {% if c.bidding_open %}<span class="text-xs align-middle text-white px-2 py-0.5 rounded-full" style="background:#16a34a">LIVE</span>{% endif %}</div>
     {% if c.bidding_open and c.open_month %}
-      <p class="text-sm text-slate-500 mb-3">Month <b>{{ c.open_month }}</b> ki boli khuli hai. Sabse zyada boli (discount) wala uthayega.</p>
+      <p class="text-sm text-slate-500 mb-3">Month <b>{{ c.open_month }}</b> ki boli khuli hai. <b>Sabse zyada boli (discount)</b> wala uthayega.</p>
       <div id="bidForm">
         <label class="text-sm font-semibold">Aap kaun ho?</label>
         <select id="member" class="w-full p-3 mt-1 mb-3 border border-slate-200 rounded-xl">
@@ -33,8 +33,53 @@
         <button onclick="submitBid()" class="w-full text-white py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Boli daalo</button>
         <div id="bidMsg" class="text-sm mt-2"></div>
       </div>
+      <!-- Live bids — sabko dikhe (transparency) -->
+      <div class="mt-4 pt-3 border-t">
+        <div class="text-sm font-bold mb-1">📊 Abhi tak ki boli ({{ live|length }})</div>
+        {% if live %}
+          <div class="space-y-1">
+          {% for b in live %}
+            <div class="flex justify-between text-sm {% if forloop.first %}font-bold text-green-700{% endif %}">
+              <span>{% if forloop.first %}🏆 {% endif %}{{ b.name }}</span><span>{{ b.bid }}</span>
+            </div>
+          {% endfor %}
+          </div>
+          <p class="text-xs text-slate-400 mt-2">Page apne aap refresh hota hai — nayi boli yahan dikhegi.</p>
+        {% else %}
+          <p class="text-sm text-slate-400">Abhi tak koi boli nahi. Pehle aap daalo!</p>
+        {% endif %}
+      </div>
     {% else %}
-      <p class="text-sm text-slate-500">Boli abhi band hai. Organizer jab kholenge tab yahan boli daal sakte ho.</p>
+      <p class="text-sm text-slate-500">Boli abhi band hai. Organizer jab agli month ki boli kholenge, tab yahan boli daal sakte ho. Neeche pichhle result dekho 👇</p>
+    {% endif %}
+  </div>
+
+  <!-- Results / History — sabke liye transparent -->
+  <div class="bg-white rounded-2xl border border-slate-100 p-5 mb-4">
+    <div class="font-bold text-lg mb-1">🧾 Result / History</div>
+    <p class="text-sm text-slate-500 mb-2">{{ done|length }} month ho chuke · {{ months_left }} baaki</p>
+    {% if done %}
+      <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-slate-400 text-xs border-b">
+          <th class="text-left py-1">Month</th><th class="text-left py-1">Kisne uthaya</th>
+          <th class="text-right py-1">Boli</th><th class="text-right py-1">Mila (net)</th><th class="text-right py-1">Per-head</th>
+        </tr></thead>
+        <tbody>
+        {% for r in done %}
+          <tr class="border-b border-slate-50">
+            <td class="py-1.5 font-semibold">{{ r.month_no }}</td>
+            <td class="py-1.5">{{ r.winner }}</td>
+            <td class="py-1.5 text-right">{{ r.bid }}</td>
+            <td class="py-1.5 text-right">{{ r.net_payable }}</td>
+            <td class="py-1.5 text-right" style="color:#c2410c">{{ r.per_head }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    {% else %}
+      <p class="text-sm text-slate-400">Abhi tak koi month poora nahi hua.</p>
     {% endif %}
   </div>
 
@@ -70,9 +115,12 @@ async function submitJoin(){
   var msg=document.getElementById("joinMsg");
   if(!n){msg.textContent="Naam daalo";msg.className="text-sm mt-2 text-red-600";return;}
   try{ var r=await fetch("/c/"+UUID+"/join/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:n,phone:p,message:m})});
-    var d=await r.json(); if(r.ok){msg.textContent="✓ Request bhej di! Organizer jaldi confirm karenge.";msg.className="text-sm mt-2 text-green-600";document.getElementById("jname").value="";document.getElementById("jphone").value="";document.getElementById("jmsg").value="";}
+    var d=await r.json(); if(r.ok){msg.innerHTML="✓ Request bhej di! Organizer approve karenge, phir aapka naam upar boli-list me aa jaayega — tab boli daal sakte ho.";msg.className="text-sm mt-2 text-green-600";document.getElementById("jname").value="";document.getElementById("jphone").value="";document.getElementById("jmsg").value="";}
     else {msg.textContent=d.detail||"Error";msg.className="text-sm mt-2 text-red-600";} }
   catch(e){msg.textContent="Network error";msg.className="text-sm mt-2 text-red-600";}
 }
+// Boli LIVE ho to page auto-refresh (nayi boli sabko dikhe) — jab tak koi field me type na kar raha ho
+var BIDDING_OPEN = {{ c.bidding_open|yesno:"true,false" }};
+if(BIDDING_OPEN){ setInterval(function(){ var a=document.activeElement; if(!a||(a.tagName!=="INPUT"&&a.tagName!=="SELECT")) location.reload(); }, 15000); }
 </script>
 </body></html>

@@ -21,15 +21,15 @@ _Priority order: bugs first, then missing features in waves._
       Needs: OTP send/verify (SMS gateway — e.g. MSG91/Twilio) + signup form change.
 
 ## Slide 3 — New Sale (billing window)
-- [ ] 🟡 Party billing window se add (naya inline + manual) — select hai, inline-create add.
-- [ ] 🟡 Wahi se naya item add (inline-create).
-- [ ] 🐞 GST 18% wrong default → item se pick.
-- [ ] 🟡 Unit dropdown → alag **column**.
-- [x] 🟢 Price with/without tax + auto tax calc — backend `price_inclusive_tax` HAI; UI toggle clear karna.
-- [ ] 🟡 Item add pe **row auto-open**.
-- [ ] 🟠 **Description column** per line — missing.
-- [ ] 🟠 **Image upload** (item/line) — missing.
-- [ ] 🟡 **Document upload** — party-level hai, line/invoice-level add.
+- [x] ✅ Party billing window se add — **inline "+ New"** quick-add (naam+phone → Save & Select). _(233604d)_
+- [x] ✅ Wahi se naya item add — **"+ New Item"** quick-add (naam+price+GST → Save & Add to bill). _(233604d)_
+- [x] ✅ GST 18% wrong default → item se real GST pick. _(1d258eb)_
+- [x] ✅ Unit alag **column** me — already tha (Item ke baad Unit column).
+- [x] ✅ Price with/without tax + auto tax calc — `price_inclusive_tax` + row me **+T/−T toggle**.
+- [x] ✅ Item add pe **row auto-open** — item select karte hi nayi khaali row auto-add. _(0845bfa)_
+- [x] ✅ **Description column** per line (+ invoice par print). _(0845bfa)_
+- [ ] 🟠 **Image upload** (item/line) — missing (task #62 ke saath).
+- [ ] 🟡 **Document upload** — party-level hai, line/invoice-level add (task #62).
 
 ## Slide 4 — Transactions
 - [ ] 🟠 Sale Order → invoice **once**; generate pe billing window; qty change → partial/close prompt.

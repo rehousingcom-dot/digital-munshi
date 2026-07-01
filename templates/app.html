@@ -2349,6 +2349,40 @@ function Stat({label,v}){
   return <div className="card p-3"><div className="text-xs text-slate-500">{label}</div><div className="text-lg font-extrabold text-slate-800">{v}</div></div>;
 }
 
+// ---------- AI Munshi (chat + voice) ----------
+function MunshiChat(){
+  const [open,setOpen]=useState(false);
+  const [msgs,setMsgs]=useState([{me:false,text:t("Namaste! Main aapka Munshi. Poochho: \"aaj ki bikri?\", \"kaun udhaar me hai?\", ya \"parcha: 2 kilo cheeni\".","Namaste! Main aapka Munshi.")}]);
+  const [inp,setInp]=useState(""),[busy,setBusy]=useState(false),[rec,setRec]=useState(false);
+  const boxRef=useRef(null);
+  useEffect(()=>{ if(boxRef.current)boxRef.current.scrollTop=boxRef.current.scrollHeight; },[msgs,open]);
+  const send=async(q)=>{ const text=(q||inp).trim(); if(!text)return; setInp("");
+    setMsgs(m=>[...m,{me:true,text}]); setBusy(true);
+    try{ const r=await api("/munshi/ask/",{method:"POST",body:JSON.stringify({q:text})}); setMsgs(m=>[...m,{me:false,text:r.answer||"..."}]); }
+    catch(e){ setMsgs(m=>[...m,{me:false,text:t("Kuch gadbad ho gayi.","Error.")}]); } setBusy(false); };
+  const mic=()=>{ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){ alert(t("Aapke browser me voice support nahi. Chrome try karo.","Voice not supported. Try Chrome.")); return; }
+    const r=new SR(); r.lang="hi-IN"; r.interimResults=false; setRec(true);
+    r.onresult=e=>{ const txt=e.results[0][0].transcript; setInp(txt); setRec(false); send(txt); };
+    r.onerror=()=>setRec(false); r.onend=()=>setRec(false); r.start(); };
+  if(!open) return <button onClick={()=>setOpen(true)} title="Munshi" className="fixed z-40 rounded-full shadow-lg flex items-center justify-center text-white" style={{bottom:20,right:20,width:56,height:56,background:"linear-gradient(135deg,#ea6a1e,#c2410c)",fontSize:26}}>🧑‍💼</button>;
+  return (<div className="fixed z-40 flex flex-col bg-white rounded-2xl shadow-2xl border border-slate-200" style={{bottom:20,right:20,width:340,maxWidth:"92vw",height:480,maxHeight:"78vh"}}>
+    <div className="flex items-center justify-between px-4 py-3 rounded-t-2xl text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>
+      <div className="flex items-center gap-2 font-bold">🧑‍💼 {t("Munshi","मुंशी")} <span className="text-[10px] bg-white/25 px-1.5 py-0.5 rounded">AI</span></div>
+      <button onClick={()=>setOpen(false)} className="text-white/90 text-lg">✕</button>
+    </div>
+    <div ref={boxRef} className="flex-1 overflow-y-auto p-3 space-y-2 bg-slate-50">
+      {msgs.map((m,i)=><div key={i} className={"max-w-[85%] px-3 py-2 rounded-2xl text-sm whitespace-pre-line "+(m.me?"ml-auto bg-blue-900 text-white":"bg-white border border-slate-100 text-slate-700")}>{m.text}</div>)}
+      {busy&&<div className="text-xs text-slate-400">Munshi soch raha hai…</div>}
+    </div>
+    <div className="p-2 border-t flex items-center gap-1">
+      <button onClick={mic} title="Bolo" className={"w-10 h-10 rounded-full flex items-center justify-center "+(rec?"bg-red-500 text-white animate-pulse":"bg-slate-100")}>🎤</button>
+      <input value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder={t("Sawal likho ya bolo…","Type or speak…")} className="flex-1 border border-slate-200 rounded-full px-3 py-2 text-sm" />
+      <button onClick={()=>send()} className="w-10 h-10 rounded-full text-white flex items-center justify-center" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>➤</button>
+    </div>
+  </div>);
+}
+
 // ---------- Trial / subscription banner ----------
 function Banner({sub,onUpgrade}){
   if(!sub) return null;
@@ -2774,6 +2808,7 @@ function App(){
             {tab==="plan" && <Subscribe sub={sub} onActivated={onActivated} />}
           </>}
       </main>
+      <MunshiChat/>
     </div>);
 }
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);

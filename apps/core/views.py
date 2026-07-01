@@ -211,7 +211,7 @@ def lead_create(request):
     name = (request.POST.get("name") or "").strip()
     phone = (request.POST.get("phone") or "").strip()
     if not name or len(phone) < 8:
-        return JsonResponse({"error": "Naam aur sahi phone number daalo"}, status=400)
+        return JsonResponse({"error": "Enter a valid name and phone number"}, status=400)
     lead = Lead.objects.create(
         name=name[:120], phone=phone[:20],
         business=(request.POST.get("business") or "")[:160],
@@ -219,7 +219,7 @@ def lead_create(request):
         source=(request.POST.get("source") or "")[:120],
     )
     _notify_lead_email(lead)
-    return JsonResponse({"ok": True, "message": "Dhanyavaad! Hum jaldi contact karenge."})
+    return JsonResponse({"ok": True, "message": "Thank you! We will contact you soon."})
 
 
 def keyword_page(request, slug):

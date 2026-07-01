@@ -32,8 +32,8 @@
     {% for pt in p.points %}<li class="flex items-start gap-2"><span style="color:#ea6a1e">✓</span> <span>{{ pt }}</span></li>{% endfor %}
   </ul>
   <div class="flex gap-3 mt-8">
-    <a href="/" class="text-white px-6 py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Free me shuru karo →</a>
-    <a href="#leadbox" class="border border-slate-200 px-6 py-3 rounded-xl font-bold text-slate-700">Demo book karo</a>
+    <a href="/" class="text-white px-6 py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Get started free →</a>
+    <a href="#leadbox" class="border border-slate-200 px-6 py-3 rounded-xl font-bold text-slate-700">Book a demo</a>
   </div>
 </section>
 
@@ -41,7 +41,7 @@
 
 <!-- Why choose -->
 <section class="bg-slate-50 py-12"><div class="max-w-5xl mx-auto px-5">
-  <h2 class="text-2xl font-extrabold text-center mb-8">Digital Munshi kyun choose karein?</h2>
+  <h2 class="text-2xl font-extrabold text-center mb-8">Why choose Digital Munshi?</h2>
   <div class="grid md:grid-cols-3 gap-4">
     {% for w in why %}<div class="bg-white p-5 rounded-2xl border border-slate-100"><div class="font-bold text-slate-800">{{ w.t }}</div><p class="text-sm text-slate-500 mt-1">{{ w.d }}</p></div>{% endfor %}
   </div>
@@ -49,7 +49,7 @@
 
 <!-- FAQ -->
 {% if p.faqs %}<section class="max-w-3xl mx-auto px-5 py-12">
-  <h2 class="text-2xl font-extrabold mb-5">Aksar poochhe jaane wale sawaal (FAQ)</h2>
+  <h2 class="text-2xl font-extrabold mb-5">Frequently Asked Questions (FAQ)</h2>
   <div class="space-y-3">
     {% for f in p.faqs %}<div class="border border-slate-100 rounded-xl p-4"><div class="font-bold text-slate-800">{{ f.q }}</div><p class="text-sm text-slate-500 mt-1">{{ f.a }}</p></div>{% endfor %}
   </div>
@@ -60,12 +60,12 @@
 
 <!-- Internal links -->
 <section class="max-w-3xl mx-auto px-5 py-10">
-  <div class="font-bold text-slate-700 mb-3">Aur dekho</div>
+  <div class="font-bold text-slate-700 mb-3">Explore more</div>
   <div class="flex flex-wrap gap-2 mb-4">
     {% for s, h in other %}<a href="/software/{{ s }}/" class="text-sm bg-slate-100 px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">{{ h }}</a>{% endfor %}
     <a href="/blog/" class="text-sm bg-slate-100 px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Blog</a>
   </div>
-  <div class="font-bold text-slate-700 mb-2 text-sm">City me:</div>
+  <div class="font-bold text-slate-700 mb-2 text-sm">By city:</div>
   <div class="flex flex-wrap gap-2">
     {% for cs, cn in cities %}<a href="/billing-software-in-{{ cs }}/" class="text-xs bg-orange-50 text-orange-700 px-2.5 py-1 rounded-lg hover:bg-orange-100">Billing Software in {{ cn }}</a>{% endfor %}
   </div>

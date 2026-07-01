@@ -1,123 +1,123 @@
-"""Marketing/SEO content — keyword landing pages, city pages + blog posts."""
+"""Marketing/SEO content — keyword landing pages, city pages + blog posts (English)."""
 
 _WHY = [
-    {"t": "Hinglish me aasan", "d": "App Hindi-English mix me — koi bhi dukaandaar bina training ke chala le."},
-    {"t": "Sab kuch ek app me", "d": "Billing, GST, inventory, udhaar, accounting, POS, HR — alag-alag software ki zaroorat nahi."},
-    {"t": "Sasta + free trial", "d": "7 din free trial, phir ₹399/mo se. Vyapar/Tally se sasta aur modern."},
-    {"t": "Cloud + mobile", "d": "Kahin se bhi — mobile, laptop. Data cloud pe safe, auto-backup."},
-    {"t": "GST-ready", "d": "GST invoice, e-invoice, e-way bill JSON, GSTR-1/3B reports — sab built-in."},
-    {"t": "WhatsApp + UPI", "d": "Invoice WhatsApp par bhejo, invoice par UPI QR — customer turant pay kare."},
+    {"t": "Simple & easy", "d": "Clean, easy interface — any shopkeeper or staff can use it without training."},
+    {"t": "Everything in one app", "d": "Billing, GST, inventory, credit (udhaar), accounting, POS and HR — no need for separate software."},
+    {"t": "Affordable + free trial", "d": "7-day free trial, then from Rs 399/month. Cheaper and more modern than Vyapar or Tally."},
+    {"t": "Cloud + mobile", "d": "Access from anywhere — mobile or laptop. Data is safe on the cloud with auto-backup."},
+    {"t": "GST-ready", "d": "GST invoice, e-invoice, e-way bill JSON, GSTR-1/3B reports — all built in."},
+    {"t": "WhatsApp + UPI", "d": "Send invoices on WhatsApp and add a UPI QR on the invoice so customers pay instantly."},
 ]
 
 KEYWORD_PAGES = {
     "gst-billing-software": {
         "title": "GST Billing Software for Indian Businesses (Free Trial) | Digital Munshi",
-        "desc": "Best GST billing software India. GST invoice, e-invoice, e-way bill, HSN, GSTR reports. Kirana, wholesale, pharmacy ke liye. Free trial, ₹399/mo se.",
-        "h1": "GST Billing Software — aasan, tez, GST-ready",
-        "intro": "Digital Munshi se seconds me GST invoice banao — CGST/SGST/IGST auto, HSN, e-invoice aur e-way bill JSON ready. Thermal aur A4 print, WhatsApp par share, invoice par UPI QR.",
+        "desc": "Best GST billing software in India. GST invoice, e-invoice, e-way bill, HSN, GSTR reports. For kirana, wholesale, pharmacy. Free trial, from Rs 399/mo.",
+        "h1": "GST Billing Software — Fast, Simple, GST-Ready",
+        "intro": "Create GST invoices in seconds with Digital Munshi — automatic CGST/SGST/IGST, HSN, e-invoice and e-way bill JSON. Thermal and A4 print, WhatsApp share, and a UPI QR on every invoice.",
         "points": ["GST invoice + Bill of Supply + Credit/Debit note", "e-Invoice & e-Way bill JSON", "Thermal (58mm) + A4 print, PDF", "GSTR-1 / GSTR-3B / HSN summary reports", "WhatsApp share + UPI QR on invoice"],
         "keyword": "GST billing software",
         "body": """
-<h2>GST billing software kya hota hai?</h2>
-<p>GST billing software ek aisa tool hai jo aapke liye GST-compliant invoice banata hai — sahi CGST/SGST/IGST calculation, HSN/SAC codes, aur GST return-ready reports ke saath. Manually Excel ya register me karne se galti hoti hai aur time lagta hai; software se ye kaam seconds me sahi hota hai.</p>
-<h2>Digital Munshi me kya-kya milta hai?</h2>
-<p>Ye sirf billing tak simit nahi — ek hi app me GST invoicing, inventory/stock, party udhaar (khata), double-entry accounting, POS aur reports. Chhoti dukaan se le kar wholesale/distributor tak sabke liye.</p>
+<h2>What is GST billing software?</h2>
+<p>GST billing software creates GST-compliant invoices for you — with correct CGST/SGST/IGST calculation, HSN/SAC codes and return-ready reports. Doing this manually in Excel or a register is slow and error-prone; software does it correctly in seconds.</p>
+<h2>What you get with Digital Munshi</h2>
+<p>It is not limited to billing. In one app you get GST invoicing, inventory/stock, customer credit (udhaar/khata), double-entry accounting, POS and reports — from a small shop to a wholesaler or distributor.</p>
 <h2>CGST/SGST vs IGST — automatic</h2>
-<p>Same state ka customer ho to CGST+SGST, alag state ho to IGST — Digital Munshi party ke state code se ye khud decide karta hai. Aapko sochna nahi padta.</p>
-<h2>e-Invoice aur e-Way bill</h2>
-<p>Turnover limit wale businesses ke liye e-invoice zaroori hai. Digital Munshi invoice se seedha government-schema JSON generate karta hai jo portal par upload-ready hota hai. E-way bill (₹50,000+ goods movement) ke liye bhi JSON ready milta hai.</p>
+<p>Same-state customer means CGST+SGST, different state means IGST — Digital Munshi decides this automatically from the party's state code, so you don't have to think about it.</p>
+<h2>e-Invoice and e-Way bill</h2>
+<p>Businesses above the turnover limit need e-invoicing. Digital Munshi generates the government-schema JSON directly from your invoice, ready to upload on the portal. E-way bill JSON (for goods movement above Rs 50,000) is also ready.</p>
 """,
         "faqs": [
-            {"q": "Kya GST billing software free hai?", "a": "Digital Munshi 7 din free trial deta hai. Uske baad ₹399/mo se plans. Bina credit card signup."},
-            {"q": "Kya e-invoice aur e-way bill bana sakte hain?", "a": "Haan. Invoice se seedha e-invoice aur e-way bill JSON generate hota hai jo GST portal par upload-ready hai."},
-            {"q": "Kya bina GST ke bhi bill bana sakte hain?", "a": "Haan, Bill of Supply / non-GST invoice bhi ban sakta hai — composition ya unregistered businesses ke liye."},
-            {"q": "Thermal printer par print hota hai?", "a": "Haan, 58mm thermal receipt aur A4 dono. PDF aur WhatsApp share bhi."},
+            {"q": "Is GST billing software free?", "a": "Digital Munshi offers a 7-day free trial. After that, plans start at Rs 399/month. Sign up without a credit card."},
+            {"q": "Can I create e-invoices and e-way bills?", "a": "Yes. e-Invoice and e-way bill JSON are generated directly from the invoice, ready to upload on the GST portal."},
+            {"q": "Can I bill without GST too?", "a": "Yes, Bill of Supply / non-GST invoices are supported — for composition or unregistered businesses."},
+            {"q": "Does it print on a thermal printer?", "a": "Yes, both 58mm thermal receipts and A4. PDF and WhatsApp sharing too."},
         ],
     },
     "kirana-billing-app": {
-        "title": "Kirana Store Billing App — POS + Udhaar Khata (Free) | Digital Munshi",
-        "desc": "Kirana dukaan billing app — fast POS billing, barcode scan, udhaar khata, stock alert, GST. Hinglish me, aasan. Free trial.",
-        "h1": "Kirana Billing App — dukaan ka poora hisaab",
-        "intro": "Kirana store ke liye sabse aasan billing app. Barcode se fatafat billing, udhaar/khata, stock kam hone par alert, aur roz ki bikri ka hisaab — sab ek jagah.",
-        "points": ["Fast POS billing + camera barcode scan", "Udhaar / khata + payment reminder", "Stock alert (kam maal par)", "Roz ki bikri ka summary", "Online catalog — WhatsApp par order"],
+        "title": "Kirana Store Billing App — POS + Credit Khata (Free) | Digital Munshi",
+        "desc": "Kirana store billing app — fast POS billing, barcode scan, credit khata, stock alerts, GST. Simple and easy. Free trial.",
+        "h1": "Kirana Billing App — Complete Shop Accounts",
+        "intro": "The easiest billing app for kirana stores. Fast barcode billing, credit (udhaar) khata, low-stock alerts, and a daily sales summary — all in one place.",
+        "points": ["Fast POS billing + camera barcode scan", "Credit (udhaar) khata + payment reminders", "Stock alerts on low inventory", "Daily sales summary", "Online catalog — orders on WhatsApp"],
         "keyword": "kirana billing app",
         "body": """
-<h2>Kirana dukaan ke liye kyun chahiye?</h2>
-<p>Register/copy me hisaab rakhna purana tarika hai — udhaar bhool jaate hain, stock ka andaza nahi rehta, aur din ke ant me total nikalna mushkil. Kirana billing app ye sab automatic kar deta hai.</p>
-<h2>Barcode se billing</h2>
-<p>Item par barcode scan karo (phone camera ya scanner se) — rate aur GST apne aap. Ek-ek cheez type karne ki zaroorat nahi. Rush me bhi tezi se billing.</p>
-<h2>Udhaar / Khata</h2>
-<p>Kisne kitna udhaar liya, kab dena hai — sab track. Reminder WhatsApp par ek click me. Purana "bahi khata" ab digital.</p>
-<h2>Stock aur online order</h2>
-<p>Maal kam hone par alert. Apni dukaan ka online catalog link banao — customer ghar baithe products dekh kar WhatsApp par order kare.</p>
+<h2>Why a kirana store needs it</h2>
+<p>Keeping accounts in a register is the old way — you forget who owes money, you can't track stock, and totalling at day's end is hard. A kirana billing app automates all of this.</p>
+<h2>Barcode billing</h2>
+<p>Scan the barcode on an item (phone camera or scanner) — rate and GST fill in automatically. No typing each item. Fast billing even in a rush.</p>
+<h2>Credit / Khata</h2>
+<p>Who took how much credit and when it's due — all tracked. Send a reminder on WhatsApp in one click. Your old ledger, now digital.</p>
+<h2>Stock and online orders</h2>
+<p>Get alerts when stock runs low. Create an online catalog link for your shop — customers browse products from home and order on WhatsApp.</p>
 """,
         "faqs": [
-            {"q": "Kya mobile par chalta hai?", "a": "Haan, mobile aur laptop dono par. Cloud-based hai to kahin se bhi access."},
-            {"q": "Udhaar/khata track hota hai?", "a": "Haan. Har customer ka udhaar, payment aur balance track hota hai, reminder WhatsApp par bhej sakte hain."},
-            {"q": "Barcode scanner chahiye?", "a": "Zaroori nahi. Phone ka camera se bhi barcode scan ho jaata hai."},
+            {"q": "Does it work on mobile?", "a": "Yes, on both mobile and laptop. It's cloud-based, so you can access it from anywhere."},
+            {"q": "Is credit/khata tracked?", "a": "Yes. Each customer's credit, payments and balance are tracked, and you can send reminders on WhatsApp."},
+            {"q": "Do I need a barcode scanner?", "a": "Not necessarily. You can scan barcodes with your phone camera too."},
         ],
     },
     "invoice-software": {
-        "title": "Free Invoice Software India — Bill Banane Ka App | Digital Munshi",
-        "desc": "Free invoice software India. Professional bill banao GST ya bina-GST, print/PDF/WhatsApp, logo + UPI QR. Har business ke liye. Free trial.",
-        "h1": "Invoice Software — professional bill 30 second me",
-        "intro": "Apne business ka professional invoice banao — logo, bank details, UPI QR ke saath. GST ya bina-GST, print ya PDF, seedha WhatsApp par bhejo.",
-        "points": ["Professional GST / non-GST invoice", "Logo + bank details + UPI QR", "Print, PDF, WhatsApp share", "Recurring/auto invoice", "Multi-currency (export)"],
+        "title": "Free Invoice Software India — Billing App | Digital Munshi",
+        "desc": "Free invoice software in India. Create professional bills, GST or non-GST, print/PDF/WhatsApp, with logo and UPI QR. For every business. Free trial.",
+        "h1": "Invoice Software — Professional Bills in 30 Seconds",
+        "intro": "Create professional invoices for your business — with logo, bank details and UPI QR. GST or non-GST, print or PDF, and send directly on WhatsApp.",
+        "points": ["Professional GST / non-GST invoices", "Logo + bank details + UPI QR", "Print, PDF, WhatsApp share", "Recurring / auto invoices", "Multi-currency (for exports)"],
         "keyword": "invoice software",
         "body": """
-<h2>Professional invoice kyun zaroori hai?</h2>
-<p>Ek clean, professional invoice aapke business ka bharosa badhata hai aur payment jaldi aata hai. Digital Munshi se logo, bank details aur UPI QR ke saath invoice bante hain — customer QR scan kar ke turant pay kar sakta hai.</p>
-<h2>GST ya bina GST — dono</h2>
-<p>Registered ho to GST invoice, warna simple bill/estimate. Recurring invoices (rent, AMC, subscription) auto-generate ho sakte hain.</p>
-<h2>Print, PDF ya WhatsApp</h2>
-<p>A4 ya 58mm thermal print, PDF download, ya ek click me WhatsApp par bhejo. Customer ko turant bill milta hai.</p>
+<h2>Why professional invoices matter</h2>
+<p>A clean, professional invoice builds trust and gets you paid faster. Digital Munshi creates invoices with your logo, bank details and a UPI QR — the customer can scan and pay instantly.</p>
+<h2>GST or non-GST — both</h2>
+<p>If you're registered, create GST invoices; if not, simple bills or estimates. Recurring invoices (rent, AMC, subscriptions) can be auto-generated.</p>
+<h2>Print, PDF or WhatsApp</h2>
+<p>A4 or 58mm thermal print, PDF download, or send on WhatsApp in one click. Your customer gets the bill instantly.</p>
 """,
         "faqs": [
-            {"q": "Kya invoice par apna logo aur UPI QR laga sakte hain?", "a": "Haan. Business logo, bank details aur UPI 'Scan & Pay' QR invoice par automatically aata hai."},
-            {"q": "Recurring invoice ban sakta hai?", "a": "Haan. Monthly/quarterly recurring (auto) invoice set kar sakte hain — rent, AMC, subscription ke liye."},
-            {"q": "Export ke liye multi-currency?", "a": "Haan, foreign currency invoice bhi support karta hai."},
+            {"q": "Can I add my logo and UPI QR to the invoice?", "a": "Yes. Your business logo, bank details and a UPI 'Scan & Pay' QR appear on the invoice automatically."},
+            {"q": "Can I create recurring invoices?", "a": "Yes. Set up monthly/quarterly recurring (auto) invoices — for rent, AMC or subscriptions."},
+            {"q": "Multi-currency for exports?", "a": "Yes, foreign-currency invoices are supported."},
         ],
     },
     "inventory-management-software": {
         "title": "Inventory Management Software India — Stock App | Digital Munshi",
-        "desc": "Inventory & stock management software India. Multi-godown, batch/expiry, barcode, low-stock alert, dead-stock report. Free trial.",
-        "h1": "Inventory Management Software — stock par poora control",
-        "intro": "Multi-godown stock, batch/expiry, variants, barcode aur low-stock alerts. Dead vs fast-moving items ka report — kya rukega, kya restock karna hai turant pata.",
-        "points": ["Multi-godown stock tracking", "Batch, expiry, serial/IMEI", "Barcode + label designer", "Low-stock & reorder alerts", "Dead / fast-mover report"],
+        "desc": "Inventory & stock management software in India. Multi-warehouse, batch/expiry, barcode, low-stock alerts, dead-stock report. Free trial.",
+        "h1": "Inventory Management Software — Full Control of Stock",
+        "intro": "Multi-warehouse stock, batch/expiry, variants, barcode and low-stock alerts. A dead vs fast-moving report tells you what's stuck and what to restock — instantly.",
+        "points": ["Multi-warehouse stock tracking", "Batch, expiry, serial/IMEI", "Barcode + label designer", "Low-stock & reorder alerts", "Dead / fast-mover report"],
         "keyword": "inventory management software",
         "body": """
-<h2>Stock management kyun zaroori?</h2>
-<p>Zyada stock = paisa phasa, kam stock = sale miss. Sahi inventory software se aap exactly jaan sakte ho kitna maal hai, kaunsa jaldi khatam hoga, aur kaunsa ruka pada hai.</p>
-<h2>Multi-godown + batch/expiry</h2>
-<p>Ek se zyada godown/store ka alag stock, batch aur expiry tracking (pharmacy/FMCG ke liye zaroori), aur serial/IMEI (electronics ke liye).</p>
-<h2>Alerts aur reports</h2>
-<p>Maal reorder level par pahunchte hi alert. Dead-stock report se pata chale kaunsa item nahi bik raha, aur fast-mover se kaunsa jaldi restock karna hai.</p>
+<h2>Why stock management matters</h2>
+<p>Too much stock ties up cash; too little means missed sales. Good inventory software tells you exactly how much stock you have, what will run out soon, and what is sitting idle.</p>
+<h2>Multi-warehouse + batch/expiry</h2>
+<p>Separate stock per warehouse/store, batch and expiry tracking (essential for pharmacy/FMCG), and serial/IMEI (for electronics).</p>
+<h2>Alerts and reports</h2>
+<p>Get an alert the moment stock hits the reorder level. The dead-stock report shows what isn't selling, and the fast-mover report shows what to restock quickly.</p>
 """,
         "faqs": [
-            {"q": "Multiple godown/warehouse support karta hai?", "a": "Haan, har godown ka alag stock track hota hai."},
-            {"q": "Expiry/batch tracking hai?", "a": "Haan — pharmacy aur FMCG ke liye batch number aur expiry date track hoti hai."},
-            {"q": "Low stock par alert milega?", "a": "Haan, reorder level set karo — stock kam hote hi dashboard par alert."},
+            {"q": "Does it support multiple warehouses/godowns?", "a": "Yes, stock is tracked separately for each warehouse."},
+            {"q": "Is there expiry/batch tracking?", "a": "Yes — batch numbers and expiry dates are tracked, useful for pharmacy and FMCG."},
+            {"q": "Will I get low-stock alerts?", "a": "Yes, set a reorder level and get a dashboard alert as soon as stock runs low."},
         ],
     },
     "vyapar-alternative": {
         "title": "Best Vyapar Alternative — Billing + Accounting App | Digital Munshi",
-        "desc": "Vyapar / Tally ka aasan alternative. Billing, GST, inventory, accounting, HR, POS, multi-firm ek hi app me. Hinglish. Free trial.",
-        "h1": "Vyapar / Tally ka aasan alternative",
-        "intro": "Ek hi app me billing + GST + inventory + accounting + HR + POS + multi-firm. Hinglish me, aasan — Vyapar aur Tally ka modern, sasta alternative.",
+        "desc": "An easy Vyapar / Tally alternative. Billing, GST, inventory, accounting, HR, POS and multi-firm in one app. Free trial.",
+        "h1": "An Easy Vyapar / Tally Alternative",
+        "intro": "One app for billing + GST + inventory + accounting + HR + POS + multi-firm. Simple and modern — a cloud-based, affordable alternative to Vyapar and Tally.",
         "points": ["Billing + GST + e-invoice", "Double-entry accounting + reports", "Inventory + POS + multi-firm", "HR / payroll", "Online catalog + loyalty points"],
         "keyword": "Vyapar alternative",
         "body": """
-<h2>Vyapar/Tally se kya alag hai?</h2>
-<p>Digital Munshi cloud-based hai — mobile aur laptop dono par, kahin se access. Isme billing + accounting + inventory + HR + POS + online catalog + loyalty sab built-in hai, aur interface Hinglish me aasan hai.</p>
-<h2>Kise switch karna chahiye?</h2>
-<p>Agar aap chahte ho ek modern, cloud, mobile-friendly system jisme customer ko WhatsApp par invoice/catalog jaaye, UPI QR ho, aur online orders aayein — to Digital Munshi behtar fit hai.</p>
-<h2>Migration aasan</h2>
-<p>Items aur parties CSV se import ho jaate hain — purane data ke saath jaldi shuru karo.</p>
+<h2>How is it different from Vyapar/Tally?</h2>
+<p>Digital Munshi is cloud-based — on mobile and laptop, accessible from anywhere. It includes billing + accounting + inventory + HR + POS + online catalog + loyalty, and the interface is simple and easy.</p>
+<h2>Who should switch?</h2>
+<p>If you want a modern, cloud, mobile-friendly system where invoices/catalogs go to customers on WhatsApp, invoices carry a UPI QR, and you can receive online orders — Digital Munshi is a better fit.</p>
+<h2>Easy migration</h2>
+<p>Items and parties import from CSV — get started quickly with your existing data.</p>
 """,
         "faqs": [
-            {"q": "Kya purana data import ho sakta hai?", "a": "Haan, items aur parties CSV se import ho jaate hain."},
-            {"q": "Vyapar se sasta hai?", "a": "Free trial ke saath ₹399/mo se — aur billing, accounting, inventory, HR, POS sab ek hi plan me."},
-            {"q": "Cloud hai ya desktop?", "a": "Cloud-based — mobile aur laptop dono par, data auto-backup ke saath."},
+            {"q": "Can I import my old data?", "a": "Yes, items and parties import from CSV."},
+            {"q": "Is it cheaper than Vyapar?", "a": "With a free trial and plans from Rs 399/month — and billing, accounting, inventory, HR and POS all in one plan."},
+            {"q": "Is it cloud or desktop?", "a": "Cloud-based — on mobile and laptop, with automatic data backup."},
         ],
     },
 }
@@ -137,187 +137,187 @@ def city_page_data(slug):
     return {
         "city": name, "slug": slug,
         "title": f"Billing & GST Software in {name} — Digital Munshi",
-        "desc": f"{name} me billing, GST invoice aur inventory software. Kirana, wholesale, pharmacy, restaurant ke liye. Free trial, Hinglish me aasan.",
+        "desc": f"Billing, GST invoice and inventory software in {name}. For kirana, wholesale, pharmacy and restaurants. Free trial, simple and easy.",
         "h1": f"Billing & GST Software in {name}",
-        "intro": f"{name} ke dukaandaron aur businesses ke liye Digital Munshi — GST billing, inventory, udhaar khata, accounting aur POS ek hi app me. Cloud-based, mobile par, Hinglish me aasan.",
+        "intro": f"For shops and businesses in {name}, Digital Munshi brings GST billing, inventory, credit (udhaar) khata, accounting and POS into one app. Cloud-based, works on mobile, simple to use.",
     }
 
 
 # ---- Blog posts (/blog/<slug>/) ----
 BLOG_POSTS = {
-    "gst-invoice-kaise-banaye": {
-        "title": "GST Invoice Kaise Banaye — Step by Step (2026) | Digital Munshi",
-        "desc": "GST invoice banane ka aasan tarika — kaunsi details chahiye, CGST/SGST/IGST kab lagta hai, aur software se 30 second me invoice.",
-        "h1": "GST Invoice Kaise Banaye — Poori Guide",
+    "how-to-create-gst-invoice": {
+        "title": "How to Create a GST Invoice — Step by Step (2026) | Digital Munshi",
+        "desc": "The easy way to create a GST invoice — what details are required, when CGST/SGST or IGST applies, and how to bill in 30 seconds with software.",
+        "h1": "How to Create a GST Invoice — Full Guide",
         "html": """
-<p>GST invoice har registered business ke liye zaroori hai. Isme kuch mandatory details honi chahiye. Aaiye simple bhasha me samajhte hain.</p>
-<h2>GST Invoice me kya-kya hona chahiye</h2>
+<p>A GST invoice is mandatory for every registered business, and it must include certain details. Let's break it down simply.</p>
+<h2>What a GST invoice must include</h2>
 <ul>
-<li>Seller ka naam, address aur GSTIN</li>
-<li>Invoice number aur date</li>
-<li>Buyer ka naam, address, GSTIN (agar registered)</li>
-<li>Item ka naam, HSN/SAC code, quantity, rate</li>
-<li>Taxable value, CGST/SGST ya IGST, total</li>
+<li>Seller's name, address and GSTIN</li>
+<li>Invoice number and date</li>
+<li>Buyer's name, address, GSTIN (if registered)</li>
+<li>Item name, HSN/SAC code, quantity, rate</li>
+<li>Taxable value, CGST/SGST or IGST, and total</li>
 </ul>
-<h2>CGST/SGST vs IGST — kab kaunsa?</h2>
-<p>Agar buyer aur seller <b>same state</b> me hain to <b>CGST + SGST</b> lagta hai. Agar <b>alag state</b> me hain to <b>IGST</b>. Digital Munshi ye automatically decide kar leta hai party ke state ke hisaab se.</p>
-<h2>Software se invoice — 30 second</h2>
-<p>Manually ye sab likhna time leta hai aur galti hoti hai. Digital Munshi me party aur item choose karo — GST, HSN, total sab auto. Print, PDF ya seedha WhatsApp par bhejo, UPI QR ke saath.</p>
+<h2>CGST/SGST vs IGST — which one?</h2>
+<p>If buyer and seller are in the <b>same state</b>, apply <b>CGST + SGST</b>. If in <b>different states</b>, apply <b>IGST</b>. Digital Munshi decides this automatically based on the party's state.</p>
+<h2>Invoicing with software — 30 seconds</h2>
+<p>Writing all this manually is slow and error-prone. In Digital Munshi, just pick the party and items — GST, HSN and totals are automatic. Print, PDF or send on WhatsApp with a UPI QR.</p>
 """,
     },
-    "dukaan-ka-hisaab-kaise-rakhe": {
-        "title": "Dukaan Ka Hisaab App Se Kaise Rakhe | Digital Munshi",
-        "desc": "Dukaan ka roz ka hisaab, udhaar/khata, stock aur bikri — mobile app se aasan tarika. Kirana, wholesale sabke liye.",
-        "h1": "Dukaan Ka Hisaab App Se Kaise Rakhe",
+    "manage-shop-accounts-with-app": {
+        "title": "How to Manage Shop Accounts With an App | Digital Munshi",
+        "desc": "Keep daily accounts, credit/khata, stock and sales for your shop — the easy way with a mobile app. For kirana and wholesale.",
+        "h1": "How to Manage Shop Accounts With an App",
         "html": """
-<p>Register/copy me hisaab rakhna purana tarika hai — udhaar bhool jaate hain, stock ka pata nahi chalta. App se ye sab automatic ho jata hai.</p>
-<h2>1. Har bikri turant record</h2>
-<p>Barcode scan ya item choose karke bill banao. Har sale apne aap hisaab me chadh jaati hai.</p>
-<h2>2. Udhaar / Khata</h2>
-<p>Kisne kitna udhaar liya, kab dena hai — sab track. Payment reminder WhatsApp par bhej sakte ho.</p>
-<h2>3. Stock aur alert</h2>
-<p>Maal kam hone par app alert deta hai. Dead stock (jo nahi bik raha) bhi pata chalta hai.</p>
-<h2>4. Roz ka summary</h2>
-<p>Har shaam aaj ki bikri, cash, top item ka summary — email par automatic. Digital Munshi se ye sab ek app me.</p>
+<p>Keeping accounts in a register is outdated — you forget credit, you can't track stock. An app automates all of it.</p>
+<h2>1. Record every sale instantly</h2>
+<p>Scan a barcode or pick an item to create a bill. Every sale is added to your accounts automatically.</p>
+<h2>2. Credit / Khata</h2>
+<p>Track who took how much credit and when it's due. Send payment reminders on WhatsApp.</p>
+<h2>3. Stock and alerts</h2>
+<p>The app alerts you when stock runs low. It also shows dead stock (items that aren't selling).</p>
+<h2>4. Daily summary</h2>
+<p>Every evening, get a summary of the day's sales, cash and top item — automatically by email. All of this in one app with Digital Munshi.</p>
 """,
     },
-    "eway-bill-kya-hai": {
-        "title": "E-Way Bill Kya Hai — Kab Zaroori Hai? | Digital Munshi",
-        "desc": "E-way bill kya hota hai, kab banana zaroori hai (Rs 50,000+), aur software se JSON kaise ready karein.",
-        "h1": "E-Way Bill Kya Hai aur Kab Zaroori Hai",
+    "what-is-eway-bill": {
+        "title": "What Is an E-Way Bill — When Is It Required? | Digital Munshi",
+        "desc": "What an e-way bill is, when it's required (goods above Rs 50,000), and how to get the JSON ready with software.",
+        "h1": "What Is an E-Way Bill and When Is It Required",
         "html": """
-<p>E-way bill ek electronic document hai jo goods ki movement ke liye chahiye jab value ek limit se zyada ho.</p>
-<h2>Kab zaroori hai?</h2>
-<p>Jab ek consignment ki value <b>Rs 50,000 se zyada</b> ho aur goods ek jagah se doosri jagah ja rahe ho — tab e-way bill banana zaroori hai.</p>
-<h2>Kya chahiye?</h2>
+<p>An e-way bill is an electronic document required for the movement of goods when the value crosses a limit.</p>
+<h2>When is it required?</h2>
+<p>When a single consignment's value is <b>more than Rs 50,000</b> and goods are moving from one place to another, an e-way bill is required.</p>
+<h2>What's needed?</h2>
 <ul>
 <li>Invoice / bill of supply</li>
-<li>Transporter ID ya vehicle number</li>
+<li>Transporter ID or vehicle number</li>
 <li>HSN code, value, GSTIN details</li>
 </ul>
-<h2>Software se aasan</h2>
-<p>Digital Munshi invoice se seedha <b>e-way bill JSON</b> generate kar deta hai jo portal par upload-ready hota hai — manually type karne ki zaroorat nahi.</p>
+<h2>Easy with software</h2>
+<p>Digital Munshi generates the <b>e-way bill JSON</b> directly from your invoice, ready to upload on the portal — no manual typing.</p>
 """,
     },
-    "gstr1-gstr3b-antar": {
-        "title": "GSTR-1 aur GSTR-3B me Kya Antar Hai? | Digital Munshi",
-        "desc": "GSTR-1 vs GSTR-3B — dono kya hain, kab file karne hain, aur software se aasan tarika. Simple bhasha me guide.",
-        "h1": "GSTR-1 aur GSTR-3B me Kya Antar Hai?",
+    "gstr1-vs-gstr3b": {
+        "title": "GSTR-1 vs GSTR-3B — What's the Difference? | Digital Munshi",
+        "desc": "GSTR-1 vs GSTR-3B — what each is, when to file, and the easy way with software. A simple guide.",
+        "h1": "GSTR-1 vs GSTR-3B — What's the Difference?",
         "html": """
-<p>GST me do sabse common returns hain — GSTR-1 aur GSTR-3B. Naye business owners aksar confuse ho jaate hain. Aaiye simple bhasha me samajhte hain.</p>
-<h2>GSTR-1 kya hai?</h2>
-<p>GSTR-1 aapki <b>sales (outward supplies)</b> ki detail hai — kisko, kya, kitne me becha, kitna GST liya. Ye har invoice ki detail hoti hai. Monthly ya quarterly file hoti hai (turnover ke hisaab se).</p>
-<h2>GSTR-3B kya hai?</h2>
-<p>GSTR-3B ek <b>summary return</b> hai — total sales, total purchase, input tax credit (ITC), aur net GST jo bharna hai. Ye har mahine file hoti hai aur isi ke saath tax payment hota hai.</p>
-<h2>Dono me antar (short)</h2>
+<p>The two most common GST returns are GSTR-1 and GSTR-3B. New business owners often get confused. Let's keep it simple.</p>
+<h2>What is GSTR-1?</h2>
+<p>GSTR-1 is the detail of your <b>sales (outward supplies)</b> — who you sold to, what, and how much GST you charged, invoice by invoice. Filed monthly or quarterly based on turnover.</p>
+<h2>What is GSTR-3B?</h2>
+<p>GSTR-3B is a <b>summary return</b> — total sales, total purchases, input tax credit (ITC) and the net GST payable. Filed monthly, and tax is paid with it.</p>
+<h2>The difference (short)</h2>
 <ul>
-<li><b>GSTR-1</b> = invoice-wise sales detail (kya becha).</li>
-<li><b>GSTR-3B</b> = summary + tax payment (kitna GST dena hai).</li>
+<li><b>GSTR-1</b> = invoice-wise sales detail (what you sold).</li>
+<li><b>GSTR-3B</b> = summary + tax payment (how much GST to pay).</li>
 </ul>
-<h2>Software se aasan</h2>
-<p>Digital Munshi me har sale record hoti hai, to <b>GSTR-1 aur GSTR-3B ke reports apne aap ban jaate hain</b> — aapko sirf portal par values daalni/upload karni hoti hain. Manually calculation ki zaroorat nahi.</p>
+<h2>Easy with software</h2>
+<p>In Digital Munshi every sale is recorded, so <b>GSTR-1 and GSTR-3B reports are generated automatically</b> — you just enter/upload the values on the portal.</p>
 """,
     },
-    "billing-software-kaise-chune": {
-        "title": "Billing Software Kaise Chune — 7 Zaroori Baatein | Digital Munshi",
-        "desc": "Apne business ke liye sahi billing software kaise chune — GST, inventory, price, mobile, support. 7 checklist points.",
-        "h1": "Billing Software Kaise Chune — 7 Zaroori Baatein",
+    "how-to-choose-billing-software": {
+        "title": "How to Choose Billing Software — 7 Key Points | Digital Munshi",
+        "desc": "How to choose the right billing software for your business — GST, inventory, price, mobile, support. A 7-point checklist.",
+        "h1": "How to Choose Billing Software — 7 Key Points",
         "html": """
-<p>Market me bahut billing software hain — Vyapar, Tally, Zoho, Marg. Sahi kaunsa hai? In 7 baaton par dhyaan do.</p>
+<p>There's a lot of billing software — Vyapar, Tally, Zoho, Marg. Which is right? Focus on these 7 points.</p>
 <h2>1. GST support</h2>
-<p>GST invoice, e-invoice, e-way bill aur GSTR reports honi chahiye — warna baad me dikkat.</p>
-<h2>2. Inventory + billing saath</h2>
-<p>Sirf billing kaafi nahi — stock, batch, low-stock alert bhi ek hi jagah ho to behtar.</p>
+<p>It should have GST invoices, e-invoice, e-way bill and GSTR reports — otherwise you'll struggle later.</p>
+<h2>2. Inventory + billing together</h2>
+<p>Billing alone isn't enough — stock, batches and low-stock alerts in one place are better.</p>
 <h2>3. Mobile + cloud</h2>
-<p>Cloud-based ho to mobile aur laptop dono par chale, data auto-backup ho, kahin se access.</p>
-<h2>4. Aasan (Hinglish)</h2>
-<p>Staff bina training ke chala sake — complex software chhod diya jaata hai.</p>
+<p>Cloud-based works on mobile and laptop, backs up data, and is accessible anywhere.</p>
+<h2>4. Easy to use</h2>
+<p>Staff should use it without training — complex software gets abandoned.</p>
 <h2>5. Price + free trial</h2>
-<p>Free trial se pehle try karo. Chhoti dukaan ke liye ₹300-500/mo theek hai.</p>
+<p>Try before you buy. For a small shop, Rs 300-500/month is reasonable.</p>
 <h2>6. WhatsApp + UPI</h2>
-<p>Invoice WhatsApp par bhejna aur UPI QR — aaj ke customers ke liye zaroori.</p>
+<p>Sending invoices on WhatsApp and a UPI QR are essential for today's customers.</p>
 <h2>7. Support</h2>
-<p>Setup me help mile aur dikkat par jawaab. Digital Munshi in saaton par khara utarta hai.</p>
+<p>You want setup help and quick answers. Digital Munshi ticks all seven boxes.</p>
 """,
     },
-    "udhaar-vasooli-tips": {
-        "title": "Udhaar Vasooli Kaise Kare — 6 Aasan Tips | Digital Munshi",
-        "desc": "Customer se udhaar time par kaise vasoole — payment reminder, credit limit, aur app se tracking. Practical tips.",
-        "h1": "Udhaar Vasooli Kaise Kare — 6 Aasan Tips",
+    "how-to-recover-credit-udhaar": {
+        "title": "How to Recover Customer Credit (Udhaar) — 6 Tips | Digital Munshi",
+        "desc": "Recover customer credit on time — payment reminders, credit limits, and app-based tracking. Practical tips.",
+        "h1": "How to Recover Customer Credit (Udhaar) — 6 Tips",
         "html": """
-<p>Har dukaandaar ki sabse badi problem — udhaar time par wapas na aana. In tips se vasooli behtar hogi.</p>
-<h2>1. Har udhaar record karo</h2>
-<p>Zubaani mat rakho. App me har udhaar entry karo — kaun, kitna, kab. Bhoolna khatam.</p>
-<h2>2. Credit limit set karo</h2>
-<p>Har customer ki ek limit rakho. Limit cross ho to naya udhaar mat do.</p>
-<h2>3. Due date decide karo</h2>
-<p>Udhaar dete waqt clear karo kab wapas dena hai (credit days). App reminder de dega.</p>
-<h2>4. WhatsApp reminder</h2>
-<p>Due hone par polite WhatsApp reminder bhejo. Digital Munshi se ek click me reminder + statement jaata hai.</p>
-<h2>5. Statement do</h2>
-<p>Customer ko poora ledger statement (PDF) bhejo — clarity se payment jaldi aata hai.</p>
-<h2>6. Regular follow-up</h2>
-<p>Overdue list roz dekho. Digital Munshi ka "Payment Reminders" report ye kaam aasan karta hai.</p>
+<p>Every shopkeeper's biggest problem — credit that doesn't come back on time. These tips will improve recovery.</p>
+<h2>1. Record every credit</h2>
+<p>Don't keep it in your head. Log every credit in the app — who, how much, when. No more forgetting.</p>
+<h2>2. Set a credit limit</h2>
+<p>Keep a limit per customer. Don't extend new credit once the limit is crossed.</p>
+<h2>3. Decide a due date</h2>
+<p>When giving credit, make the due date clear (credit days). The app will remind you.</p>
+<h2>4. WhatsApp reminders</h2>
+<p>Send a polite WhatsApp reminder when it's due. Digital Munshi sends the reminder and statement in one click.</p>
+<h2>5. Share statements</h2>
+<p>Send customers a full ledger statement (PDF) — clarity gets you paid faster.</p>
+<h2>6. Follow up regularly</h2>
+<p>Check the overdue list daily. Digital Munshi's Payment Reminders report makes this easy.</p>
 """,
     },
-    "hsn-code-kya-hai": {
-        "title": "HSN Code Kya Hai aur Kaise Dhoondhe? | Digital Munshi",
-        "desc": "HSN code kya hota hai, GST me kyun zaroori hai, kitne digit chahiye, aur kaise dhoondhe. Simple guide.",
-        "h1": "HSN Code Kya Hai aur Kaise Dhoondhe?",
+    "what-is-hsn-code": {
+        "title": "What Is an HSN Code and How to Find It? | Digital Munshi",
+        "desc": "What an HSN code is, why it matters in GST, how many digits you need, and how to find it. A simple guide.",
+        "h1": "What Is an HSN Code and How to Find It?",
         "html": """
-<p>HSN (Harmonized System of Nomenclature) code har product ka ek standard number hai jo GST me item classify karta hai.</p>
-<h2>HSN code kyun zaroori?</h2>
-<p>GST invoice par sahi HSN code likhna zaroori hai. Isse tax rate decide hota hai aur GST return me item classify hota hai.</p>
-<h2>Kitne digit chahiye?</h2>
+<p>An HSN (Harmonized System of Nomenclature) code is a standard number for each product that classifies items under GST.</p>
+<h2>Why does the HSN code matter?</h2>
+<p>Writing the correct HSN code on a GST invoice is mandatory. It determines the tax rate and classifies items in GST returns.</p>
+<h2>How many digits do you need?</h2>
 <ul>
-<li>Turnover ₹5 crore tak: <b>4 digit</b> HSN.</li>
-<li>Turnover ₹5 crore se zyada: <b>6 digit</b> HSN.</li>
-<li>Export/import: 8 digit.</li>
+<li>Turnover up to Rs 5 crore: <b>4-digit</b> HSN.</li>
+<li>Turnover above Rs 5 crore: <b>6-digit</b> HSN.</li>
+<li>Export/import: 8 digits.</li>
 </ul>
-<h2>HSN code kaise dhoondhe?</h2>
-<p>GST portal par HSN search tool hai, ya apne product category se pata kar sakte ho. Ek baar item me HSN save kar do — phir har invoice par apne aap aata hai.</p>
-<h2>Digital Munshi me</h2>
-<p>Item banate waqt HSN/SAC daal do — uske baad har bill par automatically HSN aur sahi GST rate lagta hai. HSN summary report bhi ready milti hai.</p>
+<h2>How to find an HSN code</h2>
+<p>The GST portal has an HSN search tool, or you can find it from your product category. Save the HSN in your item once — then it appears on every invoice.</p>
+<h2>In Digital Munshi</h2>
+<p>Enter the HSN/SAC when creating an item — after that, every bill carries the HSN and correct GST rate automatically. An HSN summary report is also ready.</p>
 """,
     },
-    "dukaan-online-kaise-laaye": {
-        "title": "Chhoti Dukaan Online Kaise Laaye — 5 Step | Digital Munshi",
-        "desc": "Apni chhoti dukaan ko online kaise laaye — online catalog, WhatsApp order, digital payment. Aasan 5 step guide.",
-        "h1": "Chhoti Dukaan Online Kaise Laaye — 5 Step",
+    "take-your-shop-online": {
+        "title": "How to Take Your Small Shop Online — 5 Steps | Digital Munshi",
+        "desc": "How to take your small shop online — online catalog, WhatsApp orders, digital payments. An easy 5-step guide.",
+        "h1": "How to Take Your Small Shop Online — 5 Steps",
         "html": """
-<p>Online hone ke liye website ya app banane ki zaroorat nahi. In 5 step me apni dukaan ghar-ghar pahunchao.</p>
-<h2>1. Products digital karo</h2>
-<p>Apne items app me daalo — naam, photo, price. Ye aapka digital catalog ban jaata hai.</p>
-<h2>2. Online catalog link banao</h2>
-<p>Digital Munshi ek public catalog link deta hai. Customer link kholke saare products dekh sakta hai.</p>
-<h2>3. WhatsApp par order lo</h2>
-<p>Customer catalog se items choose karke seedha WhatsApp par order bhejta hai — aapke number par.</p>
-<h2>4. Digital payment</h2>
-<p>Invoice par UPI QR lagao — customer scan karke turant pay kare. Cash ki tension kam.</p>
-<h2>5. Delivery + reminder</h2>
-<p>Order pack karke bhejo, aur payment/udhaar ka reminder WhatsApp par. Dukaan ab online.</p>
+<p>You don't need a website or app to go online. Reach every home with these 5 steps.</p>
+<h2>1. Digitise your products</h2>
+<p>Add your items to the app — name, photo, price. This becomes your digital catalog.</p>
+<h2>2. Create an online catalog link</h2>
+<p>Digital Munshi gives you a public catalog link. Customers open it and see all your products.</p>
+<h2>3. Take orders on WhatsApp</h2>
+<p>Customers pick items from the catalog and send the order straight to your WhatsApp.</p>
+<h2>4. Digital payments</h2>
+<p>Put a UPI QR on the invoice — customers scan and pay instantly. Less cash hassle.</p>
+<h2>5. Delivery + reminders</h2>
+<p>Pack and send the order, and send payment/credit reminders on WhatsApp. Your shop is now online.</p>
 """,
     },
-    "composition-scheme-gst": {
-        "title": "GST Composition Scheme Kya Hai — Kiske Liye? | Digital Munshi",
-        "desc": "GST composition scheme kya hai, kaun le sakta hai, rate kya hai, aur fayde-nuksaan. Chhote business ke liye guide.",
-        "h1": "GST Composition Scheme Kya Hai?",
+    "what-is-gst-composition-scheme": {
+        "title": "What Is the GST Composition Scheme — Who Is It For? | Digital Munshi",
+        "desc": "What the GST composition scheme is, who can opt in, the rates, and the pros and cons. A guide for small businesses.",
+        "h1": "What Is the GST Composition Scheme?",
         "html": """
-<p>Composition scheme chhote businesses ke liye ek aasan GST option hai — kam paperwork, fixed low rate.</p>
-<h2>Kaun le sakta hai?</h2>
-<p>Jinka turnover ek limit tak hai (goods ke liye aam taur par ₹1.5 crore tak) wo composition scheme choose kar sakte hain. Kuch categories exclude hoti hain.</p>
-<h2>Rate kya hai?</h2>
+<p>The composition scheme is an easy GST option for small businesses — less paperwork, a fixed low rate.</p>
+<h2>Who can opt in?</h2>
+<p>Businesses with turnover up to a limit (generally up to Rs 1.5 crore for goods) can choose the composition scheme. Some categories are excluded.</p>
+<h2>What are the rates?</h2>
 <ul>
 <li>Traders/manufacturers: ~1%</li>
 <li>Restaurants: ~5%</li>
 <li>Other service providers: ~6% (special scheme)</li>
 </ul>
-<h2>Fayde</h2>
-<p>Kam GST rate, simple quarterly return, aur kam compliance. Chhoti dukaan ke liye aasan.</p>
-<h2>Nuksaan</h2>
-<p>Aap GST invoice par tax alag se charge nahi kar sakte (Bill of Supply banta hai), aur input tax credit nahi milta. Inter-state sale ki limit hoti hai.</p>
-<h2>Digital Munshi me</h2>
-<p>Composition business ke liye Digital Munshi <b>Bill of Supply</b> banata hai aur composition-friendly reports deta hai.</p>
+<h2>Advantages</h2>
+<p>A lower GST rate, a simple quarterly return, and less compliance. Easy for a small shop.</p>
+<h2>Disadvantages</h2>
+<p>You can't charge GST separately on the invoice (a Bill of Supply is issued), and you don't get input tax credit. There are limits on inter-state sales.</p>
+<h2>In Digital Munshi</h2>
+<p>For composition businesses, Digital Munshi creates a <b>Bill of Supply</b> and provides composition-friendly reports.</p>
 """,
     },
 }

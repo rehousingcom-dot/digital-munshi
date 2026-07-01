@@ -127,13 +127,33 @@ const API = "/api";
 // ---------- auth + fetch helper ----------
 function getToken(){ return localStorage.getItem("dm_token"); }
 function setToken(t){ if(t) localStorage.setItem("dm_token", t); else localStorage.removeItem("dm_token"); }
+function getRefresh(){ return localStorage.getItem("dm_refresh"); }
+function setRefresh(t){ if(t) localStorage.setItem("dm_refresh", t); else localStorage.removeItem("dm_refresh"); }
+function saveTokens(d){ if(!d) return; if(d.access) setToken(d.access); if(d.refresh) setRefresh(d.refresh); }
+function clearAuth(){ setToken(null); setRefresh(null); }
 
-async function api(path, opts={}){
+// 401 aane par pehle refresh token se naya access lene ki koshish — tabhi logout.
+async function tryRefresh(){
+  const r = getRefresh();
+  if(!r) return false;
+  try{
+    const res = await fetch(API+"/auth/token/refresh/", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({refresh:r})});
+    if(!res.ok) return false;
+    const d = await res.json();
+    if(d.access){ setToken(d.access); if(d.refresh) setRefresh(d.refresh); return true; }
+  }catch(e){}
+  return false;
+}
+
+async function api(path, opts={}, _retried){
   const headers = {"Content-Type":"application/json", ...(opts.headers||{})};
   const t = getToken();
   if(t) headers["Authorization"] = "Bearer "+t;
   const res = await fetch(API+path, {...opts, headers});
-  if(res.status===401){ setToken(null); location.reload(); return; }
+  if(res.status===401){
+    if(!_retried && await tryRefresh()) return api(path, opts, true);
+    clearAuth(); location.reload(); return;
+  }
   const ct = res.headers.get("content-type")||"";
   const data = ct.includes("json") ? await res.json() : await res.text();
   if(!res.ok) throw data;
@@ -192,11 +212,11 @@ function Login({onLogin}){
     try{
       if(mode==="login"){
         const d=await fetch(API+"/auth/token/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:f.username,password:f.password})}).then(r=>r.json());
-        if(d.access){ setToken(d.access); onLogin(); } else setErr("Galat username/password");
+        if(d.access){ saveTokens(d); onLogin(); } else setErr("Galat username/password");
       }else{
         const r=await fetch(API+"/signup/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(f)});
         const d=await r.json();
-        if(r.ok && d.tokens){ setToken(d.tokens.access); onLogin(); } else setErr(d.detail||"Signup failed");
+        if(r.ok && d.tokens){ saveTokens(d.tokens); onLogin(); } else setErr(d.detail||"Signup failed");
       }
     }catch(e){ setErr("Kuch galat hua"); } setBusy(false); };
   const FEATURES=["GST-ready invoice — print, PDF & WhatsApp","Live stock + low-stock alerts","Payments, udhaar & auto reminders","Staff payroll, attendance & payslip","Accounting, reports & GSTR","POS, barcode & thermal print"];
@@ -2132,7 +2152,7 @@ function App(){
   const expired = loaded && sub && !sub.access_allowed;
   const isAdmin = me && me.is_platform_admin;
   const toggleTheme=()=>setTheme(t=>t==="dark"?"light":"dark");
-  const logout=()=>{ setToken(null); setAuthed(false); setSub(null); };
+  const logout=()=>{ clearAuth(); setAuthed(false); setSub(null); };
   const nav=[["dash","Dashboard"],["pos","POS Billing"],["sale","New Sale"],["vouchers","Sales & Transactions"],["items","Items"],["parties","Parties"],["cashbank","Cash & Bank"],["accounting","Accounting"],["reports","Reports"],["utils","Utilities"],["whatsapp","WhatsApp"],["hr","HR / Payroll"],["staff","App Users"],["settings","Settings"],["plan","Subscription"]];
   if(isAdmin) nav.push(["admin","Platform Admin"]);
   const onActivated=s=>{ setSub(s); setTab("dash"); };
@@ -2156,7 +2176,7 @@ function App(){
         <div className="mt-4 mb-1 hidden md:block"><FirmSwitcher /></div>
         <div className="mt-2 mb-1 px-2 text-[10px] uppercase tracking-wider text-indigo-300 hidden md:block">Menu</div>
         {nav.map(([k,l])=><button key={k} onClick={()=>go(k)} className={"flex items-center gap-3 text-left mb-1 "+(tab===k?"bg-blue-700":"")+(k==="plan"?" mt-2":"")}><Icon n={k} size={17}/><span>{l}</span></button>)}
-        <button onClick={()=>{setToken(null);setAuthed(false);setSub(null);}} className="md:mt-auto flex items-center gap-3 text-left text-indigo-300"><Icon n="logout" size={17}/><span>Logout</span></button>
+        <button onClick={()=>{clearAuth();setAuthed(false);setSub(null);}} className="md:mt-auto flex items-center gap-3 text-left text-indigo-300"><Icon n="logout" size={17}/><span>Logout</span></button>
       </aside>
       <main className="flex-1 md:h-screen overflow-y-auto">
         <TopBar me={me} sub={sub} onNav={go} theme={theme} toggleTheme={toggleTheme} onLogout={logout} onSearch={(q)=>{setGsearch(q); go("vouchers");}} />

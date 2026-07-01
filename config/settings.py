@@ -3,6 +3,7 @@ Django settings for ERP Munshi.
 Local test: SQLite (default). Server: PostgreSQL via DATABASE_URL.
 """
 from pathlib import Path
+from datetime import timedelta
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -146,6 +147,13 @@ REST_FRAMEWORK = {
         "user": "2000/hour",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# JWT lifetimes — access token lambi (kaam ke beech logout na ho), refresh se auto-renew.
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
 }
 
 SPECTACULAR_SETTINGS = {

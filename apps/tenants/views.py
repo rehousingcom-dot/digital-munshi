@@ -107,16 +107,20 @@ def _tokens(user):
 
 
 def _send_email_otp(email):
-    """Generate + cache an OTP for the email and try to send it. Returns (otp, sent)."""
+    """Generate + cache an OTP for the email and try to send it.
+    Returns (otp, sent, error_str)."""
     import random
     from django.core.cache import cache
     from django.core.mail import send_mail
     from django.conf import settings
     otp = f"{random.randint(0, 999999):06d}"
     cache.set(f"otp:{email}", otp, 600)  # 10 min
-    sent = False
+    sent, err = False, ""
     host = getattr(settings, "EMAIL_HOST", "") or ""
-    if getattr(settings, "EMAIL_HOST_USER", "") or host not in ("", "localhost"):
+    configured = bool(getattr(settings, "EMAIL_HOST_USER", "")) or host not in ("", "localhost")
+    if not configured:
+        err = "EMAIL_* env vars not set (EMAIL_HOST/EMAIL_HOST_USER/EMAIL_HOST_PASSWORD)."
+    else:
         try:
             send_mail(
                 "Your Digital Munshi OTP",
@@ -125,9 +129,9 @@ def _send_email_otp(email):
                 [email], fail_silently=False,
             )
             sent = True
-        except Exception:
-            sent = False
-    return otp, sent
+        except Exception as e:
+            err = f"{type(e).__name__}: {e}"
+    return otp, sent, err
 
 
 @api_view(["POST"])
@@ -138,11 +142,12 @@ def send_otp(request):
     email = str(request.data.get("email") or "").strip().lower()
     if "@" not in email or "." not in email.split("@")[-1]:
         return Response({"detail": "Enter a valid email address"}, status=400)
-    otp, sent = _send_email_otp(email)
+    otp, sent, err = _send_email_otp(email)
     resp = {"sent": sent}
     if not sent:
         resp["dev_otp"] = otp
-        resp["message"] = "Email not configured yet — OTP shown on screen (dev mode)."
+        resp["message"] = "Email not sent — OTP shown on screen (dev mode)."
+        resp["email_error"] = err
     return Response(resp)
 
 

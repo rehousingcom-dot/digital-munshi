@@ -58,7 +58,7 @@
 
 <script>
 var WA = "{{ wa }}";
-var SHOP = {{ shop_name|json_script:"shopn" }};
+var SHOP = "{{ shop_name|escapejs }}";
 function filter(){ var q=document.getElementById("q").value.toLowerCase();
   document.querySelectorAll(".prod").forEach(function(p){ p.style.display = p.dataset.name.indexOf(q)>=0?"":"none"; }); }
 function step(btn,d){ var row=btn.closest("[data-price]"); var span=row.querySelector(".qty");
@@ -69,8 +69,7 @@ function recalc(){ var items=0,total=0,lines=[];
   document.getElementById("citems").textContent=items;
   document.getElementById("ctotal").textContent=total.toFixed(0);
   document.getElementById("bar").classList.toggle("hidden", items===0);
-  var shop=document.getElementById("shopn")?JSON.parse(document.getElementById("shopn").textContent):"Shop";
-  var msg="Namaste "+shop+"%0A%0AMujhe ye order chahiye:%0A"+encodeURIComponent(lines.join("\n"))+"%0A%0ATotal: ₹"+total.toFixed(0)+"%0A%0AMera naam: ";
+  var msg="Namaste "+SHOP+"%0A%0AMujhe ye order chahiye:%0A"+encodeURIComponent(lines.join("\n"))+"%0A%0ATotal: Rs "+total.toFixed(0)+"%0A%0AMera naam: ";
   var btn=document.getElementById("waBtn");
   btn.href = WA ? ("https://wa.me/"+WA+"?text="+msg) : "#";
   if(!WA){ btn.textContent="Shop ka WhatsApp number set nahi"; btn.style.background="#94a3b8"; }

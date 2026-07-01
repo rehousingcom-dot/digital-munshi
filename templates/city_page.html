@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ c.title }}</title>
+<meta name="description" content="{{ c.desc }}">
+<meta name="keywords" content="billing software {{ c.city }}, GST software {{ c.city }}, invoice software {{ c.city }}, Digital Munshi">
+<link rel="canonical" href="https://erp.reloaddigital.in/billing-software-in-{{ c.slug }}/">
+<meta property="og:title" content="{{ c.title }}">
+<meta property="og:description" content="{{ c.desc }}">
+<meta property="og:type" content="website">
+<meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>.prose h2{font-size:1.35rem;font-weight:800;margin:1.4rem 0 .5rem}.prose p{margin:.7rem 0;line-height:1.75;color:#334155}</style>
+</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20">
+  <div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+    <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+    <a href="/" class="text-white px-4 py-2 rounded-xl text-sm font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Free Trial</a>
+  </div>
+</header>
+
+<section class="max-w-3xl mx-auto px-5 py-12">
+  <div class="inline-block text-xs font-bold px-3 py-1 rounded-full mb-3" style="background:#fff7ed;color:#c2410c">📍 {{ c.city }}</div>
+  <h1 class="text-3xl md:text-4xl font-extrabold leading-tight">{{ c.h1 }}</h1>
+  <p class="text-lg text-slate-500 mt-4">{{ c.intro }}</p>
+  <div class="prose mt-6">
+    <h2>{{ c.city }} ke businesses ke liye</h2>
+    <p>{{ c.city }} me kirana store, wholesale, medical/pharmacy, restaurant, garment aur service businesses ke liye Digital Munshi ek complete solution hai — GST billing, inventory, udhaar khata, accounting aur POS ek hi app me. Koi installation nahi, cloud par chalta hai, mobile aur laptop dono par.</p>
+    <h2>Kya milega?</h2>
+    <p>GST invoice + e-invoice/e-way bill JSON, barcode billing, multi-godown stock, payment reminders WhatsApp par, invoice par UPI QR, aur roz ki bikri ka summary. {{ c.city }} ke dukaandaron ke liye Hinglish me aasan.</p>
+  </div>
+  <div class="flex gap-3 mt-8">
+    <a href="/" class="text-white px-6 py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Free me shuru karo →</a>
+    <a href="#leadbox" class="border border-slate-200 px-6 py-3 rounded-xl font-bold text-slate-700">Demo book karo</a>
+  </div>
+</section>
+
+<section class="bg-slate-50 py-12"><div class="px-5">{% include "_leadform.html" %}</div></section>
+
+<section class="max-w-3xl mx-auto px-5 py-10">
+  <div class="font-bold text-slate-700 mb-3">Features</div>
+  <div class="flex flex-wrap gap-2">
+    {% for s, h in software %}<a href="/software/{{ s }}/" class="text-sm bg-slate-100 px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">{{ h }}</a>{% endfor %}
+    <a href="/blog/" class="text-sm bg-slate-100 px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Blog</a>
+  </div>
+</section>
+
+<footer class="border-t py-8 text-center text-sm text-slate-400">
+  <div class="font-extrabold text-slate-600">Digital Munshi</div>
+  <div class="mt-2">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a> · <a href="/" class="text-orange-600">Login</a></div>
+</footer>
+</body>
+</html>

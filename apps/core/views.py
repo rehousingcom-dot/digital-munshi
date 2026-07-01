@@ -225,12 +225,25 @@ def lead_create(request):
 def keyword_page(request, slug):
     from django.shortcuts import render
     from django.http import HttpResponseNotFound
-    from .marketing import KEYWORD_PAGES
+    from .marketing import KEYWORD_PAGES, _WHY, CITIES
     page = KEYWORD_PAGES.get(slug)
     if not page:
         return HttpResponseNotFound("Page not found")
-    other = [(s, p["h1"]) for s, p in KEYWORD_PAGES.items() if s != slug]
-    return render(request, "keyword_page.html", {"p": page, "slug": slug, "other": other})
+    other = [(s, kp["h1"]) for s, kp in KEYWORD_PAGES.items() if s != slug]
+    cities = list(CITIES.items())
+    return render(request, "keyword_page.html",
+                  {"p": page, "slug": slug, "other": other, "why": _WHY, "cities": cities})
+
+
+def city_page(request, slug):
+    from django.shortcuts import render
+    from django.http import HttpResponseNotFound
+    from .marketing import city_page_data, KEYWORD_PAGES
+    data = city_page_data(slug)
+    if not data:
+        return HttpResponseNotFound("City page not found")
+    software = [(s, kp["h1"]) for s, kp in KEYWORD_PAGES.items()]
+    return render(request, "city_page.html", {"c": data, "software": software})
 
 
 def blog_index(request):

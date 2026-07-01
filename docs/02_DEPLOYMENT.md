@@ -86,3 +86,16 @@ Or `git revert <commit>` and push.
 Railway managed Postgres has automatic backups (plan-dependent). Extra safety: weekly
 manual DB dump (Railway → Postgres → Data/Connect, or `pg_dump` via Console using
 `$DATABASE_URL`). See runbook.
+
+## Email (signup OTP) — Resend (HTTPS), NOT SMTP
+⚠️ **Railway blocks outbound SMTP** (ports 25/465/587 → `Network is unreachable`). So Gmail/any
+SMTP will NOT work. We use **Resend** (HTTPS API) instead. Code: `apps/tenants/views.py`
+`_send_via_resend()` (preferred) → SMTP fallback → dev-OTP on screen.
+
+Railway env vars (web service):
+- `RESEND_API_KEY` = `re_...` (from resend.com → API Keys)
+- `RESEND_FROM` = `Digital Munshi <noreply@reloaddigital.in>`
+
+Domain `reloaddigital.in` is **verified in Resend** (Cloudflare auto-config DKIM), so OTP can be
+sent to ANY customer email from `@reloaddigital.in`. Free tier ~3000 emails/month.
+(Without domain verify, Resend only sends to the account owner's email — that's the test path.)

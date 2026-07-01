@@ -619,7 +619,7 @@ function PartyView(){
         <div className="flex gap-2 items-center">
           <div className="relative"><span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
             <input className="p-2.5 pl-9 text-sm rounded-xl border border-slate-200" style={{minWidth:220}} placeholder="Search party…" value={q} onChange={e=>setQ(e.target.value)} /></div>
-          <button onClick={()=>{setEdit(null);setOpen(true);}} className="text-white px-4 py-2.5 rounded-xl text-sm font-bold" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>+ Add Party</button>
+          <button onClick={()=>{setEdit(null);setOpen(true);}} className="text-white px-4 py-2.5 rounded-xl text-sm font-bold" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>{t("+ Add Party","+ पार्टी जोड़ें")}</button>
         </div>
       </div>
       <div className="card overflow-hidden">
@@ -674,7 +674,7 @@ function PartyForm({party,onClose,onSaved}){
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{background:"rgba(15,23,42,.45)"}} onClick={onClose}>
       <div className="card my-8 w-full max-w-3xl p-0 overflow-hidden" onClick={e=>e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 py-4" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>
-          <h3 className="text-white font-bold text-lg">{party?"Edit Party":"Add Party"}</h3>
+          <h3 className="text-white font-bold text-lg">{party?t("Edit Party","पार्टी एडिट करें"):t("Add Party","पार्टी जोड़ें")}</h3>
           <button onClick={onClose} className="text-white text-xl">×</button></div>
         <div className="p-6 space-y-4">
           {err && <div className="bg-red-50 text-red-700 text-sm p-2.5 rounded-lg">{err}</div>}
@@ -733,7 +733,7 @@ function PartyForm({party,onClose,onSaved}){
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t">
           <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">Cancel</button>
-          <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)",opacity:busy?.6:1}}>{busy?"Saving…":party?"Update":"Save Party"}</button>
+          <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)",opacity:busy?.6:1}}>{busy?t("Saving…","सेव हो रहा…"):party?t("Update","अपडेट"):t("Save Party","पार्टी सेव करें")}</button>
         </div>
       </div>
     </div>);
@@ -752,7 +752,7 @@ function ItemView(){
         <div className="flex gap-2 items-center">
           <div className="relative"><span className="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
             <input className="p-2.5 pl-9 text-sm rounded-xl border border-slate-200" style={{minWidth:220}} placeholder="Search item…" value={q} onChange={e=>setQ(e.target.value)} /></div>
-          <button onClick={()=>{setEdit(null);setOpen(true);}} className="text-white px-4 py-2.5 rounded-xl text-sm font-bold" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>+ Add Item</button>
+          <button onClick={()=>{setEdit(null);setOpen(true);}} className="text-white px-4 py-2.5 rounded-xl text-sm font-bold" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>{t("+ Add Item","+ आइटम जोड़ें")}</button>
         </div>
       </div>
       <div className="card overflow-hidden">
@@ -834,7 +834,7 @@ function ItemForm({item,onClose,onSaved}){
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{background:"rgba(15,23,42,.45)"}} onClick={onClose}>
       <div className="card my-8 w-full max-w-3xl p-0 overflow-hidden" onClick={e=>e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 py-4" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>
-          <div className="flex items-center gap-3"><h3 className="text-white font-bold text-lg">{item?"Edit Item":"Add Item"}</h3>
+          <div className="flex items-center gap-3"><h3 className="text-white font-bold text-lg">{item?t("Edit Item","आइटम एडिट करें"):t("Add Item","आइटम जोड़ें")}</h3>
             <div className="flex rounded-lg overflow-hidden text-xs">
               {[["GOODS","Product"],["SERVICE","Service"]].map(([v,l])=><button key={v} onClick={()=>set("item_type",v)} className="px-3 py-1 font-semibold" style={{background:f.item_type===v?"#fff":"rgba(255,255,255,.2)",color:f.item_type===v?"#c2410c":"#fff"}}>{l}</button>)}</div></div>
           <button onClick={onClose} className="text-white text-xl">×</button></div>
@@ -916,7 +916,7 @@ function ItemForm({item,onClose,onSaved}){
         </div>
         <div className="flex justify-end gap-2 px-6 py-4 bg-slate-50 border-t">
           <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600">Cancel</button>
-          <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)",opacity:busy?.6:1}}>{busy?"Saving…":item?"Update":"Save Item"}</button>
+          <button onClick={save} disabled={busy} className="px-5 py-2 rounded-lg text-sm font-bold text-white" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)",opacity:busy?.6:1}}>{busy?t("Saving…","सेव हो रहा…"):item?t("Update","अपडेट"):t("Save Item","आइटम सेव करें")}</button>
         </div>
       </div>
     </div>);
@@ -1004,7 +1004,7 @@ function NewSale({initialDoc}){
   return (
     <div className="p-6 max-w-6xl fade-in">
       <div className="flex flex-wrap justify-between items-center mb-4 gap-3">
-        <h2 className="text-2xl font-extrabold text-slate-800">New Billing</h2>
+        <h2 className="text-2xl font-extrabold text-slate-800">{t("New Billing","नई बिलिंग")}</h2>
         <div className="flex gap-2 items-center">
           <div className="flex rounded-xl overflow-hidden border border-slate-200">
             {[["CREDIT","Credit"],["CASH","Cash"]].map(([v,l])=><button key={v} onClick={()=>{setPayMode(v); if(v==="CASH")setReceived(String(grand||""));}}

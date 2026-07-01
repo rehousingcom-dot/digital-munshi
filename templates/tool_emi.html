@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free EMI Calculator — Loan EMI, Interest & Total | Digital Munshi</title>
+<meta name="description" content="Free EMI calculator. Calculate loan EMI, total interest and total payment for any loan amount, rate and tenure. No signup.">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/emi-calculator/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold">EMI Calculator</h1>
+  <p class="text-slate-500 mt-2 mb-6">Calculate your loan EMI, total interest and total payment. Free, no signup.</p>
+  <div class="bg-white border border-slate-100 rounded-2xl p-6 space-y-3">
+    <div><label class="text-sm font-semibold text-slate-600">Loan amount (₹)</label><input id="p" type="number" value="500000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div><label class="text-sm font-semibold text-slate-600">Interest rate (% per year)</label><input id="r" type="number" value="12" step="0.1" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div><label class="text-sm font-semibold text-slate-600">Tenure (months)</label><input id="n" type="number" value="36" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div class="rounded-xl bg-slate-50 p-4 text-sm space-y-1 mt-2">
+      <div class="flex justify-between text-lg font-extrabold" style="color:#c2410c"><span>Monthly EMI</span><b id="emi">₹0</b></div>
+      <div class="flex justify-between"><span>Total interest</span><b id="ti">₹0</b></div>
+      <div class="flex justify-between"><span>Total payment</span><b id="tp">₹0</b></div>
+    </div>
+  </div>
+  <div class="mt-5 p-4 rounded-2xl text-sm" style="background:linear-gradient(135deg,#fff7ed,#fff)">Manage loans & EMIs for your business? <a href="/" class="font-bold text-orange-700">Try Digital Munshi free →</a></div>
+</section>
+<section class="max-w-xl mx-auto px-5 pb-6 text-sm text-slate-600"><h2 class="text-xl font-extrabold mb-2 text-slate-800">How EMI is calculated</h2><p>EMI = P × r × (1+r)^n / ((1+r)^n − 1), where P is the principal, r is the monthly interest rate (annual rate / 12 / 100), and n is the number of months. This calculator shows your monthly EMI, total interest and total amount payable.</p></section>
+<section class="bg-slate-50 py-10"><div class="px-5">{% include "_leadform.html" %}</div></section>
+<footer class="border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+{% include "_floatwa.html" %}
+<script>
+function fmt(n){return "₹"+Math.round(n).toLocaleString("en-IN");}
+function calc(){var P=parseFloat(document.getElementById("p").value)||0;var ann=parseFloat(document.getElementById("r").value)||0;var n=parseInt(document.getElementById("n").value)||0;var r=ann/12/100;
+ var emi=(r===0)?(n?P/n:0):(P*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);var tp=emi*n;var ti=tp-P;
+ document.getElementById("emi").textContent=fmt(emi||0);document.getElementById("ti").textContent=fmt(ti||0);document.getElementById("tp").textContent=fmt(tp||0);}
+calc();
+</script></body></html>

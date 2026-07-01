@@ -86,6 +86,7 @@ def sitemap_xml(request):
     from apps.core.marketing import COMPARISONS
     urls += [base + "/compare/" + s + "/" for s in COMPARISONS]
     urls += [base + "/tools/", base + "/tools/gst-calculator/", base + "/tools/invoice-generator/", base + "/tools/hsn-code-finder/"]
+    urls += [base + "/tools/emi-calculator/", base + "/tools/discount-calculator/", base + "/tools/profit-margin-calculator/", base + "/tools/rupees-in-words/", base + "/tools/barcode-generator/", base + "/tools/upi-qr-code-generator/"]
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     for u in urls:
         body += f"<url><loc>{u}</loc><changefreq>weekly</changefreq></url>"
@@ -216,6 +217,12 @@ urlpatterns = [
     path("tools/gst-calculator/", core_views.tool_gst_calculator, name="tool_gst_calculator"),
     path("tools/invoice-generator/", core_views.tool_invoice_generator, name="tool_invoice_generator"),
     path("tools/hsn-code-finder/", core_views.tool_hsn_finder, name="tool_hsn_finder"),
+    path("tools/emi-calculator/", core_views.tool_emi, name="tool_emi"),
+    path("tools/discount-calculator/", core_views.tool_discount, name="tool_discount"),
+    path("tools/profit-margin-calculator/", core_views.tool_margin, name="tool_margin"),
+    path("tools/rupees-in-words/", core_views.tool_words, name="tool_words"),
+    path("tools/barcode-generator/", core_views.tool_barcode, name="tool_barcode"),
+    path("tools/upi-qr-code-generator/", core_views.tool_upi_qr, name="tool_upi_qr"),
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),

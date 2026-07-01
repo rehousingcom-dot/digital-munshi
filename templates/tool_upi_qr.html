@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free UPI QR Code Generator — Scan & Pay QR | Digital Munshi</title>
+<meta name="description" content="Free UPI QR code generator. Create a Scan & Pay UPI QR with your UPI ID and amount. Print or download. No signup.">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/upi-qr-code-generator/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>{% include "_analytics.html" %}
+<style>@media print{.noprint{display:none}}</style></head>
+<body class="text-slate-800 bg-white">
+<header class="noprint border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-xl mx-auto px-5 py-10">
+  <h1 class="noprint text-3xl font-extrabold">UPI QR Code Generator</h1>
+  <p class="noprint text-slate-500 mt-2 mb-6">Create a Scan & Pay UPI QR with your UPI ID. Free, no signup.</p>
+  <div class="noprint bg-white border border-slate-100 rounded-2xl p-6 space-y-3">
+    <div><label class="text-sm font-semibold text-slate-600">UPI ID (VPA) *</label><input id="pa" placeholder="name@upi" oninput="gen()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div><label class="text-sm font-semibold text-slate-600">Payee name</label><input id="pn" placeholder="Your shop name" oninput="gen()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div><label class="text-sm font-semibold text-slate-600">Amount (₹, optional)</label><input id="am" type="number" oninput="gen()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <button onclick="window.print()" class="text-white px-5 py-2 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">🖨 Print QR</button>
+  </div>
+  <div class="mt-6 flex flex-col items-center"><div id="qr" class="bg-white p-3 rounded-xl border"></div><div id="qlabel" class="text-sm text-slate-500 mt-2"></div></div>
+  <div class="noprint mt-5 p-4 rounded-2xl text-sm" style="background:linear-gradient(135deg,#fff7ed,#fff)">Put a UPI QR on every invoice automatically. <a href="/" class="font-bold text-orange-700">Try Digital Munshi free →</a></div>
+</section>
+<section class="noprint bg-slate-50 py-10"><div class="px-5">{% include "_leadform.html" %}</div></section>
+<footer class="noprint border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+{% include "_floatwa.html" %}
+<script>
+var qr=new QRCode(document.getElementById("qr"),{width:220,height:220});
+function gen(){var pa=document.getElementById("pa").value.trim();var pn=document.getElementById("pn").value.trim();var am=document.getElementById("am").value.trim();
+ if(!pa){qr.clear();document.getElementById("qlabel").textContent="Enter a UPI ID to generate QR";return;}
+ var s="upi://pay?pa="+encodeURIComponent(pa)+(pn?"&pn="+encodeURIComponent(pn):"")+(am?"&am="+encodeURIComponent(am):"")+"&cu=INR";
+ qr.makeCode(s);document.getElementById("qlabel").textContent="Scan & Pay"+(am?(" ₹"+am):"")+(pn?(" to "+pn):"");}
+gen();
+</script></body></html>

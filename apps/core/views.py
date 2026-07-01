@@ -360,3 +360,32 @@ def tool_invoice_generator(request):
 def tool_hsn_finder(request):
     from django.shortcuts import render
     return render(request, "tool_hsn_finder.html", {})
+
+
+def _tool(request, tmpl):
+    from django.shortcuts import render
+    return render(request, tmpl, {})
+
+
+def tool_emi(request):
+    return _tool(request, "tool_emi.html")
+
+
+def tool_discount(request):
+    return _tool(request, "tool_discount.html")
+
+
+def tool_margin(request):
+    return _tool(request, "tool_margin.html")
+
+
+def tool_words(request):
+    return _tool(request, "tool_words.html")
+
+
+def tool_barcode(request):
+    return _tool(request, "tool_barcode.html")
+
+
+def tool_upi_qr(request):
+    return _tool(request, "tool_upi_qr.html")

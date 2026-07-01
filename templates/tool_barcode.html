@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Barcode Generator — Create & Print Barcodes | Digital Munshi</title>
+<meta name="description" content="Free barcode generator. Create CODE128 / EAN barcodes online and print them. For products and inventory. No signup.">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/barcode-generator/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>{% include "_analytics.html" %}
+<style>@media print{.noprint{display:none}}</style></head>
+<body class="text-slate-800 bg-white">
+<header class="noprint border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-xl mx-auto px-5 py-10">
+  <h1 class="noprint text-3xl font-extrabold">Barcode Generator</h1>
+  <p class="noprint text-slate-500 mt-2 mb-6">Type a value and generate a barcode to print. Free, no signup.</p>
+  <div class="noprint bg-white border border-slate-100 rounded-2xl p-6">
+    <label class="text-sm font-semibold text-slate-600">Value / product code</label>
+    <input id="val" value="1234567890" oninput="gen()" class="w-full p-3 mt-1 mb-3 border border-slate-200 rounded-xl">
+    <div class="flex gap-2"><select id="fmt" onchange="gen()" class="p-2 border border-slate-200 rounded-lg text-sm"><option value="CODE128">CODE128</option><option value="EAN13">EAN-13</option><option value="CODE39">CODE39</option></select>
+    <button onclick="window.print()" class="ml-auto text-white px-5 py-2 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">🖨 Print</button></div>
+  </div>
+  <div class="mt-6 text-center"><svg id="bc"></svg></div>
+  <div class="noprint mt-5 p-4 rounded-2xl text-sm" style="background:linear-gradient(135deg,#fff7ed,#fff)">Need barcode labels for all products with a designer? <a href="/" class="font-bold text-orange-700">Try Digital Munshi free →</a></div>
+</section>
+<section class="noprint bg-slate-50 py-10"><div class="px-5">{% include "_leadform.html" %}</div></section>
+<footer class="noprint border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+{% include "_floatwa.html" %}
+<script>function gen(){var v=document.getElementById("val").value||"0";var f=document.getElementById("fmt").value;try{JsBarcode("#bc",v,{format:(f==="EAN13"&&/^\d{12,13}$/.test(v))?"EAN13":f,width:2,height:80,fontSize:16,margin:10});}catch(e){try{JsBarcode("#bc",v,{format:"CODE128"});}catch(_){}}}gen();</script>
+</body></html>

@@ -1155,7 +1155,7 @@ function NewSale({initialDoc}){
     <div className="p-6 max-w-6xl fade-in">
       <div className="flex flex-wrap justify-between items-center mb-4 gap-3">
         <h2 className="text-2xl font-extrabold text-slate-800">{t("New Billing","नई बिलिंग")}</h2>
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-wrap gap-2 items-center">
           <div className="flex rounded-xl overflow-hidden border border-slate-200">
             {[["CREDIT","Credit"],["CASH","Cash"]].map(([v,l])=><button key={v} onClick={()=>{setPayMode(v); if(v==="CASH")setReceived(String(grand||""));}}
               className="px-4 py-2 text-sm font-semibold" style={{background:payMode===v?"#ea6a1e":"#fff",color:payMode===v?"#fff":"#475569"}}>{l}</button>)}</div>
@@ -1193,7 +1193,7 @@ function NewSale({initialDoc}){
           <input type="date" className={cell} value={date} onChange={e=>setDate(e.target.value)} /></div>
       </div>
       <div className="card p-3 mb-3">
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-wrap gap-2 items-center">
           <span className="text-sm text-slate-500">📷 Barcode / Item code:</span>
           <input className="border border-slate-200 p-2 rounded-lg flex-1 text-sm" placeholder={t("Scan or type, then Enter","स्कैन करें या टाइप करके Enter")} value={barcode}
             onChange={e=>setBarcode(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();doScan(barcode);}}} />
@@ -2974,17 +2974,17 @@ function TopBar({me,sub,onNav,theme,toggleTheme,onLogout,onSearch}){
     else { planLabel=String(sub.status); planGrad="linear-gradient(135deg,#ef4444,#b91c1c)"; planIcon="⚠"; }
   }
   return (
-    <div className="topbar sticky top-0 z-30 flex items-center gap-4 px-6 py-3">
+    <div className="topbar sticky top-0 z-30 flex flex-wrap items-center gap-x-4 gap-y-2 px-4 md:px-6 py-3">
       <div className="hidden lg:block" style={{minWidth:150}}>
         <div className="text-base font-extrabold text-slate-800 truncate">{me?me.organization:"Digital Munshi"}</div>
         <div className="text-xs text-slate-400">{t("Welcome back","वापस स्वागत है")}, {name} 👋</div>
       </div>
-      <div className="relative flex-1 max-w-md">
+      <div className="relative flex-1 min-w-0 max-w-md order-2 md:order-none basis-full md:basis-auto">
         <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
         <input value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")onSearch&&onSearch(q);}}
           placeholder={t("Search invoices, parties, items…","इनवॉइस, पार्टी, आइटम खोजें…")} className="w-full pl-10 pr-4 py-2.5 rounded-full text-sm" style={{background:"#f1f5f9",border:"1px solid transparent"}} />
       </div>
-      <div className="flex items-center gap-2.5 ml-auto">
+      <div className="flex flex-wrap items-center gap-2 md:gap-2.5 ml-auto order-1 md:order-none">
         <div className="flex rounded-full overflow-hidden border border-slate-200 text-xs font-bold" title="Language">
           <button onClick={()=>setLang("en")} className="px-2.5 py-1" style={{background:DM_LANG!=="hi"?"#ea6a1e":"#fff",color:DM_LANG!=="hi"?"#fff":"#64748b"}}>EN</button>
           <button onClick={()=>setLang("hi")} className="px-2.5 py-1" style={{background:DM_LANG==="hi"?"#ea6a1e":"#fff",color:DM_LANG==="hi"?"#fff":"#64748b"}}>हिं</button>
@@ -3323,7 +3323,7 @@ function App(){
         {nav.map(([k,l])=>{const locked=!allow(k);return <button key={k} onClick={()=>go(k)} title={locked?t("Upgrade se unlock","Upgrade to unlock"):l} className={"flex items-center gap-3 text-left mb-1 "+(tab===k?"bg-blue-700":"")+(k==="plan"?" mt-2":"")+(locked?" opacity-50":"")}><Icon n={k} size={17}/><span className="flex-1">{l}</span>{locked&&<span className="text-xs">🔒</span>}</button>;})}
         <button onClick={()=>{clearAuth();setAuthed(false);setSub(null);}} className="md:mt-auto flex items-center gap-3 text-left text-indigo-300"><Icon n="logout" size={17}/><span>Logout</span></button>
       </aside>
-      <main className="flex-1 md:h-screen overflow-y-auto">
+      <main className="flex-1 md:h-screen overflow-y-auto overflow-x-hidden min-w-0">
         <TopBar me={me} sub={sub} onNav={go} theme={theme} toggleTheme={toggleTheme} onLogout={logout} onSearch={(q)=>{setGsearch(q); go("vouchers");}} />
         <Banner sub={sub} onUpgrade={()=>setTab("plan")} />
         {expired && tab!=="plan" && tab!=="settings"

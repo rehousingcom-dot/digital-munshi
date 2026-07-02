@@ -184,6 +184,43 @@ def about_page(request):
     return render(request, "about.html")
 
 
+def digital_card(request, catalog_uuid):
+    """Public digital visiting card — shop ka mini-profile (call, WhatsApp, catalog, UPI)."""
+    from django.shortcuts import render
+    from django.http import HttpResponse
+    from apps.tenants.models import Organization
+    from apps.core.models import Company
+    org = Organization.objects.filter(catalog_uuid=catalog_uuid).first()
+    if not org:
+        return HttpResponse("Card not found", status=404)
+    company = (Company.all_objects.filter(organization=org, is_active=True).first()
+               or Company.all_objects.filter(organization=org).first())
+    upi = ""
+    try:
+        from apps.cashbank.models import BankAccount
+        acc = BankAccount.all_objects.filter(organization=org).exclude(upi_id="").order_by("id").first()
+        if acc:
+            upi = acc.upi_id
+    except Exception:
+        pass
+    logo = ""
+    try:
+        if company and company.logo:
+            logo = company.logo.url
+    except Exception:
+        logo = ""
+    ctx = {
+        "name": (company.name if company else org.name),
+        "phone": (company.phone if company else ""),
+        "email": (company.email if company else ""),
+        "address": (company.address if company else ""),
+        "gstin": (company.gstin if company else ""),
+        "logo": logo, "upi": upi, "catalog_uuid": str(catalog_uuid),
+        "catalog_on": bool(org.catalog_enabled),
+    }
+    return render(request, "card.html", ctx)
+
+
 def legal_page(request):
     """Privacy / Terms — path se decide."""
     from django.shortcuts import render

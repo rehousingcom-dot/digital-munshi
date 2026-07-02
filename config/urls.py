@@ -281,6 +281,7 @@ urlpatterns = [
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),
+    path("card/<uuid:catalog_uuid>/", core_views.digital_card, name="digital_card"),
     path("shop/<uuid:catalog_uuid>/order/", store_public.api_place_order, name="store_place_order"),
     path("order/<uuid:token>/", store_public.order_track, name="order_track"),
     path("api/catalog/toggle/", tenant_views.catalog_toggle, name="catalog_toggle"),

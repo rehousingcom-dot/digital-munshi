@@ -2540,6 +2540,7 @@ function StoreLinkCard(){
       <button onClick={copy} className="bg-slate-700 text-white px-3 py-1.5 rounded-lg text-sm">{t("Copy","कॉपी")}</button>
       <button onClick={wa} className="text-white px-3 py-1.5 rounded-lg text-sm" style={{background:"#25D366"}}>{t("WhatsApp","व्हाट्सएप")}</button>
       <a href={link} target="_blank" className="bg-blue-900 text-white px-3 py-1.5 rounded-lg text-sm">{t("Open","खोलो")}</a>
+      <a href={window.location.origin+"/card/"+me.catalog_uuid+"/"} target="_blank" className="bg-slate-100 px-3 py-1.5 rounded-lg text-sm font-semibold">💳 {t("Visiting card","विज़िटिंग कार्ड")}</a>
       {msg&&<span className="text-green-600 text-sm self-center font-semibold">{msg}</span>}
     </div>
     <p className="text-xs text-slate-400 mt-2">{t("Ye link customers ko bhejo — woh products dekh ke ghar baithe order karein. Items 'Items' me add karo, phir yahan dikhеinge.","Share this link with customers to receive orders.")}</p>

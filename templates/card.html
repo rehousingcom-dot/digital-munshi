@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ name }} — Digital Visiting Card</title>
+<meta name="description" content="{{ name }} — contact, WhatsApp, catalog and location. Digital visiting card.">
+<meta property="og:title" content="{{ name }}">
+<meta property="og:description" content="Contact {{ name }} — call, WhatsApp, view catalog & pay by UPI.">
+<meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body style="background:radial-gradient(1000px 500px at 50% -10%, #ffedd5, #f8fafc)">
+<div class="max-w-sm mx-auto px-4 py-8">
+  <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
+    <div class="h-24" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)"></div>
+    <div class="px-6 pb-6 -mt-12 text-center">
+      {% if logo %}<img src="{{ logo }}" class="w-24 h-24 rounded-2xl object-cover border-4 border-white mx-auto bg-white">{% else %}
+      <div class="w-24 h-24 rounded-2xl border-4 border-white mx-auto flex items-center justify-center text-white text-4xl font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">{{ name|slice:":1" }}</div>{% endif %}
+      <h1 class="text-2xl font-extrabold mt-3">{{ name }}</h1>
+      {% if address %}<div class="text-sm text-slate-500 mt-1">📍 {{ address }}</div>{% endif %}
+      {% if gstin %}<div class="text-xs text-slate-400 mt-1">GSTIN: {{ gstin }}</div>{% endif %}
+
+      <div class="grid grid-cols-2 gap-2 mt-5">
+        {% if phone %}<a href="tel:{{ phone }}" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-100 font-semibold text-sm">📞 Call</a>
+        <a href="https://wa.me/91{{ phone|slice:'-10:' }}" target="_blank" class="flex items-center justify-center gap-2 py-3 rounded-xl text-white font-semibold text-sm" style="background:#25D366">💬 WhatsApp</a>{% endif %}
+        {% if catalog_on %}<a href="/shop/{{ catalog_uuid }}/" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-100 font-semibold text-sm">🛒 Catalog</a>{% endif %}
+        {% if address %}<a href="https://maps.google.com/?q={{ address|urlencode }}" target="_blank" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-100 font-semibold text-sm">🗺️ Map</a>{% endif %}
+        {% if email %}<a href="mailto:{{ email }}" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-100 font-semibold text-sm">✉ Email</a>{% endif %}
+      </div>
+
+      {% if upi %}<a href="upi://pay?pa={{ upi|urlencode }}&pn={{ name|urlencode }}&cu=INR" class="block mt-3 py-3 rounded-xl text-white font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">📲 Pay by UPI</a>{% endif %}
+
+      <button onclick="saveContact()" class="w-full mt-3 py-3 rounded-xl bg-slate-800 text-white font-semibold text-sm">💾 Save contact</button>
+    </div>
+  </div>
+  <div class="text-center text-xs text-slate-400 mt-4">Powered by <a href="/welcome/" class="text-orange-600 font-semibold">Digital Munshi</a> — <a href="/" class="text-orange-600">create your free card</a></div>
+</div>
+<script>
+function saveContact(){
+  var vcard="BEGIN:VCARD\nVERSION:3.0\nFN:{{ name|escapejs }}\n{% if phone %}TEL:{{ phone|escapejs }}\n{% endif %}{% if email %}EMAIL:{{ email|escapejs }}\n{% endif %}{% if address %}ADR:;;{{ address|escapejs }}\n{% endif %}END:VCARD";
+  var b=new Blob([vcard],{type:"text/vcard"});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="{{ name|escapejs }}.vcf";a.click();
+}
+</script>
+</body></html>

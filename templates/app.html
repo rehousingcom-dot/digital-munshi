@@ -132,6 +132,22 @@ function dmInstallApp(){ if(__dmInstall){__dmInstall.prompt();__dmInstall.userCh
   .report-btn{ transition:all .15s ease; border:1px solid var(--line); background:#fff; }
   .report-btn:hover{ background:#fff7ed; border-color:#fed7aa; transform:translateY(-2px); box-shadow:0 10px 22px -12px rgba(234,106,30,.4); }
   body[data-theme="dark"] .report-btn:hover{ background:#27314a; border-color:#3a4a6b; }
+  /* ---- Mobile responsiveness ---- */
+  html,body{ max-width:100%; overflow-x:hidden; }
+  @media (max-width: 768px){
+    main .p-6{ padding:0.85rem !important; }
+    main .p-5{ padding:0.85rem !important; }
+    /* wide tables ko clip karne ki jagah horizontally scroll karo */
+    main .card{ overflow-x:auto !important; -webkit-overflow-scrolling:touch; }
+    main table{ min-width:520px; }
+    /* headings thodi chhoti */
+    main h2.text-2xl{ font-size:1.25rem; }
+    main .text-3xl{ font-size:1.5rem; }
+    /* nav buttons touch-friendly */
+    aside button{ padding-top:10px; padding-bottom:10px; }
+    /* grids jo md pe multi-col hain, mobile pe 1-col already; ensure inputs full width */
+    main input, main select, main textarea{ max-width:100%; }
+  }
 </style>
 </head>
 <body>

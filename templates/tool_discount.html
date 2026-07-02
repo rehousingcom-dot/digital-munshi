@@ -23,7 +23,9 @@
 </section>
 <section class="max-w-xl mx-auto px-5 pb-6 text-sm text-slate-600"><h2 class="text-xl font-extrabold mb-2 text-slate-800">How to calculate discount</h2><p>Discount amount = MRP × discount% ÷ 100. Final price = MRP − discount amount. For example, 20% off ₹1000 saves ₹200, so the final price is ₹800.</p></section>
 <section class="bg-slate-50 py-10"><div class="px-5">{% include "_leadform.html" %}</div></section>
-<footer class="border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+{% include "_tool_links.html" %}
+{% include "_seo_footer.html" %}
+
 {% include "_floatwa.html" %}
 <script>function fmt(n){return "₹"+(Math.round(n*100)/100).toLocaleString("en-IN");}
 function calc(){var m=parseFloat(document.getElementById("mrp").value)||0;var d=parseFloat(document.getElementById("disc").value)||0;var s=m*d/100;document.getElementById("save").textContent=fmt(s);document.getElementById("fin").textContent=fmt(m-s);}calc();</script>

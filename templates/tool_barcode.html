@@ -23,7 +23,9 @@
   <div class="noprint mt-5 p-4 rounded-2xl text-sm" style="background:linear-gradient(135deg,#fff7ed,#fff)">Need barcode labels for all products with a designer? <a href="/" class="font-bold text-orange-700">Try Digital Munshi free →</a></div>
 </section>
 <section class="noprint bg-slate-50 py-10"><div class="px-5">{% include "_leadform.html" %}</div></section>
-<footer class="noprint border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+{% include "_tool_links.html" %}
+{% include "_seo_footer.html" %}
+
 {% include "_floatwa.html" %}
 <script>function gen(){var v=document.getElementById("val").value||"0";var f=document.getElementById("fmt").value;try{JsBarcode("#bc",v,{format:(f==="EAN13"&&/^\d{12,13}$/.test(v))?"EAN13":f,width:2,height:80,fontSize:16,margin:10});}catch(e){try{JsBarcode("#bc",v,{format:"CODE128"});}catch(_){}}}gen();</script>
 </body></html>

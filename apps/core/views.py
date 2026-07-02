@@ -197,13 +197,22 @@ def legal_page(request):
             "<h2 class='text-lg font-bold mt-4'>Security</h2><p>Data is encrypted in transit and backed up daily. Access is restricted to your authorised users.</p>"
             "<h2 class='text-lg font-bold mt-4'>Your rights</h2><p>You can export or request deletion of your data anytime by emailing support@reloaddigital.in.</p>"
             "<h2 class='text-lg font-bold mt-4'>Contact</h2><p>support@reloaddigital.in</p>")
+    elif slug == "refund":
+        title = "Refund & Cancellation Policy"
+        body = (
+            "<p>This policy explains refunds and cancellations for Digital Munshi subscriptions (by <b>Reload Digital India</b>).</p>"
+            "<h2 class='text-lg font-bold mt-4'>Free trial</h2><p>Every new account gets a 7-day free trial with no credit card. You are charged only if you choose a paid plan.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Cancellation</h2><p>You can cancel your subscription anytime from the app (Subscription page) or by emailing support@reloaddigital.in. After cancellation, your plan stays active until the end of the current paid period; it will not renew.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Refunds</h2><p>Because a free trial lets you fully evaluate the software before paying, subscription fees are generally non-refundable once a billing period has started. However, if you were charged by mistake (e.g. a duplicate charge or a technical error), contact us within 7 days and we will review and refund eligible amounts.</p>"
+            "<h2 class='text-lg font-bold mt-4'>How refunds are processed</h2><p>Approved refunds are returned to the original payment method within 5–7 working days.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Contact</h2><p>For any billing question, email support@reloaddigital.in with your registered email and payment details.</p>")
     else:
         title = "Terms of Service"
         body = (
             "<p>By using Digital Munshi (by Reload Digital India) you agree to these terms.</p>"
             "<h2 class='text-lg font-bold mt-4'>Service</h2><p>We provide billing, accounting and related business software on a subscription basis, with a free trial. Features depend on your chosen plan.</p>"
             "<h2 class='text-lg font-bold mt-4'>Your responsibility</h2><p>You are responsible for the accuracy of the data you enter and for complying with applicable tax and legal requirements. You must keep your login credentials secure.</p>"
-            "<h2 class='text-lg font-bold mt-4'>Billing</h2><p>Subscriptions are billed as per the selected plan and cycle. You can cancel anytime; access continues until the end of the paid period.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Billing & refunds</h2><p>Subscriptions are billed as per the selected plan and cycle. You can cancel anytime; access continues until the end of the paid period. See our <a href='/refund/' class='text-orange-600 font-semibold'>Refund &amp; Cancellation Policy</a>.</p>"
             "<h2 class='text-lg font-bold mt-4'>Liability</h2><p>The service is provided 'as is'. We are not liable for indirect losses. Always keep your own records for critical compliance.</p>"
             "<h2 class='text-lg font-bold mt-4'>Contact</h2><p>support@reloaddigital.in</p>")
     return render_legal(request, title, body, slug)

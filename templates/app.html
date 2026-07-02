@@ -201,6 +201,17 @@ function setLang(l){ try{ localStorage.setItem("dm_lang",l); }catch(e){} locatio
 // Paginated ya plain array — dono se array nikaalta hai
 const asList = d => Array.isArray(d) ? d : (d && d.results ? d.results : []);
 const apiList = async (path) => asList(await api(path));
+// API error → readable message (DRF {detail} / field errors / string / Error)
+function errMsg(e){
+  try{
+    if(!e) return "Unknown error";
+    if(typeof e==="string") return e;
+    if(e.detail) return e.detail;
+    if(e.message) return e.message;
+    if(typeof e==="object"){ const k=Object.keys(e); if(k.length) return k[0]+": "+(Array.isArray(e[k[0]])?e[k[0]][0]:e[k[0]]); }
+    return JSON.stringify(e);
+  }catch(_){ return "Error"; }
+}
 
 async function shareWhatsApp(id){
   try{ const r=await api(`/vouchers/${id}/share_link/`); window.open(r.whatsapp_url,"_blank"); }
@@ -2585,16 +2596,23 @@ function AppointmentsView(){
 
 // ---------- Restaurant (KOT + tables) ----------
 function RestaurantView(){
-  const [tables,setTables]=useState([]),[sel,setSel]=useState(null),[newT,setNewT]=useState("");
-  const load=()=>apiList("/rest-tables/?page_size=200").then(setTables);
+  const [tables,setTables]=useState([]),[sel,setSel]=useState(null),[newT,setNewT]=useState(""),[saving,setSaving]=useState(false);
+  const load=()=>apiList("/rest-tables/?page_size=200").then(setTables).catch(e=>alert("Tables load nahi hui: "+errMsg(e)));
   useEffect(()=>{ load(); },[]);
-  const addTable=async()=>{ if(!newT.trim())return; await api("/rest-tables/",{method:"POST",body:JSON.stringify({name:newT.trim()})}); setNewT(""); load(); };
-  const openTable=async(tbl)=>{ const o=await api("/rest-orders/open_table/",{method:"POST",body:JSON.stringify({table:tbl.id})}); setSel({table:tbl,order:o}); };
+  const addTable=async()=>{
+    const name=newT.trim();
+    if(!name){ alert(t("Pehle table ka naam likho (jaise T1).","पहले टेबल का नाम लिखें (जैसे T1)।")); return; }
+    setSaving(true);
+    try{ await api("/rest-tables/",{method:"POST",body:JSON.stringify({name})}); setNewT(""); await load(); }
+    catch(e){ alert(t("Table add nahi hui: ","टेबल जोड़ नहीं हुई: ")+errMsg(e)); }
+    finally{ setSaving(false); }
+  };
+  const openTable=async(tbl)=>{ try{ const o=await api("/rest-orders/open_table/",{method:"POST",body:JSON.stringify({table:tbl.id})}); setSel({table:tbl,order:o}); }catch(e){ alert("Table open nahi hui: "+errMsg(e)); } };
   if(sel) return <RestOrderPanel table={sel.table} order={sel.order} onBack={()=>{setSel(null);load();}} />;
   return (<div className="p-6">
     <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
       <h2 className="text-xl font-bold text-slate-700">{t("Restaurant — Tables","रेस्टोरेंट — टेबल")}</h2>
-      <div className="flex gap-2"><input className="border p-2 rounded text-sm" placeholder={t("Table name (T1)","टेबल")} value={newT} onChange={e=>setNewT(e.target.value)} /><button onClick={addTable} className="bg-blue-900 text-white px-3 py-2 rounded text-sm">{t("+ Table","+ टेबल")}</button></div>
+      <div className="flex gap-2"><input className="border p-2 rounded text-sm" placeholder={t("Table name (T1)","टेबल")} value={newT} onChange={e=>setNewT(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")addTable();}} /><button onClick={addTable} disabled={saving} className="bg-blue-900 text-white px-3 py-2 rounded text-sm disabled:opacity-50">{saving?t("Adding…","जोड़ रहे…"):t("+ Table","+ टेबल")}</button></div>
     </div>
     {tables.length===0 && <div className="text-slate-400 text-sm">{t("Pehle tables add karo (T1, T2…).","Add tables first.")}</div>}
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">

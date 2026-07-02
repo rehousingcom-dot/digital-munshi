@@ -1850,12 +1850,12 @@ function ReportsView(){
   const DATE_REPORTS=["pnl","daybook","gstr1","gstr3b","hsn","purchase","aging"];
   useEffect(()=>{ apiList("/parties/?page_size=500").then(setParties); api("/business-profile/").then(p=>setBiz(p.business_name||p.name||"")).catch(()=>{}); },[]);
   const load=async(t,extra="")=>{ setTab(t); setData(null);
-    const map={pnl:"/reports/pnl/",aging:"/reports/receivables-aging/",daybook:"/reports/day-book/",gstr1:"/reports/gstr1/",gstr3b:"/reports/gstr3b/",hsn:"/reports/hsn-summary/",bsheet:"/reports/balance-sheet/",stock:"/reports/stock-valuation/",reminders:"/reports/payment-reminders/",lowstock:"/reports/low-stock/",dead:"/reports/dead-stock/",stmt:"/reports/party-statement/?party="+extra,purchase:"/reports/purchase-register/",reorder:"/reorder-suggestions/"};
+    const map={pnl:"/reports/pnl/",aging:"/reports/receivables-aging/",daybook:"/reports/day-book/",gstr1:"/reports/gstr1/",gstr3b:"/reports/gstr3b/",hsn:"/reports/hsn-summary/",bsheet:"/reports/balance-sheet/",stock:"/reports/stock-valuation/",reminders:"/reports/payment-reminders/",lowstock:"/reports/low-stock/",dead:"/reports/dead-stock/",stmt:"/reports/party-statement/?party="+extra,purchase:"/reports/purchase-register/",reorder:"/reorder-suggestions/",expiry:"/pharmacy/expiry/?days=90"};
     let url=map[t];
     if((start||end)&&DATE_REPORTS.includes(t)) url+=(url.includes("?")?"&":"?")+"start="+(start||"")+"&end="+(end||"");
     try{ setData(await api(url)); }catch(e){ setData({error:String(e)}); } };
   useEffect(()=>{ load("pnl"); },[]);
-  const tabs=[["pnl",t("P&L","लाभ-हानि")],["bsheet",t("Balance Sheet","बैलेंस शीट")],["stock",t("Live Stock","लाइव स्टॉक")],["reminders",t("Payment Reminders","भुगतान रिमाइंडर")],["aging",t("Receivables Aging","प्राप्य एजिंग")],["daybook",t("Day Book","डे बुक")],["gstr1",t("GSTR-1","GSTR-1")],["gstr3b",t("GSTR-3B","GSTR-3B")],["hsn",t("HSN Summary","HSN सारांश")],["lowstock",t("Low Stock","लो स्टॉक")],["dead",t("Dead / Fast Movers","रुका / तेज़ बिकने वाला")],["reorder",t("🤖 Reorder Suggestions","🤖 रीऑर्डर")],["dayclose",t("🧾 Day Close","🧾 डे क्लोज़")],["purchase",t("Purchase Register","खरीद रजिस्टर")],["stmt",t("Party Statement","पार्टी स्टेटमेंट")]];
+  const tabs=[["pnl",t("P&L","लाभ-हानि")],["bsheet",t("Balance Sheet","बैलेंस शीट")],["stock",t("Live Stock","लाइव स्टॉक")],["reminders",t("Payment Reminders","भुगतान रिमाइंडर")],["aging",t("Receivables Aging","प्राप्य एजिंग")],["daybook",t("Day Book","डे बुक")],["gstr1",t("GSTR-1","GSTR-1")],["gstr3b",t("GSTR-3B","GSTR-3B")],["hsn",t("HSN Summary","HSN सारांश")],["lowstock",t("Low Stock","लो स्टॉक")],["dead",t("Dead / Fast Movers","रुका / तेज़ बिकने वाला")],["reorder",t("🤖 Reorder Suggestions","🤖 रीऑर्डर")],["expiry",t("💊 Expiry / FEFO","💊 एक्सपायरी")],["dayclose",t("🧾 Day Close","🧾 डे क्लोज़")],["purchase",t("Purchase Register","खरीद रजिस्टर")],["stmt",t("Party Statement","पार्टी स्टेटमेंट")]];
   const D=data;
   const body=()=>{
    try{
@@ -1880,6 +1880,22 @@ function ReportsView(){
     if(tab==="daybook") return <RTable head={["Date","Type","Number","Party","Amount"]} rows={D.entries.map(e=>[e.date,e.type,e.number,e.party,money(e.amount)])}/>;
     if(tab==="purchase") return <RTable head={["Date","Invoice","Supplier","GSTIN","Taxable","Tax","Total"]} rows={D.purchases.map(p=>[p.date,p.number,p.supplier,p.gstin||"-",money(p.taxable),money(p.tax),money(p.total)])}/>;
     if(tab==="lowstock") return <RTable head={["Item","Current Stock","Reorder Level","Shortfall"]} rows={D.items.map(x=>[x.item,x.current_stock,x.reorder_level,x.shortfall])}/>;
+    if(tab==="expiry"){ const b=D.buckets||{},cn=D.counts||{};
+      return <div className="space-y-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard label={t("Expired","एक्सपायर")+" ("+(cn.expired||0)+")"} value={money(b.expired)} accent="#dc2626"/>
+          <StatCard label={"≤30 days ("+(cn.d30||0)+")"} value={money(b.d30)} accent="#ea580c"/>
+          <StatCard label={"≤60 days ("+(cn.d60||0)+")"} value={money(b.d60)} accent="#d97706"/>
+          <StatCard label={"≤90 days ("+(cn.d90||0)+")"} value={money(b.d90)} accent="#0891b2"/>
+        </div>
+        <div className="text-sm text-slate-500">{t("Value at risk","रिस्क पे वैल्यू")}: <b style={{color:"#dc2626"}}>{money(D.at_risk_value)}</b> · {t("Jaldi expire hone wali dawaiyan pehle bechо/return karо (FEFO).","Sell/return earliest-expiry stock first.")}</div>
+        {(!D.items||D.items.length===0)?<div className="card p-6 text-slate-400">{t("Koi batch 90 din me expire nahi ho raha. 👍 (Items me batch + expiry date daalo to yahan dikhega.)","No batches expiring in 90 days.")}</div>:
+        <div className="card overflow-x-auto"><table className="w-full text-sm">
+          <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">{t("Item","आइटम")}</th><th className="text-left p-2.5">{t("Batch","बैच")}</th><th className="text-left p-2.5">{t("Expiry","एक्सपायरी")}</th><th className="text-right p-2.5">{t("Days","दिन")}</th><th className="text-right p-2.5">{t("Qty","मात्रा")}</th><th className="text-right p-2.5">{t("Value","वैल्यू")}</th></tr></thead>
+          <tbody>{D.items.map((x,i)=><tr key={i} className="border-b"><td className="p-2.5 font-semibold">{x.item}</td><td className="p-2.5">{x.batch}</td><td className="p-2.5">{x.expiry}</td>
+            <td className="p-2.5 text-right"><span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{background:x.days<0?"#fee2e2":x.days<=30?"#ffedd5":"#f1f5f9",color:x.days<0?"#b91c1c":x.days<=30?"#c2410c":"#64748b"}}>{x.days<0?t("Expired","एक्सपायर"):x.days+"d"}</span></td>
+            <td className="p-2.5 text-right">{x.qty}</td><td className="p-2.5 text-right font-semibold">{money(x.value)}</td></tr>)}</tbody>
+        </table></div>}</div>; }
     if(tab==="reorder"){ if(!D.items||D.items.length===0) return <div className="card p-6 text-slate-400">{t("Sab theek — abhi kuch reorder nahi karna. (Sales aur stock data ke hisaab se.)","All good — nothing to reorder right now.")}</div>;
       const ub=u=>{const c=u==="high"?["#fee2e2","#b91c1c"]:["#fef9c3","#854d0e"];return <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{background:c[0],color:c[1]}}>{u==="high"?"URGENT":"SOON"}</span>;};
       return <div className="space-y-3">

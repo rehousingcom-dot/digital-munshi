@@ -191,6 +191,16 @@ def munshi_ask(request):
                              "bill": {"lines": lines, "total": total}})
         return Response({"answer": "Koi item match nahi hua. Items pehle add karo ya naam saaf bolo."})
 
+    if any(w in ql for w in ["order karu", "kya order", "kitna order", "reorder", "restock", "khatam hone", "stock laana", "maal mangwa"]):
+        try:
+            from apps.core.reorder import compute_reorder
+            items = compute_reorder()[:8]
+            if not items:
+                return Response({"answer": "Abhi kuch reorder nahi karna — stock theek hai. 👍"})
+            lines = "\n".join(f"• {x['item']} — {x['stock']:g} bacha, ~{x['suggest_qty']} order karo" for x in items)
+            return Response({"answer": "Reorder suggestions (sales ke hisaab se):\n" + lines + "\n(Reports → Reorder me poori list)"})
+        except Exception:
+            return Response({"answer": "Reorder data abhi nahi mil paaya."})
     if any(w in ql for w in ["udhaar", "udhar", "receivable", "baaki", "outstanding", "len", "credit", "kaun", "vasool"]):
         return Response({"answer": _receivable_answer(ql)})
     if any(w in ql for w in ["low stock", "lowstock", "kam stock", "khatam", "stock kam", "reorder"]):

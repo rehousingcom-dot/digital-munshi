@@ -1816,12 +1816,12 @@ function ReportsView(){
   const DATE_REPORTS=["pnl","daybook","gstr1","gstr3b","hsn","purchase","aging"];
   useEffect(()=>{ apiList("/parties/?page_size=500").then(setParties); api("/business-profile/").then(p=>setBiz(p.business_name||p.name||"")).catch(()=>{}); },[]);
   const load=async(t,extra="")=>{ setTab(t); setData(null);
-    const map={pnl:"/reports/pnl/",aging:"/reports/receivables-aging/",daybook:"/reports/day-book/",gstr1:"/reports/gstr1/",gstr3b:"/reports/gstr3b/",hsn:"/reports/hsn-summary/",bsheet:"/reports/balance-sheet/",stock:"/reports/stock-valuation/",reminders:"/reports/payment-reminders/",lowstock:"/reports/low-stock/",dead:"/reports/dead-stock/",stmt:"/reports/party-statement/?party="+extra,purchase:"/reports/purchase-register/"};
+    const map={pnl:"/reports/pnl/",aging:"/reports/receivables-aging/",daybook:"/reports/day-book/",gstr1:"/reports/gstr1/",gstr3b:"/reports/gstr3b/",hsn:"/reports/hsn-summary/",bsheet:"/reports/balance-sheet/",stock:"/reports/stock-valuation/",reminders:"/reports/payment-reminders/",lowstock:"/reports/low-stock/",dead:"/reports/dead-stock/",stmt:"/reports/party-statement/?party="+extra,purchase:"/reports/purchase-register/",reorder:"/reorder-suggestions/"};
     let url=map[t];
     if((start||end)&&DATE_REPORTS.includes(t)) url+=(url.includes("?")?"&":"?")+"start="+(start||"")+"&end="+(end||"");
     try{ setData(await api(url)); }catch(e){ setData({error:String(e)}); } };
   useEffect(()=>{ load("pnl"); },[]);
-  const tabs=[["pnl",t("P&L","लाभ-हानि")],["bsheet",t("Balance Sheet","बैलेंस शीट")],["stock",t("Live Stock","लाइव स्टॉक")],["reminders",t("Payment Reminders","भुगतान रिमाइंडर")],["aging",t("Receivables Aging","प्राप्य एजिंग")],["daybook",t("Day Book","डे बुक")],["gstr1",t("GSTR-1","GSTR-1")],["gstr3b",t("GSTR-3B","GSTR-3B")],["hsn",t("HSN Summary","HSN सारांश")],["lowstock",t("Low Stock","लो स्टॉक")],["dead",t("Dead / Fast Movers","रुका / तेज़ बिकने वाला")],["purchase",t("Purchase Register","खरीद रजिस्टर")],["stmt",t("Party Statement","पार्टी स्टेटमेंट")]];
+  const tabs=[["pnl",t("P&L","लाभ-हानि")],["bsheet",t("Balance Sheet","बैलेंस शीट")],["stock",t("Live Stock","लाइव स्टॉक")],["reminders",t("Payment Reminders","भुगतान रिमाइंडर")],["aging",t("Receivables Aging","प्राप्य एजिंग")],["daybook",t("Day Book","डे बुक")],["gstr1",t("GSTR-1","GSTR-1")],["gstr3b",t("GSTR-3B","GSTR-3B")],["hsn",t("HSN Summary","HSN सारांश")],["lowstock",t("Low Stock","लो स्टॉक")],["dead",t("Dead / Fast Movers","रुका / तेज़ बिकने वाला")],["reorder",t("🤖 Reorder Suggestions","🤖 रीऑर्डर")],["purchase",t("Purchase Register","खरीद रजिस्टर")],["stmt",t("Party Statement","पार्टी स्टेटमेंट")]];
   const D=data;
   const body=()=>{
    try{
@@ -1845,6 +1845,18 @@ function ReportsView(){
     if(tab==="daybook") return <RTable head={["Date","Type","Number","Party","Amount"]} rows={D.entries.map(e=>[e.date,e.type,e.number,e.party,money(e.amount)])}/>;
     if(tab==="purchase") return <RTable head={["Date","Invoice","Supplier","GSTIN","Taxable","Tax","Total"]} rows={D.purchases.map(p=>[p.date,p.number,p.supplier,p.gstin||"-",money(p.taxable),money(p.tax),money(p.total)])}/>;
     if(tab==="lowstock") return <RTable head={["Item","Current Stock","Reorder Level","Shortfall"]} rows={D.items.map(x=>[x.item,x.current_stock,x.reorder_level,x.shortfall])}/>;
+    if(tab==="reorder"){ if(!D.items||D.items.length===0) return <div className="card p-6 text-slate-400">{t("Sab theek — abhi kuch reorder nahi karna. (Sales aur stock data ke hisaab se.)","All good — nothing to reorder right now.")}</div>;
+      const ub=u=>{const c=u==="high"?["#fee2e2","#b91c1c"]:["#fef9c3","#854d0e"];return <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{background:c[0],color:c[1]}}>{u==="high"?"URGENT":"SOON"}</span>;};
+      return <div className="space-y-3">
+        <div className="text-sm text-slate-500">{t("Sales velocity + stock ke hisaab se — kya khatam hone wala hai aur kitna order karein (30 din ka cover).","Based on 30-day sales velocity + stock.")}</div>
+        <div className="card overflow-x-auto"><table className="w-full text-sm">
+          <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">{t("Item","आइटम")}</th><th className="text-right p-2.5">{t("Stock","स्टॉक")}</th><th className="text-right p-2.5">{t("Sold 30d","30 दिन बिका")}</th><th className="text-right p-2.5">{t("Per day","रोज़")}</th><th className="text-right p-2.5">{t("Days left","दिन बचे")}</th><th className="text-right p-2.5">{t("Order qty","ऑर्डर")}</th><th className="p-2.5"></th></tr></thead>
+          <tbody>{D.items.map((x,i)=><tr key={i} className="border-b"><td className="p-2.5 font-semibold">{x.item}{x.code?<span className="text-xs text-slate-400"> ({x.code})</span>:""}</td>
+            <td className="p-2.5 text-right">{x.stock}</td><td className="p-2.5 text-right">{x.sold_30d}</td><td className="p-2.5 text-right">{x.per_day}</td>
+            <td className="p-2.5 text-right">{x.days_cover>0?x.days_cover+"d":"—"}</td>
+            <td className="p-2.5 text-right font-extrabold" style={{color:"#c2410c"}}>{x.suggest_qty}</td>
+            <td className="p-2.5 text-center">{ub(x.urgency)}</td></tr>)}</tbody>
+        </table></div></div>; }
     if(tab==="dead"){ const badge=g=>{const c=g==="DEAD"?["#fee2e2","#b91c1c"]:g==="FAST"?["#dcfce7","#166534"]:["#fef9c3","#854d0e"];return <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{background:c[0],color:c[1]}}>{g}</span>;};
       return <div className="space-y-3">
         <div className="flex gap-3 text-sm">{Object.entries(D.counts||{}).map(([k,v])=><span key={k} className="px-3 py-1 rounded-lg bg-slate-100 font-semibold text-slate-600">{k}: {v}</span>)}<span className="text-slate-400 self-center">· {t("last","पिछले")} {D.days} {t("days","दिन")}</span></div>

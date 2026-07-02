@@ -1,0 +1,53 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Bill, Rent Receipt & Payment Receipt Format (Print/PDF) | Digital Munshi</title>
+<meta name="description" content="Free bill and receipt format maker — rent receipt, cash memo/bill and payment receipt. Fill details and print or save PDF instantly. No signup.">
+<meta name="keywords" content="rent receipt format, cash bill format, payment receipt format, bill format free, receipt maker">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/bill-receipt-format/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}
+<style>@media print{.noprint{display:none!important}#doc{box-shadow:none!important;border:none!important}}</style></head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20 noprint"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-5xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold noprint">Bill &amp; Receipt Format Maker</h1>
+  <p class="text-slate-500 mt-2 mb-5 noprint">Rent receipt, cash bill or payment receipt — fill the details and print or save as PDF.</p>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="space-y-3 noprint">
+      <div><label class="text-sm font-semibold text-slate-600">Document type</label>
+        <select id="type" onchange="render()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl bg-white"><option value="rent">Rent Receipt</option><option value="bill">Cash Bill / Memo</option><option value="pay">Payment Receipt</option></select></div>
+      <input id="f1" oninput="render()" class="w-full p-3 border border-slate-200 rounded-xl" placeholder="From (your name / shop)">
+      <input id="f2" oninput="render()" class="w-full p-3 border border-slate-200 rounded-xl" placeholder="To (received from / customer)">
+      <input id="f3" type="number" oninput="render()" class="w-full p-3 border border-slate-200 rounded-xl" placeholder="Amount (₹)">
+      <input id="f4" oninput="render()" class="w-full p-3 border border-slate-200 rounded-xl" placeholder="For (rent month / item / purpose)">
+      <input id="f5" type="date" oninput="render()" class="w-full p-3 border border-slate-200 rounded-xl">
+      <input id="f6" oninput="render()" class="w-full p-3 border border-slate-200 rounded-xl" placeholder="Receipt/Bill no. (optional)">
+      <button onclick="window.print()" class="w-full text-white py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">🖨 Print / Save PDF</button>
+    </div>
+    <div>
+      <div id="doc" class="bg-white border border-slate-200 rounded-xl p-6 shadow" style="min-height:420px"></div>
+    </div>
+  </div>
+</section>
+{% include "_tool_links.html" %}
+{% include "_seo_footer.html" %}
+{% include "_floatwa.html" %}
+<script>
+function words(n){n=Math.round(n||0);if(n===0)return "Zero";var a=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"],b=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];function two(x){return x<20?a[x]:b[Math.floor(x/10)]+(x%10?" "+a[x%10]:"");}function three(x){return (Math.floor(x/100)?a[Math.floor(x/100)]+" Hundred "+(x%100?two(x%100):""):two(x%100)).trim();}var out="";var cr=Math.floor(n/10000000);n%=10000000;var lk=Math.floor(n/100000);n%=100000;var th=Math.floor(n/1000);n%=1000;if(cr)out+=three(cr)+" Crore ";if(lk)out+=three(lk)+" Lakh ";if(th)out+=three(th)+" Thousand ";if(n)out+=three(n);return out.trim();}
+function render(){var t=document.getElementById("type").value;
+  var f1=document.getElementById("f1").value||"____________",f2=document.getElementById("f2").value||"____________",amt=parseFloat(document.getElementById("f3").value)||0,f4=document.getElementById("f4").value||"____________",f5=document.getElementById("f5").value||"__________",no=document.getElementById("f6").value||"—";
+  var titles={rent:"RENT RECEIPT",bill:"CASH BILL / MEMO",pay:"PAYMENT RECEIPT"};
+  var amtStr="₹"+amt.toLocaleString("en-IN");
+  var body="";
+  if(t==="rent"){ body="<p>Received with thanks from <b>"+f2+"</b> a sum of <b>"+amtStr+"</b> ("+words(amt)+" only) towards rent for <b>"+f4+"</b>.</p>"; }
+  else if(t==="bill"){ body="<div style=\"display:flex;justify-content:space-between;border-top:1px solid #ddd;border-bottom:1px solid #ddd;padding:8px 0;margin:10px 0\"><span><b>Item / Description:</b> "+f4+"</span><span><b>"+amtStr+"</b></span></div><p style=\"text-align:right;font-weight:bold\">Total: "+amtStr+"</p><p style=\"font-size:12px;color:#666\">Amount in words: "+words(amt)+" only</p>"; }
+  else { body="<p>Received with thanks from <b>"+f2+"</b> a sum of <b>"+amtStr+"</b> ("+words(amt)+" only) towards <b>"+f4+"</b>.</p>"; }
+  document.getElementById("doc").innerHTML=
+    "<div style=\"text-align:center;border-bottom:2px solid #ea6a1e;padding-bottom:8px;margin-bottom:14px\"><div style=\"font-size:20px;font-weight:800\">"+f1+"</div><div style=\"font-size:13px;letter-spacing:2px;color:#c2410c;font-weight:700;margin-top:4px\">"+titles[t]+"</div></div>"+
+    "<div style=\"display:flex;justify-content:space-between;font-size:13px;color:#555;margin-bottom:14px\"><span>No: <b>"+no+"</b></span><span>Date: <b>"+f5+"</b></span></div>"+
+    "<div style=\"font-size:15px;line-height:1.7\">"+body+"</div>"+
+    "<div style=\"display:flex;justify-content:space-between;align-items:flex-end;margin-top:50px\"><div style=\"font-size:12px;color:#888\">This is a computer-generated receipt.</div><div style=\"text-align:center\"><div style=\"border-top:1px solid #333;width:150px;padding-top:4px;font-size:13px\">Signature</div></div></div>";
+}
+render();
+</script></body></html>

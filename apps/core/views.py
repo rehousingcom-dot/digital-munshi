@@ -448,6 +448,14 @@ def tool_tds(request):
     return _tool(request, "tool_tds.html")
 
 
+def tool_poster(request):
+    return _tool(request, "tool_poster.html")
+
+
+def tool_formats(request):
+    return _tool(request, "tool_formats.html")
+
+
 def tool_discount(request):
     return _tool(request, "tool_discount.html")
 

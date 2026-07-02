@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Festival Offer Poster Maker for Shops | Digital Munshi</title>
+<meta name="description" content="Free offer poster maker for shops — create festival, sale and discount posters for WhatsApp & Instagram in seconds. Add your shop name and offer, download instantly. No signup.">
+<meta name="keywords" content="offer poster maker, festival poster, sale banner maker, shop poster, whatsapp status poster">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/poster-maker/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-4xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold">Offer / Festival Poster Maker</h1>
+  <p class="text-slate-500 mt-2 mb-5">Make a poster for WhatsApp status or Instagram in seconds. Add your shop name &amp; offer, pick a theme, download.</p>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="space-y-3">
+      <div><label class="text-sm font-semibold text-slate-600">Theme</label>
+        <select id="theme" onchange="draw()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl bg-white">
+          <option value="diwali">🪔 Diwali</option><option value="sale">🔥 Big Sale</option><option value="new">🆕 New Arrivals</option><option value="eid">🌙 Eid</option><option value="holi">🎨 Holi</option><option value="grand">🎉 Grand Opening</option></select></div>
+      <div><label class="text-sm font-semibold text-slate-600">Shop name</label><input id="shop" value="My Store" oninput="draw()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+      <div><label class="text-sm font-semibold text-slate-600">Headline</label><input id="head" value="MEGA SALE" oninput="draw()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+      <div><label class="text-sm font-semibold text-slate-600">Offer line</label><input id="offer" value="Up to 50% OFF" oninput="draw()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+      <div><label class="text-sm font-semibold text-slate-600">Sub line</label><input id="sub" value="Visit us today!" oninput="draw()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+      <div><label class="text-sm font-semibold text-slate-600">Phone (optional)</label><input id="phone" value="" oninput="draw()" placeholder="98xxxxxxxx" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+      <button onclick="dl()" class="w-full text-white py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">⬇ Download poster</button>
+    </div>
+    <div class="flex items-start justify-center">
+      <canvas id="cv" width="1080" height="1080" class="w-full max-w-sm rounded-2xl border border-slate-200 shadow"></canvas>
+    </div>
+  </div>
+</section>
+{% include "_tool_links.html" %}
+{% include "_seo_footer.html" %}
+{% include "_floatwa.html" %}
+<script>
+var THEMES={diwali:{a:"#4a1d96",b:"#b91c1c",accent:"#fbbf24",emoji:"🪔"},sale:{a:"#7c2d12",b:"#ea580c",accent:"#fde047",emoji:"🔥"},new:{a:"#065f46",b:"#059669",accent:"#a7f3d0",emoji:"🆕"},eid:{a:"#064e3b",b:"#047857",accent:"#fcd34d",emoji:"🌙"},holi:{a:"#9d174d",b:"#7c3aed",accent:"#fde047",emoji:"🎨"},grand:{a:"#1e3a8a",b:"#c2410c",accent:"#fbbf24",emoji:"🎉"}};
+function draw(){var c=document.getElementById("cv"),x=c.getContext("2d");var th=THEMES[document.getElementById("theme").value];
+  var g=x.createLinearGradient(0,0,1080,1080);g.addColorStop(0,th.a);g.addColorStop(1,th.b);x.fillStyle=g;x.fillRect(0,0,1080,1080);
+  // decorative circles
+  x.globalAlpha=0.12;x.fillStyle=th.accent;x.beginPath();x.arc(180,180,220,0,7);x.fill();x.beginPath();x.arc(950,950,260,0,7);x.fill();x.globalAlpha=1;
+  x.textAlign="center";
+  x.font="120px sans-serif";x.fillText(th.emoji,540,230);
+  // shop name pill
+  var shop=document.getElementById("shop").value||"";x.fillStyle="rgba(255,255,255,.15)";var sw=x.measureText(shop).width;
+  x.font="bold 44px sans-serif";sw=x.measureText(shop).width;x.fillStyle="rgba(0,0,0,.25)";x.fillRect(540-sw/2-30,300,sw+60,72);
+  x.fillStyle="#fff";x.fillText(shop,540,352);
+  // headline
+  x.fillStyle=th.accent;x.font="bold 130px sans-serif";wrap(x,(document.getElementById("head").value||"").toUpperCase(),540,540,1000,130);
+  // offer
+  x.fillStyle="#fff";x.font="bold 90px sans-serif";x.fillText(document.getElementById("offer").value||"",540,720);
+  // sub
+  x.font="46px sans-serif";x.fillStyle="rgba(255,255,255,.9)";x.fillText(document.getElementById("sub").value||"",540,820);
+  // phone
+  var ph=document.getElementById("phone").value;if(ph){x.fillStyle=th.accent;x.font="bold 50px sans-serif";x.fillText("📞 "+ph,540,940);}
+  x.fillStyle="rgba(255,255,255,.5)";x.font="26px sans-serif";x.fillText("Made with Digital Munshi",540,1040);
+}
+function wrap(x,t,cx,cy,max,lh){var words=t.split(" "),line="",y=cy;var lines=[];for(var i=0;i<words.length;i++){var test=line+words[i]+" ";if(x.measureText(test).width>max&&line){lines.push(line);line=words[i]+" ";}else line=test;}lines.push(line);y=cy-(lines.length-1)*lh/2;for(var j=0;j<lines.length;j++){x.fillText(lines[j].trim(),cx,y+j*lh);}}
+function dl(){var c=document.getElementById("cv");var a=document.createElement("a");a.download="poster.png";a.href=c.toDataURL("image/png");a.click();}
+draw();
+</script></body></html>

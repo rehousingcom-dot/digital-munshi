@@ -1,0 +1,55 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TDS Calculator — Section-wise TDS on Payments | Digital Munshi</title>
+<meta name="description" content="Free TDS calculator. Find TDS on contractor, rent, professional fees, commission, interest and more — section-wise rates with thresholds. No signup.">
+<meta name="keywords" content="TDS calculator, TDS rate 194C 194J 194I 194H, TDS on rent, TDS on professional fees">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/tds-calculator/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold">TDS Calculator</h1>
+  <p class="text-slate-500 mt-2 mb-5">Section-wise TDS on your payments (with PAN, resident payee).</p>
+  <div class="bg-white border border-slate-100 rounded-2xl p-6 space-y-3">
+    <div><label class="text-sm font-semibold text-slate-600">Payment type (section)</label>
+      <select id="sec" onchange="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl bg-white"></select></div>
+    <div><label class="text-sm font-semibold text-slate-600">Payment amount (₹)</label><input id="amt" type="number" value="100000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div class="rounded-xl bg-slate-50 p-4 text-sm space-y-1 mt-2">
+      <div class="flex justify-between"><span>TDS rate</span><b id="rate">0%</b></div>
+      <div class="flex justify-between text-lg font-extrabold" style="color:#c2410c"><span>TDS amount</span><b id="tds">₹0</b></div>
+      <div class="flex justify-between"><span>Net payable to party</span><b id="net">₹0</b></div>
+    </div>
+    <p class="text-xs text-slate-400" id="thr"></p>
+    <p class="text-xs text-slate-400">If the payee has no PAN, TDS is generally 20%. Rates shown are for resident payees, FY 2025-26. Please verify current rates before deducting.</p>
+  </div>
+</section>
+{% include "_tool_links.html" %}
+{% include "_seo_footer.html" %}
+{% include "_floatwa.html" %}
+<script>
+var SECS=[
+ ["194C — Contractor (individual/HUF)",0.01,"Threshold: ₹30,000 single / ₹1,00,000 yearly"],
+ ["194C — Contractor (company/firm)",0.02,"Threshold: ₹30,000 single / ₹1,00,000 yearly"],
+ ["194J — Professional fees",0.10,"Threshold: ₹30,000/year"],
+ ["194J — Technical services",0.02,"Threshold: ₹30,000/year"],
+ ["194H — Commission / brokerage",0.02,"Threshold: ₹20,000/year (2% w.e.f. Oct 2024)"],
+ ["194I — Rent of building / land",0.10,"Threshold: ₹2,40,000/year"],
+ ["194I — Rent of plant & machinery",0.02,"Threshold: ₹2,40,000/year"],
+ ["194A — Interest (other than bank)",0.10,"Threshold: ₹5,000/year"],
+ ["194Q — Purchase of goods",0.001,"On purchases above ₹50 lakh/year"],
+ ["194O — E-commerce payment",0.001,"E-commerce operator to seller"],
+ ["206C(1H) — TCS on sale of goods",0.001,"Collect on sales above ₹50 lakh/year"]
+];
+function fmt(n){return "₹"+Math.round(n).toLocaleString("en-IN");}
+var sel=document.getElementById("sec");
+SECS.forEach(function(s,i){var o=document.createElement("option");o.value=i;o.textContent=s[0];sel.appendChild(o);});
+function calc(){var i=parseInt(sel.value)||0,amt=parseFloat(document.getElementById("amt").value)||0;var s=SECS[i];
+  var tds=amt*s[1];
+  document.getElementById("rate").textContent=(s[1]*100).toString()+"%";
+  document.getElementById("tds").textContent=fmt(tds);
+  document.getElementById("net").textContent=fmt(amt-tds);
+  document.getElementById("thr").textContent=s[2];}
+calc();
+</script></body></html>

@@ -109,6 +109,7 @@ def sitemap_xml(request):
     urls += [base + "/tools/", base + "/tools/gst-calculator/", base + "/tools/invoice-generator/", base + "/tools/hsn-code-finder/"]
     urls += [base + "/tools/emi-calculator/", base + "/tools/discount-calculator/", base + "/tools/profit-margin-calculator/", base + "/tools/rupees-in-words/", base + "/tools/barcode-generator/", base + "/tools/upi-qr-code-generator/", base + "/tools/chit-fund-calculator/"]
     urls += [base + "/tools/fd-rd-sip-calculator/", base + "/tools/interest-calculator/", base + "/tools/break-even-calculator/", base + "/tools/salary-calculator/", base + "/tools/gstin-verifier/"]
+    urls += [base + "/tools/income-tax-calculator/", base + "/tools/gst-late-fee-calculator/", base + "/tools/tds-calculator/"]
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     for u in urls:
         body += f"<url><loc>{u}</loc><changefreq>weekly</changefreq></url>"
@@ -271,6 +272,9 @@ urlpatterns = [
     path("tools/break-even-calculator/", core_views.tool_breakeven, name="tool_breakeven"),
     path("tools/salary-calculator/", core_views.tool_salary, name="tool_salary"),
     path("tools/gstin-verifier/", core_views.tool_gstin, name="tool_gstin"),
+    path("tools/income-tax-calculator/", core_views.tool_incometax, name="tool_incometax"),
+    path("tools/gst-late-fee-calculator/", core_views.tool_gstlatefee, name="tool_gstlatefee"),
+    path("tools/tds-calculator/", core_views.tool_tds, name="tool_tds"),
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),

@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GST Late Fee & Interest Calculator (GSTR-1 / 3B) | Digital Munshi</title>
+<meta name="description" content="Free GST late fee calculator for GSTR-1 and GSTR-3B. Calculate late fee (₹50/day, ₹20/day nil) and 18% interest on late GST filing. No signup.">
+<meta name="keywords" content="GST late fee calculator, GSTR-3B late fee, GSTR-1 late fee, GST interest calculator, gst penalty">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/gst-late-fee-calculator/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold">GST Late Fee Calculator</h1>
+  <p class="text-slate-500 mt-2 mb-5">Late fee + 18% interest for late GSTR-1 / GSTR-3B filing.</p>
+  <div class="bg-white border border-slate-100 rounded-2xl p-6 space-y-3">
+    <div><label class="text-sm font-semibold text-slate-600">Return type</label>
+      <select id="type" onchange="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl bg-white"><option value="normal">Normal return (with sales)</option><option value="nil">Nil return (no sales)</option></select></div>
+    <div><label class="text-sm font-semibold text-slate-600">Days late</label><input id="days" type="number" value="10" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"><span class="text-xs text-slate-400">Days after the due date</span></div>
+    <div id="taxWrap"><label class="text-sm font-semibold text-slate-600">Net GST payable (₹)</label><input id="tax" type="number" value="20000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"><span class="text-xs text-slate-400">For 18% interest (only if you have a tax liability)</span></div>
+    <div class="rounded-xl bg-slate-50 p-4 text-sm space-y-1 mt-2">
+      <div class="flex justify-between"><span>Late fee (CGST + SGST)</span><b id="lf">₹0</b></div>
+      <div class="flex justify-between"><span>Interest @ 18% p.a.</span><b id="int">₹0</b></div>
+      <div class="flex justify-between text-lg font-extrabold" style="color:#c2410c"><span>Total payable</span><b id="tot">₹0</b></div>
+    </div>
+    <p class="text-xs text-slate-400" id="capNote"></p>
+    <p class="text-xs text-slate-400">Late fee: ₹50/day normal (₹25 CGST + ₹25 SGST), ₹20/day for nil. Max cap depends on turnover (₹2,000 / ₹5,000 / ₹10,000; nil ₹500). Interest is 18% p.a. on net tax. Verify on the GST portal.</p>
+  </div>
+</section>
+{% include "_tool_links.html" %}
+{% include "_seo_footer.html" %}
+{% include "_floatwa.html" %}
+<script>
+function fmt(n){return "₹"+Math.round(n).toLocaleString("en-IN");}
+function calc(){var type=document.getElementById("type").value,days=parseInt(document.getElementById("days").value)||0,tax=parseFloat(document.getElementById("tax").value)||0;
+  var nil=type==="nil";
+  document.getElementById("taxWrap").style.display=nil?"none":"";
+  var perDay=nil?20:50;
+  var lf=days*perDay;
+  var interest=nil?0:(tax*0.18*days/365);
+  document.getElementById("lf").textContent=fmt(lf);
+  document.getElementById("int").textContent=fmt(interest);
+  document.getElementById("tot").textContent=fmt(lf+interest);
+  document.getElementById("capNote").textContent = "Note: your actual late fee is capped by turnover — this figure is before the cap.";
+}
+calc();
+</script></body></html>

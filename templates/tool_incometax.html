@@ -1,0 +1,62 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Income Tax Calculator FY 2025-26 (New vs Old Regime) | Digital Munshi</title>
+<meta name="description" content="Free income tax calculator for FY 2025-26 (AY 2026-27). Compare new vs old regime, with rebate 87A, standard deduction and 4% cess. See which regime saves more. No signup.">
+<meta name="keywords" content="income tax calculator 2025-26, new regime vs old regime, income tax slab AY 2026-27, 87A rebate, tax calculator India">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/income-tax-calculator/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold">Income Tax Calculator</h1>
+  <p class="text-slate-500 mt-2 mb-5">FY 2025-26 (AY 2026-27) — compare New vs Old regime and see which saves more.</p>
+  <div class="bg-white border border-slate-100 rounded-2xl p-6 space-y-3">
+    <div><label class="text-sm font-semibold text-slate-600">Annual income (₹)</label><input id="inc" type="number" value="1200000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"><span class="text-xs text-slate-400">Gross salary / total income before deductions</span></div>
+    <label class="flex items-center gap-2 text-sm"><input id="sal" type="checkbox" checked onchange="calc()"> Salaried / pensioner (standard deduction)</label>
+    <div><label class="text-sm font-semibold text-slate-600">Old-regime deductions (80C, 80D, HRA, home loan…) (₹)</label><input id="ded" type="number" value="150000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"><span class="text-xs text-slate-400">Only used for the Old regime</span></div>
+    <div class="grid grid-cols-2 gap-3 mt-2">
+      <div id="cNew" class="rounded-xl p-4 border-2 border-slate-100"><div class="text-xs text-slate-500 font-semibold">NEW REGIME</div><div class="text-2xl font-extrabold" id="taxNew" style="color:#c2410c">₹0</div><div class="text-xs text-slate-400" id="tiNew"></div></div>
+      <div id="cOld" class="rounded-xl p-4 border-2 border-slate-100"><div class="text-xs text-slate-500 font-semibold">OLD REGIME</div><div class="text-2xl font-extrabold" id="taxOld" style="color:#1f4e79">₹0</div><div class="text-xs text-slate-400" id="tiOld"></div></div>
+    </div>
+    <div id="verdict" class="rounded-xl bg-green-50 p-3 text-sm font-semibold text-green-800 text-center"></div>
+    <p class="text-xs text-slate-400">Includes 4% health &amp; education cess and Section 87A rebate. Surcharge (very high income), senior-citizen exemptions and marginal relief are not applied. For exact tax, consult a CA.</p>
+  </div>
+</section>
+{% include "_tool_links.html" %}
+{% include "_seo_footer.html" %}
+{% include "_floatwa.html" %}
+<script>
+function fmt(n){return "₹"+Math.round(n).toLocaleString("en-IN");}
+function slabTax(t, slabs){var tax=0,prev=0;for(var i=0;i<slabs.length;i++){var cap=slabs[i][0],rate=slabs[i][1];if(t>prev){var amt=Math.min(t,cap)-prev;tax+=amt*rate;prev=cap;}else break;}return tax;}
+function taxNew(income, salaried){
+  var taxable=income-(salaried?75000:0); if(taxable<0)taxable=0;
+  var slabs=[[400000,0],[800000,0.05],[1200000,0.10],[1600000,0.15],[2000000,0.20],[2400000,0.25],[1e12,0.30]];
+  var tax=slabTax(taxable,slabs);
+  if(taxable<=1200000) tax=0; // 87A rebate (new regime)
+  return {taxable:taxable, tax:tax*1.04};
+}
+function taxOld(income, salaried, ded){
+  var taxable=income-(salaried?50000:0)-(ded||0); if(taxable<0)taxable=0;
+  var slabs=[[250000,0],[500000,0.05],[1000000,0.20],[1e12,0.30]];
+  var tax=slabTax(taxable,slabs);
+  if(taxable<=500000) tax=0; // 87A rebate (old regime)
+  return {taxable:taxable, tax:tax*1.04};
+}
+function calc(){var inc=parseFloat(document.getElementById("inc").value)||0,sal=document.getElementById("sal").checked,ded=parseFloat(document.getElementById("ded").value)||0;
+  var n=taxNew(inc,sal), o=taxOld(inc,sal,ded);
+  document.getElementById("taxNew").textContent=fmt(n.tax);
+  document.getElementById("taxOld").textContent=fmt(o.tax);
+  document.getElementById("tiNew").textContent="on "+fmt(n.taxable)+" taxable";
+  document.getElementById("tiOld").textContent="on "+fmt(o.taxable)+" taxable";
+  var cn=document.getElementById("cNew"),co=document.getElementById("cOld");
+  cn.style.borderColor = n.tax<=o.tax?"#16a34a":"#e2e8f0";
+  co.style.borderColor = o.tax<n.tax?"#16a34a":"#e2e8f0";
+  var v=document.getElementById("verdict");
+  if(n.tax===o.tax){v.textContent="Both regimes cost the same.";}
+  else if(n.tax<o.tax){v.textContent="✅ New regime is better — you save "+fmt(o.tax-n.tax);}
+  else {v.textContent="✅ Old regime is better — you save "+fmt(n.tax-o.tax);}
+}
+calc();
+</script></body></html>

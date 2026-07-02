@@ -436,6 +436,18 @@ def tool_gstin(request):
     return _tool(request, "tool_gstin.html")
 
 
+def tool_incometax(request):
+    return _tool(request, "tool_incometax.html")
+
+
+def tool_gstlatefee(request):
+    return _tool(request, "tool_gstlatefee.html")
+
+
+def tool_tds(request):
+    return _tool(request, "tool_tds.html")
+
+
 def tool_discount(request):
     return _tool(request, "tool_discount.html")
 

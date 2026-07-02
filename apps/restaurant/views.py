@@ -73,22 +73,41 @@ class RestOrderViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
             return Response({"detail": "already billed"}, status=400)
         try:
             from apps.party.models import Party
-            from apps.core.models import Godown
+            from apps.core.models import Godown, Unit
             from apps.billing.models import Voucher, VoucherLine
+            from apps.inventory.models import Item, ItemVariant
             party = Party.objects.filter(name="Walk-in").first() or Party.objects.create(
                 name="Walk-in", party_type="CUSTOMER")
             godown = Godown.objects.first()
             if not godown:
                 return Response({"detail": "Pehle ek store/godown banao."}, status=400)
+            # Free-text restaurant items ke paas na variant hota hai na unit — par
+            # VoucherLine me dono (variant + unit) NOT NULL hain. Isliye ek baar
+            # org-level default unit + ek generic "Restaurant Item" placeholder variant
+            # bana ke un lines ke liye use kar lo (asli dish naam description me jaata hai).
+            default_unit = (Unit.objects.filter(short_code__iexact="NOS").first()
+                            or Unit.objects.first()
+                            or Unit.objects.create(name="Nos", short_code="NOS"))
+            ph_variant = None  # lazy — sirf tab bane jab koi variant-less item ho
             total = o.total
             v = Voucher.objects.create(
                 voucher_type="SALE", date=timezone.localdate(), party=party, godown=godown,
                 is_posted=False, notes=f"Restaurant {o.order_no} ({o.table.name if o.table_id else ''})",
                 subtotal=total, taxable_value=total, grand_total=total)
             for it in o.items.all():
-                unit_id = getattr(it.variant.item, "primary_unit_id", None) if it.variant_id else None
+                variant = it.variant
+                if variant is None:
+                    if ph_variant is None:
+                        ph_item = (Item.objects.filter(name="Restaurant Item").first()
+                                   or Item.objects.create(name="Restaurant Item",
+                                                          item_type=Item.ItemType.SERVICE,
+                                                          primary_unit=default_unit))
+                        ph_variant = ph_item.variants.first() or ItemVariant.objects.create(item=ph_item)
+                    variant = ph_variant
+                unit_id = getattr(variant.item, "primary_unit_id", None) or default_unit.id
                 VoucherLine.objects.create(
-                    voucher=v, variant=it.variant, unit_id=unit_id, description=it.name,
+                    voucher=v, variant=variant, unit_id=unit_id,
+                    description=it.name,
                     qty=it.qty, rate=it.price, qty_primary=it.qty,
                     gross=money(it.amount), taxable_value=money(it.amount))
             o.voucher = v

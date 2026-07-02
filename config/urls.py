@@ -284,6 +284,7 @@ urlpatterns = [
     path("api/munshi/ask/", __import__("apps.core.munshi", fromlist=["munshi_ask"]).munshi_ask, name="munshi_ask"),
     path("api/alerts/", __import__("apps.core.alerts", fromlist=["alerts"]).alerts, name="alerts"),
     path("api/reorder-suggestions/", __import__("apps.core.reorder", fromlist=["reorder_suggestions"]).reorder_suggestions, name="reorder_suggestions"),
+    path("api/day-close/", __import__("apps.core.dayclose", fromlist=["day_close"]).day_close, name="day_close"),
     path("api/marketing/broadcast/", __import__("apps.core.marketing_wa", fromlist=["broadcast"]).broadcast, name="wa_broadcast"),
     path("api/udhaar/reminder/", __import__("apps.core.udhaar", fromlist=["udhaar_reminder"]).udhaar_reminder, name="udhaar_reminder"),
     path("api/udhaar/bharosa/", __import__("apps.core.udhaar", fromlist=["bharosa"]).bharosa, name="udhaar_bharosa"),

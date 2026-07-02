@@ -1810,6 +1810,39 @@ function StatCard({label,value,accent}){
   return (<div className="card p-5"><div className="text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</div>
     <div className="text-2xl font-extrabold mt-2" style={{color:accent||"#0f172a"}}>{value}</div></div>);
 }
+function DayClose(){
+  const today=new Date().toISOString().slice(0,10);
+  const [date,setDate]=useState(today),[d,setD]=useState(null),[opening,setOpening]=useState(0),[counted,setCounted]=useState("");
+  const load=()=>api("/day-close/?date="+date).then(setD).catch(()=>{});
+  useEffect(()=>{ load(); },[date]);
+  if(!d) return <div className="card p-6 text-slate-400">Loading…</div>;
+  const expected=(+opening||0)+(d.net||0);
+  const diff=counted===""?null:(parseFloat(counted)-expected);
+  return (<div className="space-y-4">
+    <div className="flex flex-wrap gap-3 items-end card p-3">
+      <div><label className="text-xs font-semibold text-slate-500">{t("Date","तारीख")}</label><input type="date" className="border border-slate-200 p-2 rounded-lg text-sm block" value={date} onChange={e=>setDate(e.target.value)}/></div>
+      <div><label className="text-xs font-semibold text-slate-500">{t("Opening cash (₹)","ओपनिंग कैश")}</label><input type="number" className="border border-slate-200 p-2 rounded-lg text-sm block w-32" value={opening} onChange={e=>setOpening(e.target.value)}/></div>
+    </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <StatCard label={t("Cash in","कैश आया")} value={money(d.cash_in)} accent="#059669"/>
+      <StatCard label={t("Cash out","कैश गया")} value={money(d.cash_out)} accent="#dc2626"/>
+      <StatCard label={t("Net cash","नेट")} value={money(d.net)} accent="#0891b2"/>
+      <StatCard label={t("Expected in drawer","अपेक्षित")} value={money(expected)} accent="#ea6a1e"/>
+    </div>
+    <div className="card p-4">
+      <div className="flex flex-wrap gap-3 items-end">
+        <div><label className="text-sm font-semibold text-slate-600">{t("Actual counted cash (₹)","गिना हुआ कैश")}</label><input type="number" className="border border-slate-200 p-2.5 rounded-lg block w-40 mt-1" value={counted} onChange={e=>setCounted(e.target.value)} placeholder="Count & enter"/></div>
+        {diff!==null && <div className={"px-4 py-2 rounded-xl font-bold "+(Math.abs(diff)<1?"bg-green-100 text-green-700":"bg-red-100 text-red-700")}>{Math.abs(diff)<1?"✓ "+t("Matched","मैच"):(diff>0?t("Extra","ज़्यादा")+" ":t("Short","कम")+" ")+money(Math.abs(diff))}</div>}
+      </div>
+    </div>
+    <div className="card overflow-x-auto"><table className="w-full text-sm">
+      <thead className="bg-slate-100 text-slate-600"><tr><th className="text-left p-2.5">{t("Type","प्रकार")}</th><th className="text-left p-2.5">{t("Party","पार्टी")}</th><th className="text-right p-2.5">{t("In","आया")}</th><th className="text-right p-2.5">{t("Out","गया")}</th></tr></thead>
+      <tbody>{d.rows.length===0&&<tr><td colSpan="4" className="p-3 text-slate-400">{t("Is din koi cash transaction nahi.","No cash transactions this day.")}</td></tr>}
+        {d.rows.map((r,i)=><tr key={i} className="border-b"><td className="p-2.5">{r.type}</td><td className="p-2.5">{r.party||"—"}</td><td className="p-2.5 text-right text-green-600">{r.in?money(r.in):"—"}</td><td className="p-2.5 text-right text-red-600">{r.out?money(r.out):"—"}</td></tr>)}</tbody>
+    </table></div>
+  </div>);
+}
+
 function ReportsView(){
   const [tab,setTab]=useState("pnl"); const [data,setData]=useState(null),[parties,setParties]=useState([]),[pid,setPid]=useState("");
   const [start,setStart]=useState(""),[end,setEnd]=useState(""),[biz,setBiz]=useState("");
@@ -1821,10 +1854,11 @@ function ReportsView(){
     if((start||end)&&DATE_REPORTS.includes(t)) url+=(url.includes("?")?"&":"?")+"start="+(start||"")+"&end="+(end||"");
     try{ setData(await api(url)); }catch(e){ setData({error:String(e)}); } };
   useEffect(()=>{ load("pnl"); },[]);
-  const tabs=[["pnl",t("P&L","लाभ-हानि")],["bsheet",t("Balance Sheet","बैलेंस शीट")],["stock",t("Live Stock","लाइव स्टॉक")],["reminders",t("Payment Reminders","भुगतान रिमाइंडर")],["aging",t("Receivables Aging","प्राप्य एजिंग")],["daybook",t("Day Book","डे बुक")],["gstr1",t("GSTR-1","GSTR-1")],["gstr3b",t("GSTR-3B","GSTR-3B")],["hsn",t("HSN Summary","HSN सारांश")],["lowstock",t("Low Stock","लो स्टॉक")],["dead",t("Dead / Fast Movers","रुका / तेज़ बिकने वाला")],["reorder",t("🤖 Reorder Suggestions","🤖 रीऑर्डर")],["purchase",t("Purchase Register","खरीद रजिस्टर")],["stmt",t("Party Statement","पार्टी स्टेटमेंट")]];
+  const tabs=[["pnl",t("P&L","लाभ-हानि")],["bsheet",t("Balance Sheet","बैलेंस शीट")],["stock",t("Live Stock","लाइव स्टॉक")],["reminders",t("Payment Reminders","भुगतान रिमाइंडर")],["aging",t("Receivables Aging","प्राप्य एजिंग")],["daybook",t("Day Book","डे बुक")],["gstr1",t("GSTR-1","GSTR-1")],["gstr3b",t("GSTR-3B","GSTR-3B")],["hsn",t("HSN Summary","HSN सारांश")],["lowstock",t("Low Stock","लो स्टॉक")],["dead",t("Dead / Fast Movers","रुका / तेज़ बिकने वाला")],["reorder",t("🤖 Reorder Suggestions","🤖 रीऑर्डर")],["dayclose",t("🧾 Day Close","🧾 डे क्लोज़")],["purchase",t("Purchase Register","खरीद रजिस्टर")],["stmt",t("Party Statement","पार्टी स्टेटमेंट")]];
   const D=data;
   const body=()=>{
    try{
+    if(tab==="dayclose") return null;
     if(tab==="stmt" && (!D||!Array.isArray(D.entries)) && !(D&&D.error))
       return <div className="card p-6 text-slate-400">{t("Upar dropdown se party chuno, phir View dabao.","Choose a party from the dropdown above, then click View.")}</div>;
     if(!D) return <div className="card p-6 text-slate-400">Loading…</div>;
@@ -1914,7 +1948,7 @@ function ReportsView(){
         <button onClick={()=>window.print()} className="bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-semibold">🖨 Print / PDF</button>
       </div>
       <div className="flex flex-wrap gap-2 mb-3">
-        {tabs.map(([k,l])=><button key={k} onClick={()=>k==="stmt"?(setTab("stmt"),setData(null),setPid("")):load(k)} className={"px-4 py-2 rounded-xl text-sm font-semibold "+(tab===k?"bg-blue-900 text-white":"bg-white text-slate-600 border border-slate-200")}>{l}</button>)}
+        {tabs.map(([k,l])=><button key={k} onClick={()=>k==="stmt"?(setTab("stmt"),setData(null),setPid("")):k==="dayclose"?setTab("dayclose"):load(k)} className={"px-4 py-2 rounded-xl text-sm font-semibold "+(tab===k?"bg-blue-900 text-white":"bg-white text-slate-600 border border-slate-200")}>{l}</button>)}
       </div>
       {/* Date filter (date-based reports) */}
       {DATE_REPORTS.includes(tab) && <div className="mb-4 flex flex-wrap gap-2 items-end card p-3">
@@ -1923,6 +1957,7 @@ function ReportsView(){
         <button onClick={()=>load(tab)} className="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">Apply Filter</button>
         {(start||end)&&<button onClick={()=>{setStart("");setEnd("");setTimeout(()=>load(tab),0);}} className="text-slate-500 px-2 py-2 text-sm">Clear</button>}
       </div>}
+      {tab==="dayclose" && <DayClose/>}
       {tab==="stmt" && <div className="mb-4 flex flex-wrap gap-2 items-center card p-3">
         <label className="text-sm font-semibold text-slate-600">{t("Party","पार्टी")}:</label>
         <select className="p-2.5 border border-slate-200 rounded-lg text-sm bg-white min-w-[220px]" value={pid} onChange={e=>{setPid(e.target.value); if(e.target.value)load("stmt",e.target.value);}}><option value="">— {t("choose party","पार्टी चुनो")} —</option>{parties.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>

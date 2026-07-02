@@ -236,6 +236,7 @@ const PATHS = {
   market:'M3 9h18l-1.5 11a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8zM3 9l2-5h14l2 5M9 13v4M15 13v4',
   orders:'M9 2h6a1 1 0 0 1 1 1v1h2a1 1 0 0 1 1 1v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1h2V3a1 1 0 0 1 1-1zM8 9h8M8 13h8M8 17h5',
   restaurant:'M3 2v7c0 1.1.9 2 2 2h0v11M7 2v9M5 2v9M17 2c-1.66 0-3 2.5-3 5s1 4 3 4v9',
+  appointments:'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2M9 16l2 2 4-4',
 };
 function Icon({n, size=18, color="currentColor", stroke=2}){
   return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
@@ -2538,6 +2539,50 @@ function Stat({label,v}){
   return <div className="card p-3"><div className="text-xs text-slate-500">{label}</div><div className="text-lg font-extrabold text-slate-800">{v}</div></div>;
 }
 
+// ---------- Appointments / Services ----------
+function AppointmentsView(){
+  const now=new Date();
+  const [rows,setRows]=useState([]),[fil,setFil]=useState("upcoming"),[msg,setMsg]=useState("");
+  const blank={customer_name:"",phone:"",service:"",staff:"",start:new Date(Date.now()+3600000).toISOString().slice(0,16),duration_min:30,price:""};
+  const [f,setF]=useState(blank),[show,setShow]=useState(false);
+  const load=()=>apiList("/appointments/"+(fil?("?when="+fil):"")+"&page_size=200").then(setRows);
+  useEffect(()=>{ load(); },[fil]);
+  const book=async()=>{ if(!f.customer_name||!f.service||!f.start){setMsg(t("Naam, service, time zaroori","Name, service, time required"));return;}
+    await api("/appointments/",{method:"POST",body:JSON.stringify(f)}); setF(blank); setShow(false); setMsg(t("Appointment booked ✓","बुक ✓")); load(); setTimeout(()=>setMsg(""),2000); };
+  const setStatus=async(a,s)=>{ await api("/appointments/"+a.id+"/set_status/",{method:"POST",body:JSON.stringify({status:s})}); load(); };
+  const badge=s=>{const c={BOOKED:["#dbeafe","#1e40af"],DONE:["#dcfce7","#166534"],CANCELLED:["#fee2e2","#b91c1c"],NO_SHOW:["#fef9c3","#854d0e"]}[s]||["#f1f5f9","#64748b"];return <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{background:c[0],color:c[1]}}>{s}</span>;};
+  const fmtDT=s=>{try{return new Date(s).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}catch(e){return s;}};
+  return (<div className="p-6">
+    <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+      <h2 className="text-xl font-bold text-slate-700">{t("Appointments","अपॉइंटमेंट")}</h2>
+      <button onClick={()=>setShow(!show)} className="bg-blue-900 text-white px-4 py-2 rounded text-sm">{show?t("Close","बंद"):t("+ Book","+ बुक")}</button>
+    </div>
+    {msg&&<div className="bg-green-50 text-green-700 p-2 rounded mb-3 text-sm">{msg}</div>}
+    {show && <div className="card p-4 mb-4 grid md:grid-cols-3 gap-2">
+      <input className="border p-2 rounded" placeholder={t("Customer name","ग्राहक")} value={f.customer_name} onChange={e=>setF({...f,customer_name:e.target.value})}/>
+      <input className="border p-2 rounded" placeholder={t("Phone","फोन")} value={f.phone} onChange={e=>setF({...f,phone:e.target.value})}/>
+      <input className="border p-2 rounded" placeholder={t("Service (haircut, checkup…)","सर्विस")} value={f.service} onChange={e=>setF({...f,service:e.target.value})}/>
+      <input className="border p-2 rounded" placeholder={t("Staff (optional)","स्टाफ")} value={f.staff} onChange={e=>setF({...f,staff:e.target.value})}/>
+      <input type="datetime-local" className="border p-2 rounded" value={f.start} onChange={e=>setF({...f,start:e.target.value})}/>
+      <input type="number" className="border p-2 rounded" placeholder={t("Price ₹","कीमत")} value={f.price} onChange={e=>setF({...f,price:e.target.value})}/>
+      <button onClick={book} className="bg-blue-900 text-white p-2 rounded md:col-span-3">{t("Book appointment","बुक करो")}</button>
+    </div>}
+    <div className="flex gap-2 mb-4">{[["upcoming",t("Upcoming","आगामी")],["today",t("Today","आज")],["",t("All","सभी")]].map(([k,l])=><button key={k} onClick={()=>setFil(k)} className={"px-3 py-1 rounded text-sm "+(fil===k?"bg-blue-900 text-white":"bg-slate-200")}>{l}</button>)}</div>
+    <div className="space-y-2">
+      {rows.length===0&&<div className="text-slate-400 text-sm">{t("Koi appointment nahi.","No appointments.")}</div>}
+      {rows.map(a=><div key={a.id} className="card p-4 flex items-start justify-between flex-wrap gap-2">
+        <div><div className="font-bold">{a.customer_name} {badge(a.status)}</div>
+          <div className="text-sm text-slate-600">{a.service}{a.staff?" · "+a.staff:""}</div>
+          <div className="text-xs text-slate-400">🕒 {fmtDT(a.start)}{a.price>0?" · "+money(a.price):""}{a.phone?" · "+a.phone:""}</div></div>
+        <div className="flex flex-wrap gap-2">
+          {a.phone&&<a href={"https://wa.me/91"+a.phone.replace(/\D/g,'').slice(-10)+"?text="+encodeURIComponent("Reminder: aapka "+a.service+" appointment "+fmtDT(a.start)+" ko hai.")} target="_blank" className="text-xs font-semibold px-3 py-1.5 rounded text-white" style={{background:"#25D366"}}>Remind</a>}
+          {a.status==="BOOKED"&&<span><button onClick={()=>setStatus(a,"DONE")} className="text-xs text-green-600 font-semibold mr-2">Done</button><button onClick={()=>setStatus(a,"NO_SHOW")} className="text-xs text-amber-600 mr-2">No-show</button><button onClick={()=>setStatus(a,"CANCELLED")} className="text-xs text-red-500">Cancel</button></span>}
+        </div>
+      </div>)}
+    </div>
+  </div>);
+}
+
 // ---------- Restaurant (KOT + tables) ----------
 function RestaurantView(){
   const [tables,setTables]=useState([]),[sel,setSel]=useState(null),[newT,setNewT]=useState("");
@@ -3216,7 +3261,7 @@ function App(){
   const isAdmin = me && me.is_platform_admin;
   const toggleTheme=()=>setTheme(t=>t==="dark"?"light":"dark");
   const logout=()=>{ clearAuth(); setAuthed(false); setSub(null); };
-  const nav=[["dash",t("Dashboard","डैशबोर्ड")],["pos",t("POS Billing","POS बिलिंग")],["sale",t("New Sale","नई बिक्री")],["vouchers",t("Sales & Transactions","बिक्री व लेन-देन")],["orders",t("Online Orders","ऑनलाइन ऑर्डर")],["items",t("Items","आइटम")],["parties",t("Parties","पार्टी")],["cashbank",t("Cash & Bank","कैश व बैंक")],["accounting",t("Accounting","अकाउंटिंग")],["reports",t("Reports","रिपोर्ट")],["utils",t("Utilities","यूटिलिटीज़")],["whatsapp",t("WhatsApp","व्हाट्सएप")],["hr",t("HR / Payroll","HR / पेरोल")],["committee",t("Committee / BC","कमेटी / BC")],["restaurant",t("Restaurant","रेस्टोरेंट")],["market",t("Marketplace","मार्केटप्लेस")],["staff",t("App Users","ऐप यूज़र")],["settings",t("Settings","सेटिंग्स")],["plan",t("Subscription","सब्सक्रिप्शन")]];
+  const nav=[["dash",t("Dashboard","डैशबोर्ड")],["pos",t("POS Billing","POS बिलिंग")],["sale",t("New Sale","नई बिक्री")],["vouchers",t("Sales & Transactions","बिक्री व लेन-देन")],["orders",t("Online Orders","ऑनलाइन ऑर्डर")],["items",t("Items","आइटम")],["parties",t("Parties","पार्टी")],["cashbank",t("Cash & Bank","कैश व बैंक")],["accounting",t("Accounting","अकाउंटिंग")],["reports",t("Reports","रिपोर्ट")],["utils",t("Utilities","यूटिलिटीज़")],["whatsapp",t("WhatsApp","व्हाट्सएप")],["hr",t("HR / Payroll","HR / पेरोल")],["committee",t("Committee / BC","कमेटी / BC")],["restaurant",t("Restaurant","रेस्टोरेंट")],["appointments",t("Appointments","अपॉइंटमेंट")],["market",t("Marketplace","मार्केटप्लेस")],["staff",t("App Users","ऐप यूज़र")],["settings",t("Settings","सेटिंग्स")],["plan",t("Subscription","सब्सक्रिप्शन")]];
   if(isAdmin) nav.push(["admin","Platform Admin"]);
   // Plan-based feature gating — jo plan me hai wahi feature dikhe
   const feats = (me && me.features) || null;
@@ -3269,6 +3314,7 @@ function App(){
             {tab==="committee" && <CommitteeView/>}
             {tab==="market" && <MarketplaceView/>}
             {tab==="restaurant" && <RestaurantView/>}
+            {tab==="appointments" && <AppointmentsView/>}
             {tab==="orders" && <OrdersView/>}
             {tab==="staff" && <StaffView/>}
             {tab==="settings" && <Settings onSaved={()=>{}} />}

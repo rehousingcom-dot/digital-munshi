@@ -141,6 +141,7 @@ from apps.marketplace import public_views as market_public
 from apps.store import views as store_views
 from apps.store import public_views as store_public
 from apps.restaurant import views as rest_views
+from apps.appointments import views as appt_views
 
 
 def health(request):
@@ -192,6 +193,7 @@ router.register("committee-join-requests", committee_views.CommitteeJoinRequestV
 router.register("orders", store_views.OrderViewSet)
 router.register("rest-tables", rest_views.TableViewSet)
 router.register("rest-orders", rest_views.RestOrderViewSet)
+router.register("appointments", appt_views.AppointmentViewSet)
 # Cash & Bank
 router.register("bank-accounts", cashbank_views.BankAccountViewSet)
 router.register("bank-transactions", cashbank_views.BankTransactionViewSet)

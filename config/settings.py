@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "apps.marketplace",
     "apps.store",
     "apps.restaurant",
+    "apps.appointments",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

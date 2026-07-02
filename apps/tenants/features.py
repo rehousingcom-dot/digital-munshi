@@ -10,7 +10,7 @@ FEATURE_TIER = {
     "dash": 1, "pos": 1, "sale": 1, "vouchers": 1, "items": 1, "parties": 1,
     "cashbank": 1, "reports": 1, "utils": 1, "whatsapp": 1, "settings": 1, "plan": 1,
     # Pro (2)
-    "accounting": 2, "committee": 2, "orders": 2, "staff": 2,
+    "accounting": 2, "committee": 2, "orders": 2, "staff": 2, "restaurant": 2,
     # Business (3)
     "hr": 3, "market": 3,
 }

@@ -235,6 +235,7 @@ const PATHS = {
   committee:'M17 20h5v-2a3 3 0 0 0-5.4-1.8M9 20H2v-2a4 4 0 0 1 6-3.5M9 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM17 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12.5 22a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM12.5 16.6v2.4M11.4 18.2h2.2',
   market:'M3 9h18l-1.5 11a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8zM3 9l2-5h14l2 5M9 13v4M15 13v4',
   orders:'M9 2h6a1 1 0 0 1 1 1v1h2a1 1 0 0 1 1 1v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1h2V3a1 1 0 0 1 1-1zM8 9h8M8 13h8M8 17h5',
+  restaurant:'M3 2v7c0 1.1.9 2 2 2h0v11M7 2v9M5 2v9M17 2c-1.66 0-3 2.5-3 5s1 4 3 4v9',
 };
 function Icon({n, size=18, color="currentColor", stroke=2}){
   return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
@@ -2521,6 +2522,67 @@ function Stat({label,v}){
   return <div className="card p-3"><div className="text-xs text-slate-500">{label}</div><div className="text-lg font-extrabold text-slate-800">{v}</div></div>;
 }
 
+// ---------- Restaurant (KOT + tables) ----------
+function RestaurantView(){
+  const [tables,setTables]=useState([]),[sel,setSel]=useState(null),[newT,setNewT]=useState("");
+  const load=()=>apiList("/rest-tables/?page_size=200").then(setTables);
+  useEffect(()=>{ load(); },[]);
+  const addTable=async()=>{ if(!newT.trim())return; await api("/rest-tables/",{method:"POST",body:JSON.stringify({name:newT.trim()})}); setNewT(""); load(); };
+  const openTable=async(tbl)=>{ const o=await api("/rest-orders/open_table/",{method:"POST",body:JSON.stringify({table:tbl.id})}); setSel({table:tbl,order:o}); };
+  if(sel) return <RestOrderPanel table={sel.table} order={sel.order} onBack={()=>{setSel(null);load();}} />;
+  return (<div className="p-6">
+    <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+      <h2 className="text-xl font-bold text-slate-700">{t("Restaurant — Tables","रेस्टोरेंट — टेबल")}</h2>
+      <div className="flex gap-2"><input className="border p-2 rounded text-sm" placeholder={t("Table name (T1)","टेबल")} value={newT} onChange={e=>setNewT(e.target.value)} /><button onClick={addTable} className="bg-blue-900 text-white px-3 py-2 rounded text-sm">{t("+ Table","+ टेबल")}</button></div>
+    </div>
+    {tables.length===0 && <div className="text-slate-400 text-sm">{t("Pehle tables add karo (T1, T2…).","Add tables first.")}</div>}
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+      {tables.map(tb=>{const busy=!!tb.running_order_id;return <button key={tb.id} onClick={()=>openTable(tb)} className="rounded-2xl p-4 text-left border-2" style={{background:busy?"#fff7ed":"#f0fdf4",borderColor:busy?"#fdba74":"#bbf7d0"}}>
+        <div className="font-extrabold text-lg">{tb.name}</div>
+        <div className="text-xs" style={{color:busy?"#c2410c":"#16a34a"}}>{busy?t("Running","चल रहा"):t("Free","खाली")}</div>
+        {busy&&<div className="text-sm font-bold mt-1">{money(tb.running_total)}</div>}
+      </button>;})}
+    </div>
+  </div>);
+}
+
+function RestOrderPanel({table,order,onBack}){
+  const [o,setO]=useState(order),[items,setItems]=useState([]),[q,setQ]=useState(""),[msg,setMsg]=useState("");
+  useEffect(()=>{ apiList("/items/?page_size=500").then(setItems); },[]);
+  const reload=async()=>{ const x=await api("/rest-orders/"+o.id+"/"); setO(x); };
+  const add=async(it)=>{ await api("/rest-orders/"+o.id+"/add_item/",{method:"POST",body:JSON.stringify({name:it.name,price:String(it.mrp||0),qty:1,variant:it.default_variant||null})}); reload(); };
+  const addManual=async()=>{ if(!q.trim())return; await api("/rest-orders/"+o.id+"/add_item/",{method:"POST",body:JSON.stringify({name:q.trim(),price:0,qty:1})}); setQ(""); reload(); };
+  const remove=async(id)=>{ await api("/rest-orders/"+o.id+"/remove_item/",{method:"POST",body:JSON.stringify({item:id})}); reload(); };
+  const kot=async()=>{ const k=await api("/rest-orders/"+o.id+"/kot/",{method:"POST",body:JSON.stringify({})});
+    if(!k.items||k.items.length===0){setMsg(t("Koi naya item nahi","No new items"));setTimeout(()=>setMsg(""),2000);return;}
+    var w=window.open("","_blank","width=300,height=500"); w.document.write('<html><head><title>KOT</title></head><body style="font-family:monospace;padding:10px"><h3 style="text-align:center;margin:0">KOT — '+(k.table||"")+'</h3><div style="text-align:center;font-size:12px">'+k.order_no+' · '+k.time+'</div><hr>'+k.items.map(function(i){return '<div style="font-size:16px;padding:3px 0">'+i.qty+' × '+i.name+(i.note?' <i>('+i.note+')</i>':'')+'</div>';}).join('')+'<hr><div style="text-align:center;font-size:11px">Digital Munshi</div><script>window.onload=function(){window.print();}<\/script></body></html>'); w.document.close(); reload(); };
+  const settle=async()=>{ if(!confirm(t("Settle & bill banao?","Settle & bill?")))return; try{const r=await api("/rest-orders/"+o.id+"/settle/",{method:"POST",body:JSON.stringify({})}); alert(r.detail||"Billed"); onBack();}catch(e){alert((e&&e.detail)||"Settle failed");} };
+  const filt=items.filter(x=>!q||x.name.toLowerCase().includes(q.toLowerCase()));
+  return (<div className="p-6">
+    <button onClick={onBack} className="text-blue-700 text-sm mb-2">← {t("All tables","सभी टेबल")}</button>
+    <div className="grid md:grid-cols-2 gap-4">
+      <div>
+        <div className="font-bold text-lg mb-2">🍽️ {table.name} · {o.order_no}</div>
+        <input className="border p-2 rounded w-full mb-2" placeholder={t("Search / type item…","आइटम खोजें…")} value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addManual()} />
+        <div className="card max-h-72 overflow-y-auto">{filt.slice(0,50).map(it=><button key={it.id} onClick={()=>add(it)} className="flex justify-between w-full p-2 border-b hover:bg-slate-50 text-sm"><span>{it.name}</span><span className="text-slate-500">{money(it.mrp)}</span></button>)}
+          {q&&filt.length===0&&<button onClick={addManual} className="w-full p-2 text-orange-700 text-sm">+ "{q}" add karo (₹0)</button>}</div>
+      </div>
+      <div>
+        <div className="font-bold mb-2">{t("Order","ऑर्डर")}</div>
+        <div className="card p-3 min-h-[120px]">{(o.items||[]).length===0&&<div className="text-slate-400 text-sm">{t("Items add karo","Add items")}</div>}
+          {(o.items||[]).map(i=><div key={i.id} className="flex justify-between items-center py-1.5 border-b text-sm"><span>{i.qty} × {i.name} {i.kot_sent&&<span className="text-green-600 text-xs">✓KOT</span>}</span><span className="flex items-center gap-2">{money(i.amount)}<button onClick={()=>remove(i.id)} className="text-red-500 text-xs">✕</button></span></div>)}
+          <div className="flex justify-between font-extrabold mt-2 pt-1"><span>Total</span><span style={{color:"#c2410c"}}>{money(o.total)}</span></div>
+        </div>
+        {msg&&<div className="text-sm text-slate-500 mt-1">{msg}</div>}
+        <div className="flex gap-2 mt-3">
+          <button onClick={kot} className="flex-1 bg-slate-800 text-white py-2.5 rounded-xl font-bold text-sm">🖨 {t("Print KOT","KOT प्रिंट")}</button>
+          <button onClick={settle} className="flex-1 text-white py-2.5 rounded-xl font-bold text-sm" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}>💵 {t("Settle & Bill","सेटल")}</button>
+        </div>
+      </div>
+    </div>
+  </div>);
+}
+
 // ---------- Online Orders (store) ----------
 function StoreLinkCard(){
   const [me,setMe]=useState(null),[msg,setMsg]=useState("");
@@ -3138,7 +3200,7 @@ function App(){
   const isAdmin = me && me.is_platform_admin;
   const toggleTheme=()=>setTheme(t=>t==="dark"?"light":"dark");
   const logout=()=>{ clearAuth(); setAuthed(false); setSub(null); };
-  const nav=[["dash",t("Dashboard","डैशबोर्ड")],["pos",t("POS Billing","POS बिलिंग")],["sale",t("New Sale","नई बिक्री")],["vouchers",t("Sales & Transactions","बिक्री व लेन-देन")],["orders",t("Online Orders","ऑनलाइन ऑर्डर")],["items",t("Items","आइटम")],["parties",t("Parties","पार्टी")],["cashbank",t("Cash & Bank","कैश व बैंक")],["accounting",t("Accounting","अकाउंटिंग")],["reports",t("Reports","रिपोर्ट")],["utils",t("Utilities","यूटिलिटीज़")],["whatsapp",t("WhatsApp","व्हाट्सएप")],["hr",t("HR / Payroll","HR / पेरोल")],["committee",t("Committee / BC","कमेटी / BC")],["market",t("Marketplace","मार्केटप्लेस")],["staff",t("App Users","ऐप यूज़र")],["settings",t("Settings","सेटिंग्स")],["plan",t("Subscription","सब्सक्रिप्शन")]];
+  const nav=[["dash",t("Dashboard","डैशबोर्ड")],["pos",t("POS Billing","POS बिलिंग")],["sale",t("New Sale","नई बिक्री")],["vouchers",t("Sales & Transactions","बिक्री व लेन-देन")],["orders",t("Online Orders","ऑनलाइन ऑर्डर")],["items",t("Items","आइटम")],["parties",t("Parties","पार्टी")],["cashbank",t("Cash & Bank","कैश व बैंक")],["accounting",t("Accounting","अकाउंटिंग")],["reports",t("Reports","रिपोर्ट")],["utils",t("Utilities","यूटिलिटीज़")],["whatsapp",t("WhatsApp","व्हाट्सएप")],["hr",t("HR / Payroll","HR / पेरोल")],["committee",t("Committee / BC","कमेटी / BC")],["restaurant",t("Restaurant","रेस्टोरेंट")],["market",t("Marketplace","मार्केटप्लेस")],["staff",t("App Users","ऐप यूज़र")],["settings",t("Settings","सेटिंग्स")],["plan",t("Subscription","सब्सक्रिप्शन")]];
   if(isAdmin) nav.push(["admin","Platform Admin"]);
   // Plan-based feature gating — jo plan me hai wahi feature dikhe
   const feats = (me && me.features) || null;
@@ -3190,6 +3252,7 @@ function App(){
             {tab==="hr" && <HRView/>}
             {tab==="committee" && <CommitteeView/>}
             {tab==="market" && <MarketplaceView/>}
+            {tab==="restaurant" && <RestaurantView/>}
             {tab==="orders" && <OrdersView/>}
             {tab==="staff" && <StaffView/>}
             {tab==="settings" && <Settings onSaved={()=>{}} />}

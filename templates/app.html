@@ -190,7 +190,12 @@ async function api(path, opts={}, _retried){
   }
   const ct = res.headers.get("content-type")||"";
   const data = ct.includes("json") ? await res.json() : await res.text();
-  if(!res.ok) throw data;
+  if(!res.ok){
+    // Structured error: JSON body as-is, warna status + text snippet — taaki asli wajah dikhe
+    let err = (data && typeof data==="object") ? data : {detail:("HTTP "+res.status+(data?": "+String(data).replace(/<[^>]*>/g,"").trim().slice(0,200):""))};
+    try{ err.__status = res.status; }catch(_){}
+    throw err;
+  }
   return data;
 }
 const money = n => "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
@@ -894,17 +899,25 @@ function ItemForm({item,onClose,onSaved}){
       setUnits(us=>[...us,u]); set("primary_unit",u.id); setNewUnit(""); }catch(e){ setErr("Could not add unit (maybe duplicate)"); } };
   const save=async()=>{ if(!f.name){setErr("Item name is required");return;} if(!f.primary_unit){setErr("Select a primary unit");return;}
     setBusy(true); setErr("");
+    // ---- CORE create/update: ise fail hone pe hi asli error dikhao ----
+    let it;
     try{
       const body={name:f.name,item_type:f.item_type,hsn_code:f.hsn_code,mrp:String(f.mrp||0),reorder_level:String(f.reorder_level||0),
         is_combo:!!f.is_combo, primary_unit:+f.primary_unit, conversion_factor:String(f.conversion_factor||1)};
       if(f.category) body.category=+f.category;
       if(f.secondary_unit) body.secondary_unit=+f.secondary_unit;
       if(f.tax_rate) body.tax_rate=+f.tax_rate;
-      const it=item?await api(`/items/${item.id}/`,{method:"PATCH",body:JSON.stringify(body)})
-                    :await api("/items/",{method:"POST",body:JSON.stringify(body)});
-      if(imgFile){ const ifd=new FormData(); ifd.append("image",imgFile); await fetch(API+`/items/${it.id}/upload_image/`,{method:"POST",headers:{Authorization:"Bearer "+getToken()},body:ifd}).catch(()=>{}); }
-      // fetch variant id
-      const full=await api(`/items/${it.id}/`);
+      it=item?await api(`/items/${item.id}/`,{method:"PATCH",body:JSON.stringify(body)})
+             :await api("/items/",{method:"POST",body:JSON.stringify(body)});
+    }catch(e){ setErr(errMsg(e)); setBusy(false); return; }
+    // ---- EXTRAS: best-effort. Item ban chuka hai — inme se koi fail ho to save block na ho ----
+    let imgWarn="";
+    try{
+      if(imgFile){ const ifd=new FormData(); ifd.append("image",imgFile);
+        const r=await fetch(API+`/items/${it.id}/upload_image/`,{method:"POST",headers:{Authorization:"Bearer "+getToken()},body:ifd});
+        if(!r.ok){ imgWarn=" (photo upload nahi hua)"; }
+      }
+      const full=await api(`/items/${it.id}/`).catch(()=>({variants:[]}));
       const variant=full.variants&&full.variants[0];
       if(f.is_combo){ for(const c of (f.components||[])){ if(c.component&&c.quantity) await api("/item-components/",{method:"POST",body:JSON.stringify({parent:it.id,component:+c.component,quantity:String(c.quantity)})}).catch(()=>{}); } }
       if(variant){
@@ -919,8 +932,9 @@ function ItemForm({item,onClose,onSaved}){
         // opening stock
         if(+f.opening_qty&&f.opening_godown) await api("/stock/",{method:"POST",body:JSON.stringify({variant:variant.id,godown:+f.opening_godown,batch:batchId,quantity:String(f.opening_qty)})}).catch(()=>{});
       }
-      onSaved();
-    }catch(e){ setErr(typeof e==="object"?Object.entries(e).map(([k,val])=>`${k}: ${val}`).join(", "):"Save fail"); setBusy(false); } };
+    }catch(ex){ console.warn("item extras warning:", ex); }
+    if(imgWarn) alert(t("Item save ho gaya","आइटम सेव हो गया")+imgWarn);
+    onSaved(); };
   const cell="border border-slate-200 p-2 rounded-lg w-full text-sm mt-1";
   const I=(label,k,props={})=>(<div><label className="text-xs font-semibold text-slate-500">{label}</label><input className={cell} value={f[k]} onChange={e=>set(k,e.target.value)} {...props}/></div>);
   return (

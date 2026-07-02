@@ -416,6 +416,26 @@ def tool_emi(request):
     return _tool(request, "tool_emi.html")
 
 
+def tool_fdrdsip(request):
+    return _tool(request, "tool_fdrdsip.html")
+
+
+def tool_interest(request):
+    return _tool(request, "tool_interest.html")
+
+
+def tool_breakeven(request):
+    return _tool(request, "tool_breakeven.html")
+
+
+def tool_salary(request):
+    return _tool(request, "tool_salary.html")
+
+
+def tool_gstin(request):
+    return _tool(request, "tool_gstin.html")
+
+
 def tool_discount(request):
     return _tool(request, "tool_discount.html")
 

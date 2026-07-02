@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Break-Even Point Calculator for Business | Digital Munshi</title>
+<meta name="description" content="Free break-even point calculator. Find how many units and what revenue you need to cover costs, plus contribution margin and margin of safety. No signup.">
+<meta name="keywords" content="break even calculator, break even point, contribution margin, margin of safety">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/break-even-calculator/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold">Break-Even Calculator</h1>
+  <p class="text-slate-500 mt-2 mb-5">How many units (and what sales) you need to cover all costs.</p>
+  <div class="bg-white border border-slate-100 rounded-2xl p-6 space-y-3">
+    <div><label class="text-sm font-semibold text-slate-600">Fixed costs / month (₹)</label><input id="fc" type="number" value="50000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"><span class="text-xs text-slate-400">Rent, salary, etc.</span></div>
+    <div><label class="text-sm font-semibold text-slate-600">Selling price per unit (₹)</label><input id="sp" type="number" value="100" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div><label class="text-sm font-semibold text-slate-600">Variable cost per unit (₹)</label><input id="vc" type="number" value="60" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"><span class="text-xs text-slate-400">Purchase cost, packaging, etc.</span></div>
+    <div><label class="text-sm font-semibold text-slate-600">Expected monthly sales (units, optional)</label><input id="exp" type="number" value="2000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div class="rounded-xl bg-slate-50 p-4 text-sm space-y-1 mt-2">
+      <div class="flex justify-between"><span>Contribution / unit</span><b id="cm">₹0</b></div>
+      <div class="flex justify-between text-lg font-extrabold" style="color:#c2410c"><span>Break-even units</span><b id="beu">0</b></div>
+      <div class="flex justify-between"><span>Break-even sales</span><b id="ber">₹0</b></div>
+      <div class="flex justify-between" id="mosRow"><span>Margin of safety</span><b id="mos">—</b></div>
+    </div>
+  </div>
+</section>
+{% include "_tool_links.html" %}
+{% include "_seo_footer.html" %}
+{% include "_floatwa.html" %}
+<script>
+function fmt(n){return "₹"+Math.round(n).toLocaleString("en-IN");}
+function calc(){var fc=parseFloat(document.getElementById("fc").value)||0,sp=parseFloat(document.getElementById("sp").value)||0,vc=parseFloat(document.getElementById("vc").value)||0,exp=parseFloat(document.getElementById("exp").value)||0;
+  var cm=sp-vc; document.getElementById("cm").textContent=fmt(cm);
+  if(cm<=0){document.getElementById("beu").textContent="—";document.getElementById("ber").textContent="Price must exceed cost";document.getElementById("mos").textContent="—";return;}
+  var beu=fc/cm; document.getElementById("beu").textContent=Math.ceil(beu).toLocaleString("en-IN")+" units";
+  document.getElementById("ber").textContent=fmt(beu*sp);
+  if(exp>0){var mos=(exp-beu)/exp*100; document.getElementById("mos").textContent=(mos>=0?"+":"")+mos.toFixed(1)+"% ("+(exp>=beu?"safe":"loss")+")";document.getElementById("mos").style.color=mos>=0?"#059669":"#dc2626";}
+  else document.getElementById("mos").textContent="—";}
+calc();
+</script></body></html>

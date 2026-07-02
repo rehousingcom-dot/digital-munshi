@@ -1,0 +1,58 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salary / CTC Breakup Calculator (In-hand) | Digital Munshi</title>
+<meta name="description" content="Free salary CTC breakup calculator. See Basic, HRA, PF, gratuity and estimated monthly in-hand salary from your CTC. No signup.">
+<meta name="keywords" content="salary calculator, CTC breakup, in hand salary calculator, take home salary India">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/salary-calculator/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold">Salary / CTC Breakup Calculator</h1>
+  <p class="text-slate-500 mt-2 mb-5">Estimate Basic, HRA, PF, gratuity and monthly in-hand from annual CTC.</p>
+  <div class="bg-white border border-slate-100 rounded-2xl p-6 space-y-3">
+    <div><label class="text-sm font-semibold text-slate-600">Annual CTC (₹)</label><input id="ctc" type="number" value="600000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div class="grid grid-cols-2 gap-3">
+      <label class="flex items-center gap-2 text-sm"><input id="metro" type="checkbox" checked onchange="calc()"> Metro city (HRA 50%)</label>
+      <label class="flex items-center gap-2 text-sm"><input id="pf" type="checkbox" checked onchange="calc()"> PF applicable</label>
+    </div>
+    <div class="rounded-xl bg-slate-50 p-4 text-sm space-y-1 mt-2">
+      <div class="flex justify-between"><span>Basic (50% CTC)</span><b id="basic">₹0</b></div>
+      <div class="flex justify-between"><span>HRA</span><b id="hra">₹0</b></div>
+      <div class="flex justify-between"><span>Special allowance</span><b id="spec">₹0</b></div>
+      <div class="flex justify-between"><span>Employer PF</span><b id="epf">₹0</b></div>
+      <div class="flex justify-between border-t pt-1"><span>Gross (yearly)</span><b id="gross">₹0</b></div>
+      <div class="flex justify-between"><span>Deductions (PF + PT)</span><b id="ded" style="color:#dc2626">₹0</b></div>
+      <div class="flex justify-between text-lg font-extrabold" style="color:#c2410c"><span>In-hand / month</span><b id="inhand">₹0</b></div>
+    </div>
+    <p class="text-xs text-slate-400">Estimate only — actual take-home depends on income tax, company policy and other components.</p>
+  </div>
+</section>
+{% include "_tool_links.html" %}
+{% include "_seo_footer.html" %}
+{% include "_floatwa.html" %}
+<script>
+function fmt(n){return "₹"+Math.round(n).toLocaleString("en-IN");}
+function calc(){var ctc=parseFloat(document.getElementById("ctc").value)||0;
+  var metro=document.getElementById("metro").checked, pfOn=document.getElementById("pf").checked;
+  var basic=ctc*0.5;
+  var hra=basic*(metro?0.5:0.4);
+  var epf=pfOn?Math.min(basic,180000)*0.12:0; // employer PF (cap ~15000/mo basic)
+  var gratuity=basic*0.0481;
+  var spec=ctc-basic-hra-epf-gratuity; if(spec<0)spec=0;
+  var gross=basic+hra+spec; // employee gross (excl employer PF & gratuity)
+  var empPF=pfOn?Math.min(basic,180000)*0.12:0;
+  var pt=2400; // professional tax approx/year
+  var ded=empPF+pt;
+  var inhandYear=gross-ded;
+  document.getElementById("basic").textContent=fmt(basic);
+  document.getElementById("hra").textContent=fmt(hra);
+  document.getElementById("spec").textContent=fmt(spec);
+  document.getElementById("epf").textContent=fmt(epf);
+  document.getElementById("gross").textContent=fmt(gross);
+  document.getElementById("ded").textContent=fmt(ded);
+  document.getElementById("inhand").textContent=fmt(inhandYear/12);}
+calc();
+</script></body></html>

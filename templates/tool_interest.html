@@ -1,0 +1,48 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simple & Compound Interest Calculator | Digital Munshi</title>
+<meta name="description" content="Free simple and compound interest calculator. Calculate interest and total amount for any principal, rate and time. No signup.">
+<meta name="keywords" content="simple interest calculator, compound interest calculator, interest calculator India">
+<link rel="canonical" href="https://erp.reloaddigital.in/tools/interest-calculator/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/tools/" class="text-sm font-semibold text-slate-600">All tools</a></div></header>
+<section class="max-w-xl mx-auto px-5 py-10">
+  <h1 class="text-3xl font-extrabold">Interest Calculator</h1>
+  <p class="text-slate-500 mt-2 mb-5">Simple or compound interest — total interest and amount payable.</p>
+  <div class="flex gap-2 mb-4">
+    <button id="tS" onclick="setT('S')" class="px-4 py-2 rounded-full text-sm font-semibold text-white" style="background:#c2410c">Simple</button>
+    <button id="tC" onclick="setT('C')" class="px-4 py-2 rounded-full text-sm font-semibold bg-slate-100">Compound</button>
+  </div>
+  <div class="bg-white border border-slate-100 rounded-2xl p-6 space-y-3">
+    <div><label class="text-sm font-semibold text-slate-600">Principal (₹)</label><input id="p" type="number" value="100000" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div><label class="text-sm font-semibold text-slate-600">Rate (% per year)</label><input id="r" type="number" value="10" step="0.1" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div><label class="text-sm font-semibold text-slate-600">Time (years)</label><input id="t" type="number" value="3" step="0.1" oninput="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl"></div>
+    <div id="freqWrap" class="hidden"><label class="text-sm font-semibold text-slate-600">Compounding</label>
+      <select id="freq" onchange="calc()" class="w-full p-3 mt-1 border border-slate-200 rounded-xl bg-white"><option value="1">Yearly</option><option value="2">Half-yearly</option><option value="4">Quarterly</option><option value="12">Monthly</option></select></div>
+    <div class="rounded-xl bg-slate-50 p-4 text-sm space-y-1 mt-2">
+      <div class="flex justify-between text-lg font-extrabold" style="color:#c2410c"><span>Interest</span><b id="int">₹0</b></div>
+      <div class="flex justify-between"><span>Total amount</span><b id="tot">₹0</b></div>
+    </div>
+  </div>
+</section>
+{% include "_tool_links.html" %}
+{% include "_seo_footer.html" %}
+{% include "_floatwa.html" %}
+<script>
+var T="S";
+function fmt(n){return "₹"+Math.round(n).toLocaleString("en-IN");}
+function setT(x){T=x;document.getElementById("tS").style.background=x==="S"?"#c2410c":"";document.getElementById("tC").style.background=x==="C"?"#c2410c":"";
+  document.getElementById("tS").className="px-4 py-2 rounded-full text-sm font-semibold "+(x==="S"?"text-white":"bg-slate-100");
+  document.getElementById("tC").className="px-4 py-2 rounded-full text-sm font-semibold "+(x==="C"?"text-white":"bg-slate-100");
+  document.getElementById("freqWrap").className = x==="C"?"":"hidden"; calc();}
+function calc(){var P=parseFloat(document.getElementById("p").value)||0,r=parseFloat(document.getElementById("r").value)||0,t=parseFloat(document.getElementById("t").value)||0;
+  var interest=0,total=0;
+  if(T==="S"){ interest=P*r*t/100; total=P+interest; }
+  else { var n=parseInt(document.getElementById("freq").value)||1; total=P*Math.pow(1+(r/100)/n, n*t); interest=total-P; }
+  document.getElementById("int").textContent=fmt(interest);
+  document.getElementById("tot").textContent=fmt(total);}
+setT("S");
+</script></body></html>

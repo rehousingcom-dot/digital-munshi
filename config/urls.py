@@ -110,7 +110,7 @@ def sitemap_xml(request):
     urls += [base + "/tools/emi-calculator/", base + "/tools/discount-calculator/", base + "/tools/profit-margin-calculator/", base + "/tools/rupees-in-words/", base + "/tools/barcode-generator/", base + "/tools/upi-qr-code-generator/", base + "/tools/chit-fund-calculator/"]
     urls += [base + "/tools/fd-rd-sip-calculator/", base + "/tools/interest-calculator/", base + "/tools/break-even-calculator/", base + "/tools/salary-calculator/", base + "/tools/gstin-verifier/"]
     urls += [base + "/tools/income-tax-calculator/", base + "/tools/gst-late-fee-calculator/", base + "/tools/tds-calculator/"]
-    urls += [base + "/tools/poster-maker/", base + "/tools/bill-receipt-format/"]
+    urls += [base + "/tools/poster-maker/", base + "/tools/bill-receipt-format/", base + "/tools/jewellery-price-calculator/"]
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     for u in urls:
         body += f"<url><loc>{u}</loc><changefreq>weekly</changefreq></url>"
@@ -281,6 +281,7 @@ urlpatterns = [
     path("tools/tds-calculator/", core_views.tool_tds, name="tool_tds"),
     path("tools/poster-maker/", core_views.tool_poster, name="tool_poster"),
     path("tools/bill-receipt-format/", core_views.tool_formats, name="tool_formats"),
+    path("tools/jewellery-price-calculator/", core_views.tool_jewellery, name="tool_jewellery"),
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_xml, name="sitemap"),
     path("shop/<uuid:catalog_uuid>/", core_views.catalog_shop, name="catalog_shop"),

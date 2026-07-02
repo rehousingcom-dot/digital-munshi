@@ -179,6 +179,41 @@ def landing(request):
     return render(request, "landing.html", {"plans": plans})
 
 
+def about_page(request):
+    from django.shortcuts import render
+    return render(request, "about.html")
+
+
+def legal_page(request):
+    """Privacy / Terms — path se decide."""
+    from django.shortcuts import render
+    slug = request.path.strip("/")
+    if slug == "privacy":
+        title = "Privacy Policy"
+        body = (
+            "<p><b>Reload Digital India</b> ('we') operates Digital Munshi. This policy explains how we handle your data.</p>"
+            "<h2 class='text-lg font-bold mt-4'>What we collect</h2><p>Account details (name, email, phone, business name) and the business data you enter (invoices, items, parties, payments). We do not sell your data to anyone.</p>"
+            "<h2 class='text-lg font-bold mt-4'>How we use it</h2><p>Only to provide the service — billing, reports, backups and support. Your business data is private to your account.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Security</h2><p>Data is encrypted in transit and backed up daily. Access is restricted to your authorised users.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Your rights</h2><p>You can export or request deletion of your data anytime by emailing support@reloaddigital.in.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Contact</h2><p>support@reloaddigital.in</p>")
+    else:
+        title = "Terms of Service"
+        body = (
+            "<p>By using Digital Munshi (by Reload Digital India) you agree to these terms.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Service</h2><p>We provide billing, accounting and related business software on a subscription basis, with a free trial. Features depend on your chosen plan.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Your responsibility</h2><p>You are responsible for the accuracy of the data you enter and for complying with applicable tax and legal requirements. You must keep your login credentials secure.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Billing</h2><p>Subscriptions are billed as per the selected plan and cycle. You can cancel anytime; access continues until the end of the paid period.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Liability</h2><p>The service is provided 'as is'. We are not liable for indirect losses. Always keep your own records for critical compliance.</p>"
+            "<h2 class='text-lg font-bold mt-4'>Contact</h2><p>support@reloaddigital.in</p>")
+    return render_legal(request, title, body, slug)
+
+
+def render_legal(request, title, body, slug):
+    from django.shortcuts import render
+    return render(request, "legal_page.html", {"title": title, "body": body, "slug": slug})
+
+
 def _notify_lead_email(lead):
     """Naya lead aane par owner ko email (Resend)."""
     from django.conf import settings

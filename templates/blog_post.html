@@ -40,7 +40,9 @@
     {% for s, t in other %}<a href="{{ pre }}/blog/{{ s }}/" class="block text-orange-700 hover:underline text-sm">→ {{ t }}</a>{% endfor %}
   </div>
 </section>
-<footer class="border-t py-8 text-center text-sm text-slate-400">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Home</a></footer>
+{% include "_cta_band.html" %}
+{% include "_seo_footer.html" %}
+
 {% include "_floatwa.html" %}
 </body>
 </html>

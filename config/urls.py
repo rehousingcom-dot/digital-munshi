@@ -94,7 +94,8 @@ def sitemap_xml(request):
     base = "https://erp.reloaddigital.in"
     urls = [base + "/welcome/", base + "/", base + "/blog/"]
     from apps.core.marketing import CITIES
-    urls += [base + "/suppliers/"]
+    urls += [base + "/suppliers/", base + "/about/", base + "/pricing/",
+             base + "/privacy/", base + "/terms/"]
     urls += [base + "/software/" + s + "/" for s in KEYWORD_PAGES]
     urls += [base + "/blog/" + s + "/" for s in BLOG_POSTS]
     urls += [base + "/billing-software-in-" + s + "/" for s in CITIES]
@@ -238,6 +239,10 @@ urlpatterns = [
     path("portal/<uuid:share>/", party_extra.customer_portal, name="customer_portal"),
     path("party/<int:pk>/statement/", party_extra.party_statement_doc, name="party_statement_doc"),
     path("welcome/", core_views.landing, name="landing"),
+    path("pricing/", core_views.landing, name="pricing"),
+    path("about/", core_views.about_page, name="about"),
+    path("privacy/", core_views.legal_page, name="privacy"),
+    path("terms/", core_views.legal_page, name="terms"),
     path("api/lead/", core_views.lead_create, name="lead_create"),
     path("software/<slug:slug>/", core_views.keyword_page, name="keyword_page"),
     path("blog/", core_views.blog_index, name="blog_index"),

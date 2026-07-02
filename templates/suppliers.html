@@ -71,7 +71,9 @@
   </div>
 </div>
 
-<footer class="border-t py-8 text-center text-sm text-slate-400 bg-white">© 2026 Reload Digital India · <a href="/welcome/" class="text-orange-600">Digital Munshi</a></footer>
+{% include "_cta_band.html" %}
+{% include "_seo_footer.html" %}
+
 <script>
 var curOrg=null;
 function openEnq(id,name){ curOrg=id; document.getElementById("enqName").textContent=name; document.getElementById("enqMsg").textContent=""; document.getElementById("enqBox").style.display="flex"; }

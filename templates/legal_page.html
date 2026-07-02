@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }} — Digital Munshi</title>
+<meta name="description" content="{{ title }} for Digital Munshi (Reload Digital India) — GST billing & accounting software.">
+<link rel="canonical" href="https://erp.reloaddigital.in/{{ slug }}/"><meta name="robots" content="index, follow">
+<script src="https://cdn.tailwindcss.com"></script>{% include "_analytics.html" %}</head>
+<body class="text-slate-800 bg-white">
+<header class="border-b sticky top-0 bg-white/90 backdrop-blur z-20"><div class="max-w-4xl mx-auto px-5 py-3 flex items-center justify-between">
+  <a href="/welcome/" class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">DM</div><span class="font-extrabold text-lg">Digital Munshi</span></a>
+  <a href="/" class="text-white px-4 py-2 rounded-xl text-sm font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Free Trial</a></div></header>
+<section class="max-w-3xl mx-auto px-5 py-10">
+  <nav class="text-xs text-slate-400 mb-4"><a href="/welcome/" class="hover:text-orange-600">Home</a> › {{ title }}</nav>
+  <h1 class="text-3xl font-extrabold mb-4">{{ title }}</h1>
+  <div class="prose text-slate-600 space-y-3">{{ body|safe }}</div>
+  <p class="text-sm text-slate-400 mt-8">Questions? <a href="mailto:support@reloaddigital.in" class="text-orange-600">support@reloaddigital.in</a></p>
+</section>
+{% include "_seo_footer.html" %}
+{% include "_floatwa.html" %}
+</body></html>

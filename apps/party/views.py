@@ -77,6 +77,30 @@ class PartyViewSet(OrgScopedQuerysetMixin, viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ["name", "legal_name", "gstin", "phone"]
 
+    POINT_VALUE = 1  # ₹1 per loyalty point
+    MIN_REDEEM = 100  # min points to redeem
+
+    @action(detail=True, methods=["post"])
+    def redeem_points(self, request, pk=None):
+        """Loyalty points redeem karo → rupee discount value milta hai.
+        body: {points}  (default = saare available points)"""
+        p = self.get_object()
+        avail = int(p.loyalty_points or 0)
+        req = request.data.get("points")
+        pts = int(req) if req not in (None, "") else avail
+        if pts <= 0:
+            return Response({"detail": "Kuch points redeem karne ke liye chahiye"}, status=400)
+        if pts > avail:
+            return Response({"detail": f"Sirf {avail} points available"}, status=400)
+        if avail >= self.MIN_REDEEM and pts < self.MIN_REDEEM:
+            return Response({"detail": f"Minimum {self.MIN_REDEEM} points redeem karo"}, status=400)
+        value = pts * self.POINT_VALUE
+        p.loyalty_points = avail - pts
+        p.save(update_fields=["loyalty_points"])
+        return Response({"redeemed_points": pts, "value": value,
+                         "remaining_points": p.loyalty_points,
+                         "detail": f"{pts} points = ₹{value} discount. Bill me ₹{value} kam kar do."})
+
     @action(detail=False, methods=["get"])
     def check_duplicate(self, request):
         """Deck slide 4: duplicate party name warning.

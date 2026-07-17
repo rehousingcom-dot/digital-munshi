@@ -4,6 +4,7 @@ Run: python manage.py test
 from datetime import date, timedelta
 from django.test import TestCase
 from django.utils import timezone
+from django.core.cache import cache
 from rest_framework.test import APIClient
 
 from apps.tenants.models import Subscription, Plan
@@ -21,8 +22,13 @@ class SaaSFlowTests(TestCase):
         self.c = APIClient()
 
     def _signup(self, username, org, btype="RETAIL"):
+        # Signup ab email + OTP maangta hai (feature: mobile/OTP verification).
+        # Test me OTP seedhe cache me daal do (locmem cache), phir wahi bhej do.
+        email = username + "@test.com"
+        cache.set("otp:" + email, "123456", 600)
         r = self.c.post("/api/signup/", {"username": username, "password": "pass12345",
-                                         "org_name": org, "business_type": btype}, format="json")
+                                         "org_name": org, "business_type": btype,
+                                         "email": email, "otp": "123456"}, format="json")
         self.assertEqual(r.status_code, 201)
         return r.json()["tokens"]["access"]
 
@@ -75,7 +81,7 @@ class SaaSFlowTests(TestCase):
         sub.trial_ends_at = timezone.now() - timedelta(days=1)
         sub.save()
         self.assertEqual(self.c.get("/api/items/").status_code, 402)
-        o = self.c.post("/api/subscription/create_order/", {"plan_code": "basic", "cycle": "MONTHLY"}, format="json").json()
+        o = self.c.post("/api/subscription/create_order/", {"plan_code": "starter", "cycle": "MONTHLY"}, format="json").json()
         self.c.post("/api/subscription/verify/", {"razorpay_order_id": o["order_id"]}, format="json")
         self.assertEqual(self.c.get("/api/items/").status_code, 200)
 

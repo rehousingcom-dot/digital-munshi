@@ -442,7 +442,7 @@ function Subscribe({sub,onActivated}){
         theme:{color:"#1F4E79"} });
       rzp.on("payment.failed",function(r){ setErr("Payment failed: "+((r&&r.error&&r.error.description)||"unknown")); });
       rzp.open(); setBusy("");
-    }catch(e){ setErr(JSON.stringify(e)); setBusy(""); } };
+    }catch(e){ setErr(errMsg(e)); setBusy(""); } };
   const expired = sub && !sub.access_allowed;
   return (
     <div className="p-6">
@@ -763,7 +763,7 @@ function PartyForm({party,onClose,onSaved}){
       if(docFile){ const fd=new FormData(); fd.append("party",saved.id); fd.append("title",docTitle||docFile.name); fd.append("file",docFile);
         await fetch(API+"/party-documents/",{method:"POST",headers:{Authorization:"Bearer "+getToken()},body:fd}); }
       onSaved();
-    }catch(e){ setErr(typeof e==="object"?Object.entries(e).map(([k,v])=>`${k}: ${v}`).join(", "):"Could not save"); setBusy(false); } };
+    }catch(e){ setErr(errMsg(e)); setBusy(false); } };
   const I=(label,k,props={})=>(<div><label className="text-xs font-semibold text-slate-500">{label}</label>
     <input className="border border-slate-200 w-full p-2 rounded-lg text-sm mt-1" value={f[k]||""} onChange={e=>set(k,e.target.value)} {...props}/></div>);
   return (
@@ -1149,7 +1149,7 @@ function NewSale({initialDoc}){
       if(+received>0 && (docType==="SALE"||docType==="PURCHASE")){
         await api("/payments/",{method:"POST",body:JSON.stringify({payment_type:docType==="SALE"?"RECEIPT":"PAYMENT",date,party:+party,amount:String(received),mode})}).catch(()=>{}); }
       setDone(v); setLines([blank()]); setParty(""); setReceived("");
-    }catch(e){ setErr(typeof e==="object"?JSON.stringify(e):String(e)); } };
+    }catch(e){ setErr(errMsg(e)); } };
   const cell="border border-slate-200 p-1.5 rounded-lg w-full text-sm";
   return (
     <div className="p-6 max-w-6xl fade-in">
@@ -1504,7 +1504,7 @@ function CashBankModal({modal,parties,expCats,onClose,onSaved}){
         if(f.newCat&&f.newCat.trim()){ const c=await api("/expense-categories/",{method:"POST",body:JSON.stringify({name:f.newCat.trim()})}).catch(()=>null); if(c)catId=c.id; }
         await api("/expenses/",{method:"POST",body:JSON.stringify({date:f.date||today,category:catId,party:f.party?+f.party:null,amount:String(f.amount||0),tax_amount:String(f.tax_amount||0),mode:f.mode||"CASH",reference:f.reference||"",notes:f.notes||""})}); }
       onSaved();
-    }catch(e){ setErr(typeof e==="object"?JSON.stringify(e):"Save fail"); setBusy(false); } };
+    }catch(e){ setErr(errMsg(e)); setBusy(false); } };
   const titles={accounts:"Add Bank / Cash Account",txn:"Money In / Out",cheques:"Add Cheque",loans:"Add Loan Account",expenses:"Add Expense"};
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{background:"rgba(15,23,42,.45)"}} onClick={onClose}>
@@ -1640,7 +1640,7 @@ function RecurringModal({voucher,onClose,onSaved}){
   const cell="border border-slate-200 p-2 rounded-lg w-full text-sm mt-1";
   const save=async()=>{ setBusy(true);setErr("");
     try{ await api("/recurring-invoices/",{method:"POST",body:JSON.stringify({name:f.name,source_voucher:voucher.id,frequency:f.frequency,start_date:f.start_date,next_run:f.start_date,end_date:f.end_date||null,is_active:true})}); onSaved();
-    }catch(e){ setErr(typeof e==="object"?JSON.stringify(e):"Save fail"); setBusy(false); } };
+    }catch(e){ setErr(errMsg(e)); setBusy(false); } };
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-24" style={{background:"rgba(15,23,42,.45)"}} onClick={onClose}>
       <div className="card w-full max-w-md overflow-hidden" onClick={e=>e.stopPropagation()}>
@@ -2021,7 +2021,7 @@ function StaffView(){
     try{ const r=await api("/staff/",{method:"POST",body:JSON.stringify(f)});
       setMsg(`✓ "${r.username}" add ho gaya (role: ${r.role}${r.temp_password?`, password: ${r.temp_password}`:""})`);
       setF({username:"",password:"",role:"OPERATOR",phone:""}); load();
-    }catch(e){ setErr(typeof e==="object"&&e.detail?e.detail:(typeof e==="object"?JSON.stringify(e):"Add fail")); }
+    }catch(e){ setErr(errMsg(e)); }
     setBusy(false); };
   const toggleActive=async r=>{ try{ await api(`/staff/${r.id}/`,{method:"PATCH",body:JSON.stringify({is_active:!r.is_active})}); load(); }catch(e){} };
   const roleColor={ADMIN:["#fef3c7","#92400e"],ACCOUNTANT:["#dbeafe","#1e40af"],OPERATOR:["#dcfce7","#166534"],VIEWER:["#f1f5f9","#64748b"]};
@@ -3058,7 +3058,7 @@ function POSView(){
       if(+received>0) await api("/payments/",{method:"POST",body:JSON.stringify({payment_type:"RECEIPT",date:payload.date,party:+pid,amount:String(received),mode:"CASH"})}).catch(()=>{});
       thermalPrint("Digital Munshi", v.number, payload.date, cart, totals, +received||totals.total);
       setDone(v); setCart([]); setReceived(""); setQ(""); if(scanRef.current)scanRef.current.focus();
-    }catch(e){ setErr(typeof e==="object"?JSON.stringify(e):"Checkout fail"); } };
+    }catch(e){ setErr(errMsg(e)); } };
   return (
     <div className="p-4 fade-in grid md:grid-cols-3 gap-4" style={{height:"calc(100vh - 90px)"}}>
       <div className="md:col-span-2 flex flex-col min-h-0">
@@ -3152,7 +3152,7 @@ function AccountModal({acc,onClose,onSaved}){
   const cell="border border-slate-200 p-2 rounded-lg w-full text-sm mt-1";
   const save=async()=>{ if(!f.code||!f.name){setErr("Code and name are required");return;} setBusy(true);
     try{ await api("/accounts-ledger/",{method:"POST",body:JSON.stringify({code:f.code,name:f.name,account_type:f.account_type,opening_balance:String(f.opening_balance||0)})}); onSaved();
-    }catch(e){ setErr(typeof e==="object"?JSON.stringify(e):"Save fail"); setBusy(false);} };
+    }catch(e){ setErr(errMsg(e)); setBusy(false);} };
   return (<div className="fixed inset-0 z-50 flex items-start justify-center pt-24" style={{background:"rgba(15,23,42,.45)"}} onClick={onClose}>
     <div className="card w-full max-w-md overflow-hidden" onClick={e=>e.stopPropagation()}>
       <div className="flex items-center justify-between px-6 py-4" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}><h3 className="text-white font-bold">Add Account</h3><button onClick={onClose} className="text-white text-xl">×</button></div>
@@ -3179,7 +3179,7 @@ function JournalModal({je,accounts,onClose,onSaved}){
     if(lines.length<2){setErr("At least 2 lines required");return;}
     setBusy(true);
     try{ await api("/journals/",{method:"POST",body:JSON.stringify({date:f.date,narration:f.narration,reference:f.reference||"",lines})}); onSaved();
-    }catch(e){ setErr(typeof e==="object"?(e.detail||JSON.stringify(e)):"Save fail"); setBusy(false);} };
+    }catch(e){ setErr(errMsg(e)); setBusy(false);} };
   return (<div className="fixed inset-0 z-50 flex items-start justify-center pt-16 overflow-y-auto" style={{background:"rgba(15,23,42,.45)"}} onClick={onClose}>
     <div className="card my-8 w-full max-w-2xl overflow-hidden" onClick={e=>e.stopPropagation()}>
       <div className="flex items-center justify-between px-6 py-4" style={{background:"linear-gradient(135deg,#ea6a1e,#c2410c)"}}><h3 className="text-white font-bold">Manual Journal Entry</h3><button onClick={onClose} className="text-white text-xl">×</button></div>

@@ -48,30 +48,12 @@ def committee_public(request, public_uuid):
 
 @csrf_exempt
 def api_public_bid(request, public_uuid):
-    """Member apni boli daalta hai. body: {member, bid_amount}"""
-    if request.method != "POST":
-        return JsonResponse({"detail": "POST only"}, status=405)
-    c = _get_committee(public_uuid)
-    if not c or not c.bidding_open or not c.open_month:
-        return JsonResponse({"detail": "Boli abhi band hai"}, status=400)
-    if not c.bidding_live():
-        return JsonResponse({"detail": "Boli ka time khatam ho gaya"}, status=400)
-    try:
-        data = json.loads(request.body or "{}")
-    except Exception:
-        data = request.POST
-    mid = data.get("member")
-    amt = data.get("bid_amount")
-    m = CommitteeMember.all_objects.filter(committee=c, id=mid).first()
-    if not m:
-        return JsonResponse({"detail": "Member select karo"}, status=400)
-    if not amt:
-        return JsonResponse({"detail": "Boli amount daalo"}, status=400)
-    bid, _ = CommitteeBid.all_objects.update_or_create(
-        committee=c, month_no=c.open_month, member=m,
-        defaults={"bid_amount": money(amt), "organization": c.organization})
-    return JsonResponse({"ok": True, "member": m.name, "bid": str(money(amt)),
-                         "month": c.open_month})
+    """DEPRECATED — common public link se boli band. Har member apne personal secure
+    link (/cm/<token>/) se hi boli daale taaki koi kisi aur ke naam boli na daal sake."""
+    return JsonResponse(
+        {"detail": "Boli sirf apne personal secure link (/cm/…) se daalein. "
+                   "Organizer ne aapko WhatsApp par bheja hai."},
+        status=403)
 
 
 @csrf_exempt

@@ -23,16 +23,8 @@
     {% if bid_live %}
       <p class="text-sm text-slate-500 mb-1">Month <b>{{ c.open_month }}</b> ki boli khuli hai. <b>Sabse zyada boli (discount)</b> wala uthayega.</p>
       {% if close_at %}<p class="text-xs font-semibold mb-3" style="color:#c2410c">⏰ Boli band hone ka time: {{ close_at|date:"d M Y, g:i A" }}</p>{% else %}<div class="mb-2"></div>{% endif %}
-      <div id="bidForm">
-        <label class="text-sm font-semibold">Aap kaun ho?</label>
-        <select id="member" class="w-full p-3 mt-1 mb-3 border border-slate-200 rounded-xl">
-          <option value="">— apna naam chuno —</option>
-          {% for m in members %}<option value="{{ m.id }}">{{ m.name }}</option>{% endfor %}
-        </select>
-        <label class="text-sm font-semibold">Aapki boli (₹ discount)</label>
-        <input id="bid" type="number" class="w-full p-3 mt-1 mb-3 border border-slate-200 rounded-xl" placeholder="e.g. 90000">
-        <button onclick="submitBid()" class="w-full text-white py-3 rounded-xl font-bold" style="background:linear-gradient(135deg,#ea6a1e,#c2410c)">Boli daalo</button>
-        <div id="bidMsg" class="text-sm mt-2"></div>
+      <div class="rounded-xl p-3 text-sm" style="background:#fff7ed;border:1px solid #fed7aa;color:#9a3412">
+        🔒 <b>Boli daalne ke liye apna personal secure link kholo</b> — organizer ne aapko WhatsApp par bheja hai (<span class="font-mono">…/cm/…</span>). Us link se boli sirf <b>aapke apne naam</b> se register hoti hai, isliye koi aur aapke naam boli nahi daal sakta.
       </div>
       <!-- Live bids — sabko dikhe (transparency) -->
       <div class="mt-4 pt-3 border-t">
@@ -104,16 +96,6 @@
 </div>
 <script>
 var UUID="{{ c.public_uuid }}";
-async function submitBid(){
-  var m=document.getElementById("member").value, b=document.getElementById("bid").value;
-  var msg=document.getElementById("bidMsg");
-  if(!m){msg.textContent="Naam chuno";msg.className="text-sm mt-2 text-red-600";return;}
-  if(!b){msg.textContent="Boli amount daalo";msg.className="text-sm mt-2 text-red-600";return;}
-  try{ var r=await fetch("/c/"+UUID+"/bid/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member:m,bid_amount:b})});
-    var d=await r.json(); if(r.ok){msg.textContent="✓ Boli daal di — ₹"+Number(b).toLocaleString('en-IN')+". Organizer band karenge to result aayega.";msg.className="text-sm mt-2 text-green-600";}
-    else {msg.textContent=d.detail||"Error";msg.className="text-sm mt-2 text-red-600";} }
-  catch(e){msg.textContent="Network error";msg.className="text-sm mt-2 text-red-600";}
-}
 async function submitJoin(){
   var n=document.getElementById("jname").value, p=document.getElementById("jphone").value, m=document.getElementById("jmsg").value;
   var msg=document.getElementById("joinMsg");

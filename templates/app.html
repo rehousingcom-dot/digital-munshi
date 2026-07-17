@@ -147,6 +147,13 @@ function dmInstallApp(){ if(__dmInstall){__dmInstall.prompt();__dmInstall.userCh
     aside button{ padding-top:10px; padding-bottom:10px; }
     /* grids jo md pe multi-col hain, mobile pe 1-col already; ensure inputs full width */
     main input, main select, main textarea{ max-width:100%; }
+    /* modals mobile pe fit + scroll (kabhi screen se bahar na jaayein) */
+    .fixed.inset-0 > .card, .fixed.inset-0 > div > .card{ max-width:96vw !important; }
+    .fixed.inset-0 .card{ max-height:92vh; overflow-y:auto; }
+    /* touch targets thode bade */
+    main button{ min-height:38px; }
+    /* tap highlight clean */
+    button, a{ -webkit-tap-highlight-color: rgba(234,106,30,.15); }
   }
 </style>
 </head>
@@ -544,8 +551,8 @@ function Dashboard({onNav}){
     receivables:{label:t("To Collect","लेना है"),icon:"coins",accent:"#0891b2",val:money(d.cash_flow.receivables),sub:<span className="text-slate-400">{t("from customers","ग्राहकों से बकाया")}</span>},
     payables:{label:t("To Pay","देना है"),icon:"profit",accent:"#dc2626",val:money(d.cash_flow.payables),sub:<span className="text-slate-400">{t("to suppliers","सप्लायर को देना")}</span>},
     tax:{label:t("Tax Collected","टैक्स जमा"),icon:"tax",accent:"#7C3AED",val:money(s.total_tax),sub:<span className="text-slate-400">GST</span>},
-    invoices:{label:t("Invoices","इनवॉइस"),icon:"invoices",accent:"#7C3AED",val:s.invoice_count,sub:<span className="text-slate-400">{t("ththis month","इस महीने")}</span>},
-    purchases:{label:t("Purchases","खरीद"),icon:"vouchers",accent:"#d97706",val:money(s.total_purchases),sub:<span className="text-slate-400">{t("ththis month","इस महीने")}</span>},
+    invoices:{label:t("Invoices","इनवॉइस"),icon:"invoices",accent:"#7C3AED",val:s.invoice_count,sub:<span className="text-slate-400">{t("this month","इस महीने")}</span>},
+    purchases:{label:t("Purchases","खरीद"),icon:"vouchers",accent:"#d97706",val:money(s.total_purchases),sub:<span className="text-slate-400">{t("this month","इस महीने")}</span>},
     stock_value:{label:"Stock Value",icon:"items",accent:"#0891b2",val:money(s.stock_value),sub:<span className="text-slate-400">current</span>},
   };
   const W=(k)=>{ const w=WIDGETS[k]; if(!w) return null; return (
